@@ -1,0 +1,32 @@
+{
+  "name": "il-wishlist-registry",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Israeli baby gift registry POC. Hebrew, RTL, no money custody.",
+  "workspaces": [
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@il-registry/web",
+    "dev:bg": "node tools/dev-bg.mjs",
+    "dev:stop": "pkill -f 'next dev' || true",
+    "build": "npm run build --workspace=@il-registry/web",
+    "lint": "npm run lint --workspace=@il-registry/web",
+    "typecheck": "npm run typecheck --workspace=@il-registry/web",
+    "format": "prettier --write \"**/*.{ts,tsx,css,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,css,json,md}\"",
+    "services:up": "docker compose up -d db mailpit api",
+    "services:down": "docker compose down",
+    "services:logs": "docker compose logs -f api",
+    "full:up": "docker compose --profile full up -d",
+    "harvest": "python3 tools/harvest_catalog.py",
+    "fixtures": "node tools/build_fixtures.mjs",
+    "shoot": "node tools/shoot.mjs"
+  },
+  "devDependencies": {
+    "prettier": "^3.4.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

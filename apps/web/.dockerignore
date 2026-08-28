@@ -1,0 +1,6 @@
+node_modules
+.next
+AGENTS.md
+CLAUDE.md
+.env
+.env.local

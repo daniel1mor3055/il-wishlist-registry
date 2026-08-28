@@ -1,0 +1,86 @@
+# Local development topology (D21).
+#
+# `db`, `mailpit` and `api` run in Docker. The web dev server runs on the host,
+# because containerising a Next dev server on macOS pays a cost on every edit
+# cycle through the VM file-watching boundary. The `web` service below exists
+# behind the `full` profile so the whole-topology check is still one command.
+#
+#   npm run services:up   -> db + mailpit + api
+#   npm run dev           -> web on the host, against localhost:8000
+#   npm run full:up       -> everything in Docker, including web
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: registry
+      POSTGRES_PASSWORD: registry
+      POSTGRES_DB: registry
+    ports:
+      # 5433 on the host: 5432 is commonly taken by another project's Postgres.
+      # Inside the network the port is still 5432, so DATABASE_URL is unaffected.
+      - "5433:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U registry -d registry"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Catches the magic-link emails from C4. Web UI on 8025.
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    environment:
+      MP_MAX_MESSAGES: 200
+
+  api:
+    build:
+      context: ./services/api
+    environment:
+      APP_ENV: local
+      LOG_LEVEL: info
+      DATABASE_URL: postgresql+psycopg://registry:registry@db:5432/registry
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+    ports:
+      - "8000:8000"
+    volumes:
+      # Bind mount for --reload. Small Python tree, no node_modules.
+      - ./services/api:/srv
+    depends_on:
+      db:
+        condition: service_healthy
+      mailpit:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          'python -c "import urllib.request; urllib.request.urlopen(''http://localhost:8000/health'')"',
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  web:
+    profiles: ["full"]
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    environment:
+      APP_ENV: local
+      # Server-side only. Must never be prefixed NEXT_PUBLIC_.
+      API_INTERNAL_URL: http://api:8000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_started
+
+volumes:
+  db_data:

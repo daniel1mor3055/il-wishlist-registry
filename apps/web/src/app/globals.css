@@ -1,0 +1,120 @@
+@import "tailwindcss";
+
+/* Design tokens: PRD section 9. This block is the only place a colour, radius
+   or type size is defined. A hex literal anywhere under src/components is a bug. */
+@theme {
+  --color-bg: #fdfcfa;
+  --color-surface: #ffffff;
+  --color-ink: #1f1d1b;
+  --color-ink-muted: #6b6560;
+  --color-primary: #2f6f62;
+  --color-accent: #e5a24b;
+  --color-success: #3e7d55;
+  --color-muted: #9a938c;
+  --color-border: #e8e3dc;
+
+  /* Tints derived from the palette, used for badge and panel fills. */
+  --color-primary-tint: #eaf1ef;
+  --color-accent-tint: #fbf1e2;
+  --color-accent-ink: #b47420;
+  --color-neutral-tint: #f4f1ec;
+  --color-panel: #f6f4f0;
+  --color-image-bg: #f1ece4;
+  --color-meter-track: #f1ece4;
+
+  --radius-card: 16px;
+  --radius-btn: 12px;
+
+  /* Type scale: H1 28, H2 22, H3 18, body 16, small 14. Line height 1.5
+     throughout, because Hebrew needs the leading and the PRD fixes it. */
+  --text-h1: 28px;
+  --text-h1--line-height: 1.5;
+  --text-h2: 22px;
+  --text-h2--line-height: 1.5;
+  --text-h3: 18px;
+  --text-h3--line-height: 1.5;
+  --text-body: 16px;
+  --text-body--line-height: 1.5;
+  --text-small: 14px;
+  --text-small--line-height: 1.5;
+  --text-tiny: 13px;
+  --text-tiny--line-height: 1.5;
+  --text-micro: 12px;
+  --text-micro--line-height: 1.4;
+
+  --font-sans: var(--font-heebo), system-ui, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Prices, phone numbers and Latin brand tokens are LTR runs inside RTL text
+   and must never break across lines (PRD section 8). */
+.ltr-token {
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+}
+
+.hide-scroll {
+  scrollbar-width: none;
+}
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.animate-sheet {
+  animation: sheet-in 0.32s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.animate-fade {
+  animation: fade-in 0.24s ease-out;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-toast {
+  animation: toast-in 0.22s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-sheet,
+  .animate-fade,
+  .animate-toast {
+    animation: none;
+  }
+}

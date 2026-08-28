@@ -1,0 +1,31 @@
+[project]
+name = "il-registry-api"
+version = "0.1.0"
+description = "Israeli baby gift registry API. No money custody, ever (D11)."
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.115.6",
+    "uvicorn[standard]==0.34.0",
+    "pydantic==2.10.4",
+    "pydantic-settings==2.7.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff==0.8.6",
+    "pytest==8.3.4",
+    "httpx==0.28.1",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# So `pytest` works the same as `python -m pytest`, which would otherwise be the
+# only invocation that puts the service root on sys.path.
+pythonpath = ["."]

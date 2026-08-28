@@ -36,6 +36,22 @@ Resolved from [council/consolidation.md](council/consolidation.md). These supers
 
 Consequence worth stating plainly: because of D11 and D12, the product is a **coordination layer**, not a commerce layer. Our screens never take a card. Trust design therefore shifts from "this checkout is secure" to "this page is really from Noa and Itai, and we are not asking you for money."
 
+## Locked, round three (implementation)
+
+Resolved from [council/impl-consolidation.md](council/impl-consolidation.md) and the decisions taken with the human before writing code. These are implementation decisions; the product decisions above are unchanged.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D19 | The implementation phase is open | Supersedes D10, which read "this phase produces docs only, no application code". Docs remain the source of truth for behaviour; the repo now also contains the POC. | LOCKED |
+| D20 | Stack | Monorepo. `apps/web` is Next.js App Router, TypeScript, Tailwind v4. `services/api` is Python, FastAPI, SQLAlchemy, Alembic, internally modularised as `registry`, `catalog`, `gifting`, `identity`. Postgres. | LOCKED |
+| D21 | Dev topology | Docker Compose owns `db`, `mailpit` and `api`. The web dev server runs on the host, because containerising a Next dev server on macOS costs every edit cycle through the VM file-watching boundary. A `full` compose profile also runs `web` for the whole-topology check. Docker was a preference, not a requirement. | LOCKED |
+| D22 | Catalog is a live-harvested seed | Closes O1. All four chains run Shopify and serve `products.json` with no rate limiting and no auth, verified. We harvest real products once into a versioned snapshot and seed from it, so the data and the schema are real while the runtime has no external dependency. `CatalogPort` keeps two implementations: the harvested seed (default) and live Shopify (proven, used for re-harvesting and for the paste-a-link resolver). | LOCKED |
+| D23 | Security is explicitly deferred | The magic link is a stub to make the POC work, not an identity design. No database-level read isolation, no rate limiting, no hardening pass in the POC. We revisit identity and security as its own piece of work with a real identity provider. Nothing in the POC may make that harder, but nothing waits for it either. | LOCKED |
+| D24 | The Figma Make render is a north star, not a contract | It is a visualisation of where we are heading. Where implementation reality and the render disagree, implementation reality wins and the deviation gets recorded. The device mockup, the fake iOS status bar and the home indicator are artifacts of how Make previews a design and are not part of the product. | LOCKED |
+| D25 | Eight checkpoints, not six | C3 split into the double-buy core and the money surface; the couple editor split into three by capability; hardening last. The reserve path is the product, and it was sized like a form. | LOCKED |
+
+Resolved open questions: **O1** is closed by D22.
+
 ## Target retailers
 
 Design content should look like these chains. None of them is integrated in this phase; all catalog data is mock.

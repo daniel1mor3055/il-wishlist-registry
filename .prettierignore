@@ -1,0 +1,12 @@
+node_modules/
+.next/
+# Generated from the catalog snapshot; regenerate rather than reformat.
+apps/web/src/lib/fixtures/registries.ts
+services/api/seed/catalog_snapshot.json
+package-lock.json
+
+# Hand-written prose. Hebrew copy, RTL-aware tables and deliberate line breaks
+# that Prettier's markdown printer rewrites. Reviewed by reading, not by a
+# formatter; README stays formatted because it is mostly structure.
+docs/
+.cursor/
