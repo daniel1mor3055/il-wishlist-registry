@@ -90,9 +90,12 @@ class ShippingAddressView(BaseModel):
 
     recipient_name: str
     street: str
+    entrance: str | None
+    floor: str | None
     apartment: str | None
     city: str | None
     postal_code: str | None
+    notes: str | None
     #: Ready to paste into the shop's checkout. Newlines, not commas, so a
     #: guest tapping paste fills the fields the way a handwritten address would.
     copy_text: str

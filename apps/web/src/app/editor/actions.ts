@@ -64,7 +64,10 @@ export type CreateInput = {
   dueDate: string | null;
   city: string | null;
   shippingStreet: string | null;
+  shippingEntrance: string | null;
+  shippingFloor: string | null;
   shippingApartment: string | null;
+  shippingNotes: string | null;
   shippingPostalCode: string | null;
   starterCategories: string[];
   includeEnvelope: boolean;
@@ -86,7 +89,10 @@ export async function createRegistry(input: CreateInput): Promise<ActionResult> 
 export type RegistryPatchInput = {
   city?: string | null;
   shippingStreet?: string | null;
+  shippingEntrance?: string | null;
+  shippingFloor?: string | null;
   shippingApartment?: string | null;
+  shippingNotes?: string | null;
   shippingPostalCode?: string | null;
 };
 

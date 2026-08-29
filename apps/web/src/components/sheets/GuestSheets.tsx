@@ -231,13 +231,18 @@ function ShippingAddressReveal({
         <div className="flex min-w-0 flex-col gap-0.5 text-small text-ink">
           <span className="font-bold">{address.recipientName}</span>
           <span>{address.street}</span>
-          {address.apartment && <span>{address.apartment}</span>}
+          {address.entrance && <span>{copy.handoff.entranceLine(address.entrance)}</span>}
+          {address.floor && <span>{copy.handoff.floorLine(address.floor)}</span>}
+          {address.apartment && (
+            <span>{copy.handoff.apartmentLine(address.apartment)}</span>
+          )}
           {address.city && <span>{address.city}</span>}
           {address.postalCode && (
             <span className="ltr-token" dir="ltr">
               {address.postalCode}
             </span>
           )}
+          {address.notes && <span className="text-ink-muted">{address.notes}</span>}
         </div>
         <button
           type="button"

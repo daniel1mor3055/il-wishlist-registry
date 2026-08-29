@@ -13,20 +13,29 @@ import { copy } from "@/lib/copy";
  */
 export function AddressForm({
   street,
+  entrance,
+  floor,
   apartment,
   city,
   postalCode,
+  notes,
 }: {
   street: string | null;
+  entrance: string | null;
+  floor: string | null;
   apartment: string | null;
   city: string | null;
   postalCode: string | null;
+  notes: string | null;
 }) {
   const [value, setValue] = useState<AddressValue>({
     street: street ?? "",
+    entrance: entrance ?? "",
+    floor: floor ?? "",
     apartment: apartment ?? "",
     city: city ?? "",
     postalCode: postalCode ?? "",
+    notes: notes ?? "",
   });
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
@@ -38,9 +47,12 @@ export function AddressForm({
     startTransition(async () => {
       const result = await patchRegistry({
         shippingStreet: value.street.trim() || null,
+        shippingEntrance: value.entrance.trim() || null,
+        shippingFloor: value.floor.trim() || null,
         shippingApartment: value.apartment.trim() || null,
         city: value.city.trim() || null,
         shippingPostalCode: value.postalCode.trim() || null,
+        shippingNotes: value.notes.trim() || null,
       });
       if (result.ok) setSaved(true);
       else setError(result.error);

@@ -56,7 +56,9 @@ def test_the_wizard_creates_an_unpublished_list(client: TestClient, owner: dict[
             "dueDate": "2026-11-01",
             "city": "חיפה",
             "shippingStreet": "הרצל 1",
-            "shippingApartment": "דירה 3",
+            "shippingEntrance": "א",
+            "shippingFloor": "2",
+            "shippingApartment": "3",
         },
     )
 
@@ -474,12 +476,19 @@ def test_shipping_address_is_saved_but_not_published(
         headers=headers,
         json={
             "shippingStreet": "הרצל 15",
-            "shippingApartment": "כניסה ב, דירה 4",
+            "shippingEntrance": "ב",
+            "shippingFloor": "4",
+            "shippingApartment": "12",
+            "shippingNotes": "הכניסה מאחורי המאפייה",
             "shippingPostalCode": "6100000",
             "city": "חיפה",
         },
     ).json()
     assert saved["shippingStreet"] == "הרצל 15"
+    assert saved["shippingEntrance"] == "ב"
+    assert saved["shippingFloor"] == "4"
+    assert saved["shippingApartment"] == "12"
+    assert saved["shippingNotes"] == "הכניסה מאחורי המאפייה"
     assert saved["city"] == "חיפה"
 
     public = client.get(f"/api/v1/public/registries/{registry.slug}").json()

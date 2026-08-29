@@ -33,8 +33,11 @@ export function CreateWizard() {
   const [dueDate, setDueDate] = useState("");
   const [city, setCity] = useState("");
   const [street, setStreet] = useState("");
+  const [entrance, setEntrance] = useState("");
+  const [floor, setFloor] = useState("");
   const [apartment, setApartment] = useState("");
   const [postalCode, setPostalCode] = useState("");
+  const [notes, setNotes] = useState("");
   const [starters, setStarters] = useState<Category[]>([]);
   const [envelope, setEnvelope] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +59,10 @@ export function CreateWizard() {
         dueDate: dueDate || null,
         city: city.trim() || null,
         shippingStreet: street.trim() || null,
+        shippingEntrance: entrance.trim() || null,
+        shippingFloor: floor.trim() || null,
         shippingApartment: apartment.trim() || null,
+        shippingNotes: notes.trim() || null,
         shippingPostalCode: postalCode.trim() || null,
         starterCategories: starters,
         includeEnvelope: envelope,
@@ -102,12 +108,15 @@ export function CreateWizard() {
             />
           </Field>
           <AddressFields
-            value={{ street, apartment, city, postalCode }}
+            value={{ street, entrance, floor, apartment, city, postalCode, notes }}
             onChange={(next) => {
               setStreet(next.street);
+              setEntrance(next.entrance);
+              setFloor(next.floor);
               setApartment(next.apartment);
               setCity(next.city);
               setPostalCode(next.postalCode);
+              setNotes(next.notes);
             }}
           />
         </div>

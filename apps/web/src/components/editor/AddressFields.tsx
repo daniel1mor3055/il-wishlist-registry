@@ -3,17 +3,23 @@ import { Field, inputClass } from "@/components/editor/EditorShell";
 import { copy } from "@/lib/copy";
 
 /**
- * Street, apartment, city, postal code.
+ * The Israeli address the guest copies at checkout (D49).
  *
  * Shared by the create wizard and the later-edit screen so the couple is
- * never asked these four questions in two different shapes. City is also the
- * public caption on the guest page; the other three are private (D49).
+ * never asked these questions in two different shapes. City is also the
+ * public caption on the guest page; everything else here is private.
+ *
+ * כניסה, קומה and דירה are three fields, not one. הערות נוספות is for the
+ * building that does not fit those three.
  */
 export type AddressValue = {
   street: string;
+  entrance: string;
+  floor: string;
   apartment: string;
   city: string;
   postalCode: string;
+  notes: string;
 };
 
 export function AddressFields({
@@ -26,8 +32,10 @@ export function AddressFields({
   /** Wizard needs the heading; the later-edit screen already has its own. */
   showIntro?: boolean;
 }) {
-  const set = (field: keyof AddressValue) => (event: ChangeEvent<HTMLInputElement>) =>
-    onChange({ ...value, [field]: event.target.value });
+  const set =
+    (field: keyof AddressValue) =>
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
+      onChange({ ...value, [field]: event.target.value });
 
   return (
     <div className="flex flex-col gap-4">
@@ -50,14 +58,32 @@ export function AddressFields({
         />
       </Field>
 
-      <Field label={copy.editor.wizard.apartmentLabel}>
-        <input
-          value={value.apartment}
-          onChange={set("apartment")}
-          placeholder={copy.editor.wizard.apartmentPlaceholder}
-          className={inputClass}
-        />
-      </Field>
+      <div className="grid grid-cols-3 gap-2">
+        <Field label={copy.editor.wizard.entranceLabel}>
+          <input
+            value={value.entrance}
+            onChange={set("entrance")}
+            placeholder={copy.editor.wizard.entrancePlaceholder}
+            className={inputClass}
+          />
+        </Field>
+        <Field label={copy.editor.wizard.floorLabel}>
+          <input
+            value={value.floor}
+            onChange={set("floor")}
+            placeholder={copy.editor.wizard.floorPlaceholder}
+            className={inputClass}
+          />
+        </Field>
+        <Field label={copy.editor.wizard.apartmentLabel}>
+          <input
+            value={value.apartment}
+            onChange={set("apartment")}
+            placeholder={copy.editor.wizard.apartmentPlaceholder}
+            className={inputClass}
+          />
+        </Field>
+      </div>
 
       <Field label={copy.editor.wizard.cityLabel}>
         <input
@@ -77,6 +103,16 @@ export function AddressFields({
           autoComplete="postal-code"
           className={`${inputClass} ltr-token`}
           dir="ltr"
+        />
+      </Field>
+
+      <Field label={copy.editor.wizard.notesLabel} hint={copy.editor.wizard.notesHint}>
+        <textarea
+          value={value.notes}
+          onChange={set("notes")}
+          placeholder={copy.editor.wizard.notesPlaceholder}
+          rows={2}
+          className={`${inputClass} resize-none`}
         />
       </Field>
     </div>

@@ -481,23 +481,35 @@ def reveal_shipping_address(session: Session, *, slug: str) -> ShippingAddressVi
     if not street:
         raise GiftingError("shipping_address_unset", 404)
 
+    entrance = (registry.shipping_entrance or "").strip() or None
+    floor = (registry.shipping_floor or "").strip() or None
     apartment = (registry.shipping_apartment or "").strip() or None
     city = (registry.city or "").strip() or None
     postal = (registry.shipping_postal_code or "").strip() or None
+    notes = (registry.shipping_notes or "").strip() or None
 
     lines = [registry.couple_names, street]
+    if entrance:
+        lines.append(f"כניסה {entrance}")
+    if floor:
+        lines.append(f"קומה {floor}")
     if apartment:
-        lines.append(apartment)
+        lines.append(f"דירה {apartment}")
     if city:
         lines.append(city)
     if postal:
         lines.append(postal)
+    if notes:
+        lines.append(notes)
 
     return ShippingAddressView(
         recipient_name=registry.couple_names,
         street=street,
+        entrance=entrance,
+        floor=floor,
         apartment=apartment,
         city=city,
         postal_code=postal,
+        notes=notes,
         copy_text="\n".join(lines),
     )

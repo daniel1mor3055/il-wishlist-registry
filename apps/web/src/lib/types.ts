@@ -132,9 +132,12 @@ export interface PaymentHandle {
 export interface ShippingAddress {
   recipientName: string;
   street: string;
+  entrance: string | null;
+  floor: string | null;
   apartment: string | null;
   city: string | null;
   postalCode: string | null;
+  notes: string | null;
   copyText: string;
 }
 
@@ -190,7 +193,10 @@ export interface OwnerRegistry {
   babyName: string | null;
 
   shippingStreet: string | null;
+  shippingEntrance: string | null;
+  shippingFloor: string | null;
   shippingApartment: string | null;
+  shippingNotes: string | null;
   shippingPostalCode: string | null;
 
   /** Null means guests get "not found" on the link, including the couple (D30). */

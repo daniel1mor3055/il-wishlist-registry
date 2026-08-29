@@ -103,7 +103,7 @@ Emotional register: guest surfaces read like a message from friends. First perso
 | ID | Screen | Job | Primary CTA |
 |---|---|---|---|
 | C0 | Get in | One email field, no password. A mailed one-time link, and a note that it is valid for twenty minutes. Says nothing about whether the address is known (D43) | `לשלוח לי קישור` |
-| C1 | Create wizard, 3 steps | `איך לקרוא לכם` → `התאריך המשוער ללידה` + optional shipping address (street, apartment, city, postal; city is also the public caption) → `מאיפה נתחיל` (starter categories or blank, and the envelope offered). Address is skippable; the street is private (D49) | `ליצור את הרשימה` |
+| C1 | Create wizard, 3 steps | `איך לקרוא לכם` → `התאריך המשוער ללידה` + optional shipping address (street, entrance, floor, apartment, city, postal, notes; city is also the public caption) → `מאיפה נתחיל` (starter categories or blank, and the envelope offered). Address is skippable; the street is private (D49) | `ליצור את הרשימה` |
 | C2 | Editor home | The list, the progress line, and while `published_at` is null an unpublished banner with `לפרסם את הרשימה`. This banner is the only place unpublished is ever surfaced (D30). Once published it shows the link and a copy button; the full share surface is C8. Drag to reorder is not built yet | `להוסיף פריט` |
 | C3 | Add item | Tabs: `מהחנויות` (search the harvested catalog), `משהו אחר` (title, price, category, a link as plain text). `להדביק קישור` with a parsed preview needs the resolver and lands with it | `להוסיף לרשימה` |
 | C4 | Item settings | Quantity with a floor at what guests already hold, couple note, `לאפשר מתנה משותפת` with a hint above ₪400. Controls the couple may not undo are disabled with the reason beside them (D45) | `לשמור` |

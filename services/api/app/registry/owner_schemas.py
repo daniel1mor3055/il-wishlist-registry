@@ -81,7 +81,10 @@ class OwnerRegistry(BaseModel):
     baby_name: str | None
 
     shipping_street: str | None
+    shipping_entrance: str | None
+    shipping_floor: str | None
     shipping_apartment: str | None
+    shipping_notes: str | None
     shipping_postal_code: str | None
 
     published_at: datetime | None
@@ -110,7 +113,10 @@ class CreateRegistryRequest(BaseModel):
     due_date: date | None = None
     city: str | None = Field(default=None, max_length=80)
     shipping_street: str | None = Field(default=None, max_length=160)
+    shipping_entrance: str | None = Field(default=None, max_length=40)
+    shipping_floor: str | None = Field(default=None, max_length=40)
     shipping_apartment: str | None = Field(default=None, max_length=80)
+    shipping_notes: str | None = Field(default=None, max_length=300)
     shipping_postal_code: str | None = Field(default=None, max_length=10)
     #: "מאיפה נתחיל": categories to pre-fill from the catalog, or none for blank.
     starter_categories: list[Category] = Field(default_factory=list, max_length=6)
@@ -122,7 +128,15 @@ class CreateRegistryRequest(BaseModel):
     def _trim_required(cls, value: str) -> str:
         return value.strip()
 
-    @field_validator("city", "shipping_street", "shipping_apartment", "shipping_postal_code")
+    @field_validator(
+        "city",
+        "shipping_street",
+        "shipping_entrance",
+        "shipping_floor",
+        "shipping_apartment",
+        "shipping_notes",
+        "shipping_postal_code",
+    )
     @classmethod
     def _blank_to_none(cls, value: str | None) -> str | None:
         stripped = value.strip() if value else value
@@ -140,7 +154,10 @@ class RegistryPatch(BaseModel):
     due_date: date | None = None
     baby_name: str | None = Field(default=None, max_length=80)
     shipping_street: str | None = Field(default=None, max_length=160)
+    shipping_entrance: str | None = Field(default=None, max_length=40)
+    shipping_floor: str | None = Field(default=None, max_length=40)
     shipping_apartment: str | None = Field(default=None, max_length=80)
+    shipping_notes: str | None = Field(default=None, max_length=300)
     shipping_postal_code: str | None = Field(default=None, max_length=10)
     payment_method: Literal["bit", "paybox"] | None = None
     payment_handle: str | None = Field(default=None, max_length=40)
@@ -149,7 +166,10 @@ class RegistryPatch(BaseModel):
     @field_validator(
         "city",
         "shipping_street",
+        "shipping_entrance",
+        "shipping_floor",
         "shipping_apartment",
+        "shipping_notes",
         "shipping_postal_code",
         "payment_handle",
         "payment_display_name",

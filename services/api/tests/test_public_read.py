@@ -81,12 +81,16 @@ def test_private_fields_never_appear_anywhere_in_the_payload(client: TestClient,
 
     assert "050-123-4567" not in raw
     assert "דיזנגוף 99" not in raw
+    assert "קוד לבניין 4580" not in raw
     for forbidden in (
         "paymentHandle",
         "payment_handle",
         "shippingStreet",
         "shipping_street",
         "shippingApartment",
+        "shippingEntrance",
+        "shippingFloor",
+        "shippingNotes",
         "shippingPostalCode",
         "giver",
         "blessing",

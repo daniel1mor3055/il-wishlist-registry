@@ -129,7 +129,7 @@ not already know where to send the box.
 
 | # | Decision | Detail | Status |
 |---|---|---|---|
-| D49 | Shipping address is a D13-style reveal, not a shipping product | Guests still buy at the chain. The couple may optionally store a street, apartment and postal code so a guest on the product handoff can copy them. City stays the public caption it already is (`תל אביב · נשלח אחרי הלידה`). The street is absent from the public payload and is fetched only when the guest taps `צריכים את כתובת המשלוח של…`, and the sheet says the address does not transfer into the shop. Presence is a boolean (`hasShippingAddress`) so a list with no street does not offer a dead link. We still never ship, track, or collect a guest address. | LOCKED |
+| D49 | Shipping address is a D13-style reveal, not a shipping product | Guests still buy at the chain. The couple may optionally store a street, entrance, floor, apartment, postal code and a free-text note so a guest on the product handoff can copy them. City stays the public caption it already is (`תל אביב · נשלח אחרי הלידה`). כניסה, קומה and דירה are three fields; `הערות נוספות` is for the building that does not fit those three. The street is absent from the public payload and is fetched only when the guest taps `צריכים את כתובת המשלוח של…`, and the sheet says the address does not transfer into the shop. Presence is a boolean (`hasShippingAddress`) so a list with no street does not offer a dead link. We still never ship, track, or collect a guest address. | LOCKED |
 
 ## Target retailers
 

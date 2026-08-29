@@ -27,10 +27,15 @@ def test_the_address_is_revealed_only_by_its_own_request(
     assert revealed.json() == {
         "recipientName": "נועה ואיתי",
         "street": "דיזנגוף 99",
-        "apartment": "דירה 12",
+        "entrance": "ב",
+        "floor": "3",
+        "apartment": "12",
         "city": "תל אביב",
         "postalCode": "6433228",
-        "copyText": "נועה ואיתי\nדיזנגוף 99\nדירה 12\nתל אביב\n6433228",
+        "notes": "קוד לבניין 4580",
+        "copyText": (
+            "נועה ואיתי\nדיזנגוף 99\nכניסה ב\nקומה 3\nדירה 12\nתל אביב\n6433228\nקוד לבניין 4580"
+        ),
     }
     assert page.json()["hasShippingAddress"] is True
     assert "דיזנגוף 99" not in page.text
@@ -40,7 +45,10 @@ def test_city_alone_is_not_a_shipping_address(client: TestClient, session: Sessi
     """The public caption is not enough to fill a checkout form."""
     registry = make_registry(session)
     registry.shipping_street = None
+    registry.shipping_entrance = None
+    registry.shipping_floor = None
     registry.shipping_apartment = None
+    registry.shipping_notes = None
     registry.shipping_postal_code = None
     session.flush()
 

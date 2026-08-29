@@ -14,14 +14,25 @@ export default async function AddressPage() {
   if (!state.signedIn) redirect("/editor/enter");
   if (!state.registry) redirect("/editor/new");
 
-  const { city, shippingStreet, shippingApartment, shippingPostalCode } = state.registry;
+  const {
+    city,
+    shippingStreet,
+    shippingEntrance,
+    shippingFloor,
+    shippingApartment,
+    shippingNotes,
+    shippingPostalCode,
+  } = state.registry;
 
   return (
     <EditorShell title={copy.editor.address.title} back="/editor">
       <AddressForm
         city={city}
         street={shippingStreet}
+        entrance={shippingEntrance}
+        floor={shippingFloor}
         apartment={shippingApartment}
+        notes={shippingNotes}
         postalCode={shippingPostalCode}
       />
     </EditorShell>

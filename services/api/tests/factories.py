@@ -91,7 +91,10 @@ def make_registry(
         # Private (D13, D49). Present precisely so the read tests can prove they
         # never leave the database.
         shipping_street="דיזנגוף 99",
-        shipping_apartment="דירה 12",
+        shipping_entrance="ב",
+        shipping_floor="3",
+        shipping_apartment="12",
+        shipping_notes="קוד לבניין 4580",
         shipping_postal_code="6433228",
         payment_method="bit",
         payment_handle="050-123-4567",
