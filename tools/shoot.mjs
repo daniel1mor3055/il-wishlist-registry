@@ -76,6 +76,20 @@ const SCENES = {
     { require: "הפריט נשמר לך" },
     { shot: "sheet-handoff" },
   ],
+  "handoff-address": [
+    { goto: MAIN },
+    { click: PRODUCT, nth: 0 },
+    { wait: 400 },
+    { text: "אני קונה את זה" },
+    { wait: 600 },
+    { require: "הפריט נשמר לך" },
+    { require: "כתובת המשלוח" },
+    { text: "כתובת המשלוח" },
+    { wait: 800 },
+    { require: "דיזנגוף 99" },
+    { require: "לא עוברת אוטומטית" },
+    { shot: "sheet-handoff-address" },
+  ],
   report: [
     { goto: MAIN },
     { click: PRODUCT, nth: 0 },
@@ -299,6 +313,8 @@ const SCENES = {
     { shot: "editor-wizard-names" },
     { text: "הלאה" },
     { wait: 300 },
+    { require: "כתובת למשלוח" },
+    { shot: "editor-wizard-address" },
     { text: "הלאה" },
     { wait: 300 },
     { require: "מאיפה נתחיל?" },
@@ -353,6 +369,18 @@ const SCENES = {
     { wait: 2000 },
     { require: "אורחים כבר השתתפו בסכום" },
     { shot: "editor-item-locked" },
+  ],
+  /** The street guests copy at the shop. Same fields as wizard step 2. */
+  "editor-address": [
+    { goto: "/editor/enter" },
+    { type: DEMO_COUPLE, into: "input[type='email']" },
+    { text: "לשלוח לי קישור" },
+    { wait: 1000 },
+    { mail: DEMO_COUPLE },
+    { goto: "/editor/address" },
+    { require: "כתובת למשלוח" },
+    { require: "אורחים שקונים בחנות" },
+    { shot: "editor-address" },
   ],
 };
 

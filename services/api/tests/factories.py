@@ -88,8 +88,11 @@ def make_registry(
         baby_name="יעל",
         published_at=now if published else None,
         closed_at=now if closed else None,
-        # Private (D13). Present precisely so the read tests can prove it never
-        # leaves the database.
+        # Private (D13, D49). Present precisely so the read tests can prove they
+        # never leave the database.
+        shipping_street="דיזנגוף 99",
+        shipping_apartment="דירה 12",
+        shipping_postal_code="6433228",
         payment_method="bit",
         payment_handle="050-123-4567",
         payment_display_name="נועה",

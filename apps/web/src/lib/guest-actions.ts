@@ -2,6 +2,7 @@ import type {
   ContributionView,
   PaymentHandle,
   ReservationView,
+  ShippingAddress,
   WriteResult,
 } from "./types";
 
@@ -171,6 +172,21 @@ export async function fetchPaymentHandle(
     });
     if (!response.ok) return { ok: false, code: await codeFrom(response) };
     return { ok: true, data: (await response.json()) as PaymentHandle };
+  } catch {
+    return { ok: false, code: NETWORK_FAILED };
+  }
+}
+
+/** The D49 reveal. A read, so it needs no key and no cookie. */
+export async function fetchShippingAddress(
+  slug: string,
+): Promise<WriteResult<ShippingAddress>> {
+  try {
+    const response = await fetch(`${base(slug)}/shipping-address`, {
+      credentials: "same-origin",
+    });
+    if (!response.ok) return { ok: false, code: await codeFrom(response) };
+    return { ok: true, data: (await response.json()) as ShippingAddress };
   } catch {
     return { ok: false, code: NETWORK_FAILED };
   }

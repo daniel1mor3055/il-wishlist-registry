@@ -79,6 +79,12 @@ export interface PublicRegistry {
   itemsTotal: number;
   itemsClaimed: number;
 
+  /**
+   * Presence only (D49). The street itself is a separate GET, like the Bit
+   * handle, so the page source cannot name where the couple lives.
+   */
+  hasShippingAddress: boolean;
+
   items: PublicItem[];
 }
 
@@ -117,6 +123,19 @@ export interface PaymentHandle {
   method: "bit" | "paybox";
   handle: string;
   displayName: string;
+}
+
+/**
+ * Revealed only when a guest on the product handoff asks (D49). Same split as
+ * the Bit handle: never part of the registry payload.
+ */
+export interface ShippingAddress {
+  recipientName: string;
+  street: string;
+  apartment: string | null;
+  city: string | null;
+  postalCode: string | null;
+  copyText: string;
 }
 
 /* ---------- the couple's own view ---------- */
@@ -169,6 +188,10 @@ export interface OwnerRegistry {
   city: string | null;
   dueDate: string | null;
   babyName: string | null;
+
+  shippingStreet: string | null;
+  shippingApartment: string | null;
+  shippingPostalCode: string | null;
 
   /** Null means guests get "not found" on the link, including the couple (D30). */
   publishedAt: string | null;

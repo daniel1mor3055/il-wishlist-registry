@@ -71,6 +71,11 @@ class Registry(Base):
     story: Mapped[str] = mapped_column(Text, default="")
     cover_image_url: Mapped[str | None] = mapped_column(String(500), default=None)
     city: Mapped[str | None] = mapped_column(String(80), default=None)
+    #: Private (D49). Revealed to a guest only on the product handoff, never in
+    #: the public payload. City above stays the public caption.
+    shipping_street: Mapped[str | None] = mapped_column(String(160), default=None)
+    shipping_apartment: Mapped[str | None] = mapped_column(String(80), default=None)
+    shipping_postal_code: Mapped[str | None] = mapped_column(String(10), default=None)
     due_date: Mapped[date | None] = mapped_column(Date, default=None)
     baby_name: Mapped[str | None] = mapped_column(String(80), default=None)
 

@@ -452,6 +452,9 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
           return (
             <HandoffSheet
               item={item}
+              coupleNames={registry.coupleNames}
+              slug={registry.slug}
+              hasShippingAddress={registry.hasShippingAddress}
               pending={reservationId === null}
               onClose={() => void abandonHold(itemId, reservationId)}
               onContinue={() => continueToChain(itemId, reservationId)}

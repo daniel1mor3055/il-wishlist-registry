@@ -2,7 +2,7 @@
 
     GET    /me/registry                 the list as its owner sees it
     POST   /me/registry                 the create wizard
-    PATCH  /me/registry                 names, story, city, payment details
+    PATCH  /me/registry                 names, story, city, shipping address, payment details
     POST   /me/registry/publish         make the link work
     POST   /me/registry/items/catalog   add from the seeded catalog
     POST   /me/registry/items/manual    add something the catalog lacks

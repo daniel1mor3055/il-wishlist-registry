@@ -88,7 +88,7 @@ Sample data for every mock: couple **נועה ואיתי** (Noa and Itai), baby 
 | G1 | Hero / land | Couple photo, names, one-line story, progress, reassurance strip, "how this works" in three lines | `לראות את הרשימה` (see the list) |
 | G2 | Item grid + filters | Chips: `הכול` / `מה שעוד חסר` / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` / `מעטפה ושוברים`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
 | G3 | Item detail sheet | Image, full name, price, chain chip, quantity line, couple note, price disclaimer | `אני קונה את זה` (I'm buying this) |
-| G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Leaving this sheet without continuing hands the unit back (D33). No name is asked here - that happens once, at G9 (D36) | `להמשיך לאתר שילב` (continue to Shilav) |
+| G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Leaving this sheet without continuing hands the unit back (D33). No name is asked here - that happens once, at G9 (D36). If the couple stored a shipping address, a link `צריכים את כתובת המשלוח של נועה ואיתי?` reveals it on tap with a copy button and the line that it does not transfer into the shop (D49) | `להמשיך לאתר שילב` (continue to Shilav) |
 | G5 | Return self-report modal | The D12 moment. `האם רכשת את הפריט?` with `כן, רכשתי` and `לא רכשתי, לשחרר את הפריט`. Dismissing the question is the third answer and keeps the hold (D35) | `כן, רכשתי` (yes, I bought it) |
 | G6 | Group gift sheet | Funding meter, `נותרו ₪550 מתוך ₪1,290`, `6 אורחים כבר השתתפו`, amount chips with a free-amount field behind `סכום אחר`, then the contact reveal | `להשתתף במתנה` (join this gift) |
 | G7 | Envelope / gift card sheet | One plain cash envelope with no target and no meter (D28), titled `חיבוק בביט / פייבוקס 💛` (D37), and voucher types. Shows what has been given so far - `נאספו עד כה ₪2,150`, `11 אורחים כבר השתתפו` - on both the card and the sheet, and nothing at all before the first gift. Amount chips, then contact reveal or outbound merchant | `לשלוח מתנה` (send a gift) |
@@ -103,11 +103,11 @@ Emotional register: guest surfaces read like a message from friends. First perso
 | ID | Screen | Job | Primary CTA |
 |---|---|---|---|
 | C0 | Get in | One email field, no password. A mailed one-time link, and a note that it is valid for twenty minutes. Says nothing about whether the address is known (D43) | `לשלוח לי קישור` |
-| C1 | Create wizard, 3 steps | `איך לקרוא לכם` → `התאריך המשוער ללידה` + city → `מאיפה נתחיל` (starter categories or blank, and the envelope offered) | `ליצור את הרשימה` |
+| C1 | Create wizard, 3 steps | `איך לקרוא לכם` → `התאריך המשוער ללידה` + optional shipping address (street, apartment, city, postal; city is also the public caption) → `מאיפה נתחיל` (starter categories or blank, and the envelope offered). Address is skippable; the street is private (D49) | `ליצור את הרשימה` |
 | C2 | Editor home | The list, the progress line, and while `published_at` is null an unpublished banner with `לפרסם את הרשימה`. This banner is the only place unpublished is ever surfaced (D30). Once published it shows the link and a copy button; the full share surface is C8. Drag to reorder is not built yet | `להוסיף פריט` |
 | C3 | Add item | Tabs: `מהחנויות` (search the harvested catalog), `משהו אחר` (title, price, category, a link as plain text). `להדביק קישור` with a parsed preview needs the resolver and lands with it | `להוסיף לרשימה` |
 | C4 | Item settings | Quantity with a floor at what guests already hold, couple note, `לאפשר מתנה משותפת` with a hint above ₪400. Controls the couple may not undo are disabled with the reason beside them (D45) | `לשמור` |
-| C5 | Envelope, vouchers and payment details | Turn the cash envelope on or off, pick voucher types, and enter the Bit or PayBox handle that D13 reveals to guests. There is nothing to name and no target to set (D28) | `לשמור` |
+| C5 | Envelope, vouchers and payment details | Turn the cash envelope on or off, pick voucher types, and enter the Bit or PayBox handle that D13 reveals to guests. The shipping address that D49 reveals at product handoff is edited here too (and already collected, optionally, in the wizard). There is nothing to name and no target to set (D28) | `לשמור` |
 | C6 | Story and cover | Photo, two-line story | `לשמור` |
 | C7 | Preview as guest | Real guest render in a device frame, banner `זו התצוגה שהאורחים רואים` | `חזרה לעריכה` |
 | C8 | Publish and share | The D14 announcement moment. WhatsApp-first, designed link-preview card, editable Hebrew message, QR for the ברית | `לשתף בוואטסאפ` |
@@ -191,7 +191,7 @@ Radius 16px cards, 12px buttons, 999px pills. Spacing on an 8pt grid. Type scale
 - Guest accounts, guest login, guest history, guest-to-guest visibility.
 - Public blessings wall or guestbook (D17).
 - Real retailer integrations, contracts, feeds, attribution panels, merchant dashboards (D18).
-- Own storefront, warehouse, shipping, gift receipts, returns, completion discounts.
+- Own storefront, warehouse, shipping, gift receipts, returns, completion discounts. Showing the couple's address to a guest who is leaving for the shop is D49, not us shipping.
 - Browser extension, baby-shower invitations, editorial content, pregnancy tracking, breast-pump flows.
 - Occasions other than baby; any English UI; native apps; dark mode.
 - Public discoverability and SEO. Lists are unlisted with a long random slug and noindex.

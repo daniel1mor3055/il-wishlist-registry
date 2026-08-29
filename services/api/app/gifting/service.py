@@ -36,7 +36,12 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.gifting.models import Blessing, Contribution, Reservation
-from app.gifting.schemas import ContributionView, PaymentHandleView, ReservationView
+from app.gifting.schemas import (
+    ContributionView,
+    PaymentHandleView,
+    ReservationView,
+    ShippingAddressView,
+)
 from app.registry.models import Registry, RegistryItem
 from app.registry.service import to_public_item
 
@@ -459,4 +464,40 @@ def reveal_payment_handle(session: Session, *, slug: str) -> PaymentHandleView:
         method=registry.payment_method,
         handle=registry.payment_handle,
         display_name=registry.payment_display_name or registry.couple_names,
+    )
+
+
+def reveal_shipping_address(session: Session, *, slug: str) -> ShippingAddressView:
+    """D49, on explicit interaction only.
+
+    Same mechanism as the Bit handle: the street is on the registry row but
+    never in `PublicRegistry`, so seeing it takes a deliberate second request.
+    A closed list still answers - a guest who already holds a unit may still
+    be at the shop - while an unpublished one is indistinguishable from a
+    wrong slug (D30).
+    """
+    registry = _load_registry(session, slug)
+    street = (registry.shipping_street or "").strip()
+    if not street:
+        raise GiftingError("shipping_address_unset", 404)
+
+    apartment = (registry.shipping_apartment or "").strip() or None
+    city = (registry.city or "").strip() or None
+    postal = (registry.shipping_postal_code or "").strip() or None
+
+    lines = [registry.couple_names, street]
+    if apartment:
+        lines.append(apartment)
+    if city:
+        lines.append(city)
+    if postal:
+        lines.append(postal)
+
+    return ShippingAddressView(
+        recipient_name=registry.couple_names,
+        street=street,
+        apartment=apartment,
+        city=city,
+        postal_code=postal,
+        copy_text="\n".join(lines),
     )

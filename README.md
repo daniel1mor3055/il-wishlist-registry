@@ -76,6 +76,7 @@ DELETE /bff/registries/{slug}/reservations/{id}              hand the unit back
 POST   /bff/registries/{slug}/items/{itemId}/contributions   record money the guest says they sent
 POST   /bff/registries/{slug}/blessings                      private message plus the guest's name
 GET    /bff/registries/{slug}/payment-handle                 the D13 reveal, on interaction only
+GET    /bff/registries/{slug}/shipping-address               the D49 reveal, on interaction only
 ```
 
 The couple's side works the other way round: `/editor` pages read the API from the server and write through server actions, because the editor is forms and navigation rather than optimistic client state (D47). Same cookie split as the guest id — the session token is `HttpOnly` on the web origin and travels to the API as `X-Session-Token` (D42).
@@ -87,6 +88,7 @@ The couple's side works the other way round: `/editor` pages read the API from t
 /editor            the list, the publish banner, the link to share
 /editor/add        search the harvested catalog, or add something by hand
 /editor/items/{id} quantity, note, group gifting, remove
+/editor/address    the street guests copy at the shop (D49)
 ```
 
 To sign in to the seeded demo list, ask for a link as `noa.itai@example.com` and open it from [Mailpit](http://localhost:8025). Any other address creates a new couple and lands in the wizard.
@@ -117,6 +119,8 @@ npm run seed             # load both into Postgres
 ## Status
 
 C5 done: the couple can now build the list a guest buys from. A magic link mailed to Mailpit and exchanged for a session (D42, D43), a three-step wizard that seeds a starter list from the harvested catalog, search over that catalog, item settings, and one button that makes the link work (D48). Before it, every registry in the product came from the seed script.
+
+The shipping address is the other half of the product handoff (D49): the couple may store a street during the wizard or later at `/editor/address`, and a guest leaving for the shop can copy it. The street is not in the public page; it is fetched only after they tap, the same split as the Bit number.
 
 The rule the editor is built around is that the couple may not edit away a guest's action (D45): quantity will not drop below what is already held, group gifting will not switch off over real contributions, and an item with history is hidden from guests rather than deleted. Ownership is a query filter, not a comparison — `/me/registry` carries no id, so someone else's item and a made-up one are the same `404`.
 

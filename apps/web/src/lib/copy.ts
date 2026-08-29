@@ -95,6 +95,12 @@ export const copy = {
     /* Hands the unit back rather than just closing the sheet (D33). */
     cancel: "ביטול",
     raceLost: RACE_LOST,
+    /* D49: the couple's street, on tap, not in the page. */
+    needAddress: (names: string) => `צריכים את כתובת המשלוח של ${names}?`,
+    addressDoesNotTransfer: "הכתובת לא עוברת אוטומטית לאתר החנות",
+    copyAddress: "העתקה",
+    copiedAddress: "הכתובת הועתקה",
+    addressLoading: "רגע…",
   },
 
   /** G5 the D12 self-report moment. */
@@ -226,6 +232,14 @@ export const copy = {
       dueDateLabel: "מתי התאריך המשוער?",
       dueDateHint: "אפשר לדלג ולהוסיף אחר כך",
       cityLabel: "עיר",
+      addressTitle: "כתובת למשלוח",
+      addressHint: "מוצגת לאורחים רק כשהם קונים בחנות, לא ברשימה עצמה. אפשר לדלג.",
+      streetLabel: "רחוב ומספר",
+      streetPlaceholder: "דיזנגוף 99",
+      apartmentLabel: "דירה / כניסה",
+      apartmentPlaceholder: "דירה 12",
+      postalLabel: "מיקוד",
+      postalPlaceholder: "6433228",
       starterTitle: "מאיפה נתחיל?",
       starterHint: "נוסיף לכם כמה פריטים מהקטגוריות שתבחרו. אפשר למחוק כל דבר אחר כך.",
       starterBlank: "להתחיל מרשימה ריקה",
@@ -244,6 +258,7 @@ export const copy = {
       addItem: "להוסיף פריט",
       addEnvelope: "להוסיף מעטפה לכסף",
       preview: "לראות איך זה נראה לאורחים",
+      address: "כתובת למשלוח",
       /* D30: the only place an unpublished list is ever named, and it is named to
          its owner, not to a guest. */
       unpublishedTitle: "הרשימה עוד לא פורסמה",
@@ -263,6 +278,15 @@ export const copy = {
       itemGroupGift: "מתנה משותפת",
       itemContributed: (amount: string) => `${amount} כבר נאספו`,
       settings: "הגדרות",
+    },
+
+    /* The street guests copy at checkout (D49). Same fields as wizard step 2. */
+    address: {
+      title: "כתובת למשלוח",
+      body: "אורחים שקונים בחנות יוכלו להעתיק את זה בקופה. זה לא מופיע ברשימה עצמה.",
+      save: "לשמור",
+      saving: "שומרים…",
+      saved: "נשמר",
     },
 
     /* ed-C3, adding. */

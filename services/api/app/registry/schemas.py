@@ -3,9 +3,11 @@
 Privacy is structural here, not a matter of discipline. These models are
 hand-written and list every field explicitly; no ORM object is ever returned
 from a router, and no model on this path has a field for a giver's name, a
-per-guest amount (D8, D15), a blessing (D17) or the couple's payment handle
-(D13). `tests/test_public_read.py` asserts the exact key set, so adding a
-column cannot quietly widen the payload.
+per-guest amount (D8, D15), a blessing (D17), the couple's payment handle
+(D13) or their street address (D49). `tests/test_public_read.py` asserts the
+exact key set, so adding a column cannot quietly widen the payload. The
+boolean `has_shipping_address` is the one exception that names a private
+thing: it says whether a reveal exists, never what it contains.
 
 The couple's own view needs the opposite of this - who gave what, and how much
 - so it gets its own models when the editor read path lands, rather than a flag
@@ -71,5 +73,9 @@ class PublicRegistry(BaseModel):
 
     items_total: int
     items_claimed: int
+
+    #: Presence only (D49). The street itself is a separate GET, like the Bit
+    #: handle, so a page scrape cannot pick up where the couple lives.
+    has_shipping_address: bool
 
     items: list[PublicItem]

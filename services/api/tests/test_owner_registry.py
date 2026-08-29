@@ -51,13 +51,21 @@ def test_the_wizard_creates_an_unpublished_list(client: TestClient, owner: dict[
     response = client.post(
         f"{ME}/registry",
         headers=owner,
-        json={"coupleNames": "נועה ואיתי", "dueDate": "2026-11-01", "city": "חיפה"},
+        json={
+            "coupleNames": "נועה ואיתי",
+            "dueDate": "2026-11-01",
+            "city": "חיפה",
+            "shippingStreet": "הרצל 1",
+            "shippingApartment": "דירה 3",
+        },
     )
 
     assert response.status_code == 201
     body = response.json()
     assert body["publishedAt"] is None
     assert body["coupleNames"] == "נועה ואיתי"
+    assert body["city"] == "חיפה"
+    assert body["shippingStreet"] == "הרצל 1"
     assert body["slug"].startswith("noa-vaiti-")
 
 
@@ -120,6 +128,7 @@ def test_the_owner_view_carries_what_the_guest_view_hides(
 
     assert body["paymentHandle"] == "050-123-4567"
     assert body["paymentMethod"] == "bit"
+    assert body["shippingStreet"] == "דיזנגוף 99"
     assert body["publishedAt"] is not None
 
 
@@ -452,6 +461,32 @@ def test_payment_details_are_saved_but_not_published(
     public = client.get(f"/api/v1/public/registries/{registry.slug}").json()
     assert "paymentHandle" not in public
     assert "052-000-1111" not in str(public)
+
+
+def test_shipping_address_is_saved_but_not_published(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry]
+) -> None:
+    """D49: the couple sees the street; a guest page scrape does not."""
+    headers, registry = owner_with_list
+
+    saved = client.patch(
+        f"{ME}/registry",
+        headers=headers,
+        json={
+            "shippingStreet": "הרצל 15",
+            "shippingApartment": "כניסה ב, דירה 4",
+            "shippingPostalCode": "6100000",
+            "city": "חיפה",
+        },
+    ).json()
+    assert saved["shippingStreet"] == "הרצל 15"
+    assert saved["city"] == "חיפה"
+
+    public = client.get(f"/api/v1/public/registries/{registry.slug}").json()
+    assert public["hasShippingAddress"] is True
+    assert public["city"] == "חיפה"
+    assert "הרצל 15" not in str(public)
+    assert "shippingStreet" not in public
 
 
 def test_the_slug_is_not_guessable(client: TestClient, session: Session) -> None:

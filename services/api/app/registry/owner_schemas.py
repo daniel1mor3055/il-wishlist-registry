@@ -80,6 +80,10 @@ class OwnerRegistry(BaseModel):
     due_date: date | None
     baby_name: str | None
 
+    shipping_street: str | None
+    shipping_apartment: str | None
+    shipping_postal_code: str | None
+
     published_at: datetime | None
     closed_at: datetime | None
 
@@ -95,8 +99,9 @@ class OwnerRegistry(BaseModel):
 class CreateRegistryRequest(BaseModel):
     """What the create wizard collects (PRD ed-C1).
 
-    Three questions and nothing else. Story, cover and payment details are asked
-    for later, by the screens that own them.
+    Names are required. Due date, city and the shipping address are skippable;
+    the street is private (D49) even though it is collected here. Story, cover
+    and the Bit handle are asked for later, by the screens that own them.
     """
 
     model_config = WireModel
@@ -104,15 +109,24 @@ class CreateRegistryRequest(BaseModel):
     couple_names: str = Field(min_length=2, max_length=120)
     due_date: date | None = None
     city: str | None = Field(default=None, max_length=80)
+    shipping_street: str | None = Field(default=None, max_length=160)
+    shipping_apartment: str | None = Field(default=None, max_length=80)
+    shipping_postal_code: str | None = Field(default=None, max_length=10)
     #: "מאיפה נתחיל": categories to pre-fill from the catalog, or none for blank.
     starter_categories: list[Category] = Field(default_factory=list, max_length=6)
     #: The envelope is opt-in, and the wizard is where it is offered.
     include_envelope: bool = True
 
-    @field_validator("couple_names", "city")
+    @field_validator("couple_names")
     @classmethod
-    def _trim(cls, value: str | None) -> str | None:
-        return value.strip() if value else value
+    def _trim_required(cls, value: str) -> str:
+        return value.strip()
+
+    @field_validator("city", "shipping_street", "shipping_apartment", "shipping_postal_code")
+    @classmethod
+    def _blank_to_none(cls, value: str | None) -> str | None:
+        stripped = value.strip() if value else value
+        return stripped or None
 
 
 class RegistryPatch(BaseModel):
@@ -125,9 +139,27 @@ class RegistryPatch(BaseModel):
     city: str | None = Field(default=None, max_length=80)
     due_date: date | None = None
     baby_name: str | None = Field(default=None, max_length=80)
+    shipping_street: str | None = Field(default=None, max_length=160)
+    shipping_apartment: str | None = Field(default=None, max_length=80)
+    shipping_postal_code: str | None = Field(default=None, max_length=10)
     payment_method: Literal["bit", "paybox"] | None = None
     payment_handle: str | None = Field(default=None, max_length=40)
     payment_display_name: str | None = Field(default=None, max_length=80)
+
+    @field_validator(
+        "city",
+        "shipping_street",
+        "shipping_apartment",
+        "shipping_postal_code",
+        "payment_handle",
+        "payment_display_name",
+        "baby_name",
+        "story",
+    )
+    @classmethod
+    def _blank_to_none(cls, value: str | None) -> str | None:
+        stripped = value.strip() if value else value
+        return stripped or None
 
 
 class AddCatalogItemRequest(BaseModel):

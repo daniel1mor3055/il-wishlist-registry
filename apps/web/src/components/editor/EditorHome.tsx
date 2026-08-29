@@ -74,6 +74,12 @@ export function EditorHome({ registry }: { registry: EditorHomeView }) {
             {copy.editor.home.preview}
           </Link>
         )}
+        <Link
+          href="/editor/address"
+          className="block py-1 text-center text-small font-medium text-ink-muted transition-opacity active:opacity-70"
+        >
+          {copy.editor.home.address}
+        </Link>
       </div>
 
       {active.length === 0 ? (

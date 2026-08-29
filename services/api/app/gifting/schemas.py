@@ -81,3 +81,18 @@ class PaymentHandleView(BaseModel):
     method: Literal["bit", "paybox"]
     handle: str
     display_name: str
+
+
+class ShippingAddressView(BaseModel):
+    """The D49 reveal. Never part of `PublicRegistry`, only ever this endpoint."""
+
+    model_config = WireModel
+
+    recipient_name: str
+    street: str
+    apartment: str | None
+    city: str | None
+    postal_code: str | None
+    #: Ready to paste into the shop's checkout. Newlines, not commas, so a
+    #: guest tapping paste fills the fields the way a handwritten address would.
+    copy_text: str

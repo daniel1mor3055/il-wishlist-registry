@@ -29,6 +29,7 @@ from app.gifting.schemas import (
     PaymentHandleView,
     ReportRequest,
     ReservationView,
+    ShippingAddressView,
 )
 from app.gifting.service import (
     add_blessing,
@@ -37,6 +38,7 @@ from app.gifting.service import (
     report_reservation,
     reserve_item,
     reveal_payment_handle,
+    reveal_shipping_address,
 )
 
 router = APIRouter(prefix="/api/v1/public", tags=["gifting"])
@@ -177,3 +179,16 @@ def payment_handle(
 ) -> PaymentHandleView:
     """The D13 reveal. No guest id: this is a read, and it identifies nobody."""
     return reveal_payment_handle(session, slug=slug)
+
+
+@router.get(
+    "/registries/{slug}/shipping-address",
+    response_model=ShippingAddressView,
+    responses={404: {"description": "No registry, or the couple set no street"}},
+)
+def shipping_address(
+    slug: str,
+    session: Session = Depends(get_session),
+) -> ShippingAddressView:
+    """The D49 reveal. Same shape as D13: a read, identifying nobody."""
+    return reveal_shipping_address(session, slug=slug)

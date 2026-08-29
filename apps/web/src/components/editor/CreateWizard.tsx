@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { createRegistry } from "@/app/editor/actions";
+import { AddressFields } from "@/components/editor/AddressFields";
 import { Field, FormError, inputClass } from "@/components/editor/EditorShell";
 import { PrimaryButton, SecondaryButton } from "@/components/primitives/Buttons";
 import { CATEGORY_LABELS, copy } from "@/lib/copy";
@@ -17,7 +18,8 @@ import type { Category } from "@/lib/types";
  * people finish. The step indicator counts down from the right (PRD section 8).
  *
  * Only step 1 is required. A couple who taps through gets a list with an
- * envelope on it and nothing else, which is a fine place to start.
+ * envelope on it and nothing else, which is a fine place to start. The street
+ * on step 2 is skippable; it is private even when they fill it (D49).
  */
 
 const STEPS = 3;
@@ -30,6 +32,9 @@ export function CreateWizard() {
   const [names, setNames] = useState("");
   const [dueDate, setDueDate] = useState("");
   const [city, setCity] = useState("");
+  const [street, setStreet] = useState("");
+  const [apartment, setApartment] = useState("");
+  const [postalCode, setPostalCode] = useState("");
   const [starters, setStarters] = useState<Category[]>([]);
   const [envelope, setEnvelope] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -50,6 +55,9 @@ export function CreateWizard() {
         coupleNames: names.trim(),
         dueDate: dueDate || null,
         city: city.trim() || null,
+        shippingStreet: street.trim() || null,
+        shippingApartment: apartment.trim() || null,
+        shippingPostalCode: postalCode.trim() || null,
         starterCategories: starters,
         includeEnvelope: envelope,
       });
@@ -93,13 +101,15 @@ export function CreateWizard() {
               className={inputClass}
             />
           </Field>
-          <Field label={copy.editor.wizard.cityLabel}>
-            <input
-              value={city}
-              onChange={(event) => setCity(event.target.value)}
-              className={inputClass}
-            />
-          </Field>
+          <AddressFields
+            value={{ street, apartment, city, postalCode }}
+            onChange={(next) => {
+              setStreet(next.street);
+              setApartment(next.apartment);
+              setCity(next.city);
+              setPostalCode(next.postalCode);
+            }}
+          />
         </div>
       )}
 

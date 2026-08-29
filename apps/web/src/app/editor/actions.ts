@@ -63,6 +63,9 @@ export type CreateInput = {
   coupleNames: string;
   dueDate: string | null;
   city: string | null;
+  shippingStreet: string | null;
+  shippingApartment: string | null;
+  shippingPostalCode: string | null;
   starterCategories: string[];
   includeEnvelope: boolean;
 };
@@ -77,6 +80,27 @@ export async function createRegistry(input: CreateInput): Promise<ActionResult> 
     return failed(result.code);
   }
   revalidatePath("/editor");
+  return { ok: true, data: undefined };
+}
+
+export type RegistryPatchInput = {
+  city?: string | null;
+  shippingStreet?: string | null;
+  shippingApartment?: string | null;
+  shippingPostalCode?: string | null;
+};
+
+export async function patchRegistry(patch: RegistryPatchInput): Promise<ActionResult> {
+  const result = await ownerFetch<OwnerRegistry>("/me/registry", {
+    method: "PATCH",
+    body: JSON.stringify(patch),
+  });
+  if (!result.ok) {
+    if (result.status === 401) redirect("/editor/enter");
+    return failed(result.code);
+  }
+  revalidatePath("/editor");
+  revalidatePath("/editor/address");
   return { ok: true, data: undefined };
 }
 

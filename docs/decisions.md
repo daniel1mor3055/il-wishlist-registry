@@ -120,6 +120,17 @@ handing its client component the whole `OwnerRegistry`, and a client component's
 props are serialised into the page - so the couple's Bit number was in the HTML
 of a screen that never displays it. The prop is now field by field.
 
+## Locked, round eight (the address at handoff)
+
+The adversary brief cut "address collection" next to thank-you automation and
+shipping tracking. That cut still holds for *us* running shipping. What it does
+not cover is the other half of the outbound handoff: a guest at שילב who does
+not already know where to send the box.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D49 | Shipping address is a D13-style reveal, not a shipping product | Guests still buy at the chain. The couple may optionally store a street, apartment and postal code so a guest on the product handoff can copy them. City stays the public caption it already is (`תל אביב · נשלח אחרי הלידה`). The street is absent from the public payload and is fetched only when the guest taps `צריכים את כתובת המשלוח של…`, and the sheet says the address does not transfer into the shop. Presence is a boolean (`hasShippingAddress`) so a list with no street does not offer a dead link. We still never ship, track, or collect a guest address. | LOCKED |
+
 ## Target retailers
 
 Design content should look like these chains. None of them is integrated in this phase; all catalog data is mock.

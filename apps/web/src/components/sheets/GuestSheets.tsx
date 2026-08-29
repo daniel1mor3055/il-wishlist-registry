@@ -13,6 +13,7 @@ import {
   TextButton,
 } from "@/components/primitives/Buttons";
 import { copy } from "@/lib/copy";
+import { fetchShippingAddress } from "@/lib/guest-actions";
 import {
   ENVELOPE_AMOUNTS,
   fundedPercent,
@@ -20,7 +21,7 @@ import {
   isFundComplete,
   suggestedAmounts,
 } from "@/lib/money";
-import type { PaymentHandle, PublicItem } from "@/lib/types";
+import type { PaymentHandle, PublicItem, ShippingAddress } from "@/lib/types";
 
 /**
  * "למי להגיד תודה?" - optional, and the only thing we ever ask a guest for.
@@ -138,11 +139,17 @@ export function ItemDetailSheet({
  */
 export function HandoffSheet({
   item,
+  coupleNames,
+  slug,
+  hasShippingAddress,
   pending,
   onClose,
   onContinue,
 }: {
   item: PublicItem;
+  coupleNames: string;
+  slug: string;
+  hasShippingAddress: boolean;
   pending: boolean;
   onClose: () => void;
   onContinue: () => void;
@@ -170,10 +177,80 @@ export function HandoffSheet({
         <p className="text-small text-ink">
           {copy.handoff.body(item.title, item.chainNameHe ?? "")}
         </p>
+        {hasShippingAddress && (
+          <ShippingAddressReveal slug={slug} coupleNames={coupleNames} />
+        )}
         {/* "למי להגיד תודה?" is asked once, on the way back (G9), not here and
             there. On the way out the guest is trying to leave for the shop. */}
       </div>
     </Sheet>
+  );
+}
+
+/**
+ * D49. The link is the ask; the street arrives only after the tap, so it is
+ * never in the page a scrape can read. The load-bearing line is that the shop
+ * will not receive this on its own — the guest still types it at checkout.
+ */
+function ShippingAddressReveal({
+  slug,
+  coupleNames,
+}: {
+  slug: string;
+  coupleNames: string;
+}) {
+  const [address, setAddress] = useState<ShippingAddress | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  async function reveal() {
+    if (address || loading) return;
+    setLoading(true);
+    const result = await fetchShippingAddress(slug);
+    setLoading(false);
+    if (result.ok) setAddress(result.data);
+  }
+
+  if (!address) {
+    return (
+      <button
+        type="button"
+        onClick={() => void reveal()}
+        disabled={loading}
+        className="text-right text-small font-medium text-primary underline decoration-primary/40 underline-offset-4 transition-opacity active:opacity-70 disabled:opacity-60"
+      >
+        {loading ? copy.handoff.addressLoading : copy.handoff.needAddress(coupleNames)}
+      </button>
+    );
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-tiny text-ink-muted">{copy.handoff.addressDoesNotTransfer}</p>
+      <div className="flex items-start justify-between gap-3 rounded-btn border border-border bg-panel px-4 py-3.5">
+        <div className="flex min-w-0 flex-col gap-0.5 text-small text-ink">
+          <span className="font-bold">{address.recipientName}</span>
+          <span>{address.street}</span>
+          {address.apartment && <span>{address.apartment}</span>}
+          {address.city && <span>{address.city}</span>}
+          {address.postalCode && (
+            <span className="ltr-token" dir="ltr">
+              {address.postalCode}
+            </span>
+          )}
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            void navigator.clipboard?.writeText(address.copyText);
+            setCopied(true);
+          }}
+          className="shrink-0 rounded-[10px] bg-primary px-3 py-1.5 text-small font-medium text-white transition-opacity active:opacity-80"
+        >
+          {copied ? copy.handoff.copiedAddress : copy.handoff.copyAddress}
+        </button>
+      </div>
+    </div>
   );
 }
 

@@ -23,6 +23,7 @@ REGISTRY_KEYS = {
     "lifecycle",
     "itemsTotal",
     "itemsClaimed",
+    "hasShippingAddress",
     "items",
 }
 
@@ -79,7 +80,18 @@ def test_private_fields_never_appear_anywhere_in_the_payload(client: TestClient,
     raw = read(client, registry.slug).text
 
     assert "050-123-4567" not in raw
-    for forbidden in ("paymentHandle", "payment_handle", "giver", "blessing", "email"):
+    assert "דיזנגוף 99" not in raw
+    for forbidden in (
+        "paymentHandle",
+        "payment_handle",
+        "shippingStreet",
+        "shipping_street",
+        "shippingApartment",
+        "shippingPostalCode",
+        "giver",
+        "blessing",
+        "email",
+    ):
         assert forbidden not in raw
 
 
@@ -107,6 +119,7 @@ def test_closed_registry_still_returns_a_payload(client: TestClient, session: Se
 
     assert body["lifecycle"] == "closed"
     assert body["coupleNames"] == "נועה ואיתי"
+    assert body["hasShippingAddress"] is True
 
 
 def test_inactive_items_are_hidden(client: TestClient, session: Session):

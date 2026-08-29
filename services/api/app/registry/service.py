@@ -70,5 +70,6 @@ def get_public_registry(session: Session, slug: str) -> PublicRegistry | None:
         # so counting it would make a full list unreachable.
         items_total=len(products),
         items_claimed=sum(1 for item in products if item.claim_state != "available"),
+        has_shipping_address=bool((registry.shipping_street or "").strip()),
         items=[to_public_item(item) for item in items],
     )
