@@ -10,6 +10,7 @@
  *   { goto }        navigate and wait for the network to settle
  *   { click }       CSS selector, or { text } to match visible text
  *   { type }        text into { into } (a CSS selector), the way a human would
+ *   { scrollTo }    bring the element this selector points at into view
  *   { steal }       another guest reserves the item this selector points at
  *   { require }     fail unless this text is on screen
  *   { shot }        write a PNG named after the value
@@ -230,6 +231,16 @@ const SCENES = {
     { require: "אורח אחר כבר לקח את זה" },
     { shot: "sheet-race-lost" },
   ],
+  /** The money tiles in the grid, where the envelope shows what it has collected. */
+  "money-cards": [
+    { goto: MAIN },
+    { text: "מעטפה ושוברים" },
+    { wait: 400 },
+    { scrollTo: "[data-testid='item-card'][data-kind='fund']" },
+    { wait: 300 },
+    { require: "נאספו עד כה" },
+    { shot: "cards-money" },
+  ],
   "all-claimed": [{ goto: CLAIMED }, { wait: 600 }, { shot: "registry-all-claimed" }],
   registry: [{ goto: MAIN }, { wait: 400 }, { shot: "registry-top" }],
 };
@@ -378,6 +389,20 @@ async function type(ws, { into, text }) {
   if (outcome !== "ok") throw new Error(outcome);
 }
 
+/** Bring something below the fold into the shot. */
+async function scrollTo(ws, selector) {
+  const outcome = await evaluate(
+    ws,
+    `(() => {
+       const node = document.querySelector(${JSON.stringify(selector)});
+       if (!node) return 'nothing to scroll to: ' + ${JSON.stringify(selector)};
+       node.scrollIntoView({ block: 'center' });
+       return 'ok';
+     })()`,
+  );
+  if (outcome !== "ok") throw new Error(outcome);
+}
+
 /** Asserts the screen is the one the scene thinks it is on. */
 async function require_(ws, needle) {
   const found = await evaluate(
@@ -472,6 +497,8 @@ try {
           await click(page, { selector: step.click, text: step.text, nth: step.nth });
         } else if (step.type) {
           await type(page, { into: step.into, text: step.type });
+        } else if (step.scrollTo) {
+          await scrollTo(page, step.scrollTo);
         } else if (step.steal) {
           await steal(page, step.steal);
         } else if (step.require) {

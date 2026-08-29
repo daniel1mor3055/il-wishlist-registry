@@ -126,6 +126,9 @@ export const copy = {
     /* No target and no meter, so the subtitle carries "any amount" instead of
        a remaining sum (D28). The envelope's own title names Bit and PayBox. */
     envelopeSubtitle: "כל סכום, ישירות אלינו",
+    /* What the envelope has collected. No target follows it, so the sentence
+       ends at the amount rather than at a "מתוך" (D28). */
+    collected: "נאספו עד כה",
     sendViaBit: "לשלוח בביט",
     voucherBody: (chain: string) => `הקנייה מתבצעת באתר ${chain}, לא כאן`,
     voucherContinue: (chain: string) => `להמשיך לאתר ${chain}`,

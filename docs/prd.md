@@ -91,7 +91,7 @@ Sample data for every mock: couple **נועה ואיתי** (Noa and Itai), baby 
 | G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Leaving this sheet without continuing hands the unit back (D33). No name is asked here - that happens once, at G9 (D36) | `להמשיך לאתר שילב` (continue to Shilav) |
 | G5 | Return self-report modal | The D12 moment. `האם רכשת את הפריט?` with `כן, רכשתי` and `לא רכשתי, לשחרר את הפריט`. Dismissing the question is the third answer and keeps the hold (D35) | `כן, רכשתי` (yes, I bought it) |
 | G6 | Group gift sheet | Funding meter, `נותרו ₪550 מתוך ₪1,290`, `6 אורחים כבר השתתפו`, amount chips with a free-amount field behind `סכום אחר`, then the contact reveal | `להשתתף במתנה` (join this gift) |
-| G7 | Envelope / gift card sheet | One plain cash envelope with no target and no meter (D28), titled `חיבוק בביט / פייבוקס 💛` (D37), and voucher types. Amount chips, then contact reveal or outbound merchant | `לשלוח מתנה` (send a gift) |
+| G7 | Envelope / gift card sheet | One plain cash envelope with no target and no meter (D28), titled `חיבוק בביט / פייבוקס 💛` (D37), and voucher types. Shows what has been given so far - `נאספו עד כה ₪2,150`, `11 אורחים כבר השתתפו` - on both the card and the sheet, and nothing at all before the first gift. Amount chips, then contact reveal or outbound merchant | `לשלוח מתנה` (send a gift) |
 | G8 | Contact reveal | The D13 component. `צריכים את הפרטים של נועה ואיתי?` with the Bit or PayBox handle and a copy button, the chosen amount restated, plus `שלחתי` (I sent it), which is the write that records the gift (D38) | `העתקה` (copy) |
 | G9 | Private blessing + confirmation | Optional name and message straight to the couple, D17 private. The only place a guest is asked who they are (D36), and the write that attaches the name to the gift (D40). Then `תודה, רשמנו את המתנה שלך`, worded for a purchase or for money depending on which happened | `לצרף ברכה` (attach a blessing) |
 | G10 | Error and edge shell | Not found, closed, offline | `לנסות שוב` (try again) |
@@ -135,6 +135,7 @@ Figma Make defaults to the happy path and to full lists, so every state below ne
 | Reserved by someone else | G2, G3 | Muted card, badge, CTA demoted | `כבר נתפס` / `לשלוח מעטפה במקום` |
 | Group gift partly funded | G3, G6 | RTL meter, remaining amount is the headline, never the percent | `נותרו ₪550 מתוך ₪1,290` |
 | Group gift complete | G6 | Full meter, closed CTA | `המתנה הושלמה. תודה לכל מי שהשתתף` |
+| Envelope with gifts in it | G2, G7 | Collected total and contributor count, no meter and no `מתוך` (D28) | `נאספו עד כה ₪2,150` |
 | Quantity partly fulfilled | G2, G3 | Counter chip, CTA stays live | `נשארו 2 מתוך 4` |
 | Handoff pending | G5 | Guest went out and came back without answering. Dismissing the question keeps the hold; an explicit `לא רכשתי` releases it (D35) | `עוד באמצע? אפשר לסגור — הפריט נשאר שמור לכם` |
 | Gift card sent | G9, C9 | Neutral chip, never an error color | `השובר נשלח לנועה ואיתי` |

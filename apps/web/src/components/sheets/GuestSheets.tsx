@@ -357,6 +357,19 @@ export function CashVoucherSheet({
         </h2>
         {item.subtitle && <p className="text-small text-ink-muted">{item.subtitle}</p>}
 
+        {/* The same line the card carries, so tapping in does not lose it. Still
+            no meter: there is no target for a bar to fill toward (D28). */}
+        {item.contributorCount > 0 && (
+          <div className="flex flex-col gap-1">
+            <p className="text-h3 font-bold text-ink">
+              {copy.fund.collected} <InlineAmount agorot={item.contributedAgorot} />
+            </p>
+            <p className="text-small text-ink-muted">
+              {copy.group.contributors(item.contributorCount)}
+            </p>
+          </div>
+        )}
+
         <AmountChips
           values={ENVELOPE_AMOUNTS}
           selected={amount}

@@ -1,5 +1,7 @@
 "use client";
 
+import { InlineAmount } from "@/components/primitives/Price";
+import { copy } from "@/lib/copy";
 import type { PublicItem } from "@/lib/types";
 
 /**
@@ -44,9 +46,13 @@ export function EnvelopeArt() {
  * product, and deliberately quieter: PRD risk 3 is that cash cannibalises
  * products, so the product tile has to be the more attractive object.
  *
- * No meter and no remaining amount. An envelope is not a fund with a target
- * (D28) - collecting toward a specific thing is what group gifting on a real
- * product is for, and that lives on `ProductCard`.
+ * It shows what has been given so far and by how many guests, but no meter and
+ * no remaining amount: an envelope is not a fund with a target (D28), so there
+ * is no "מתוך" to show. Collecting toward a specific thing is what group
+ * gifting on a real product is for, and that lives on `ProductCard`.
+ *
+ * Nothing is shown until the first guest gives. An envelope announcing ₪0 asks
+ * the first person to go first, which is the opposite of what the line is for.
  */
 export function MoneyCard({
   item,
@@ -56,6 +62,8 @@ export function MoneyCard({
   /** Optional so the card can be rendered statically from a server component. */
   onClick?: () => void;
 }) {
+  const collected = item.kind === "fund" && item.contributorCount > 0;
+
   return (
     <button
       type="button"
@@ -68,6 +76,17 @@ export function MoneyCard({
       <p className="text-body font-bold text-ink">{item.title}</p>
       {item.subtitle && <p className="text-tiny text-ink-muted">{item.subtitle}</p>}
       {item.caption && <p className="text-tiny text-ink-muted">{item.caption}</p>}
+
+      {collected && (
+        <div className="flex flex-col gap-1">
+          <p className="text-tiny font-medium text-ink">
+            {copy.fund.collected} <InlineAmount agorot={item.contributedAgorot} />
+          </p>
+          <p className="text-micro text-ink-muted">
+            {copy.group.contributors(item.contributorCount)}
+          </p>
+        </div>
+      )}
     </button>
   );
 }
