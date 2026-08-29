@@ -25,7 +25,7 @@ A B2B2C platform that Israeli retailers can embed or integrate, giving their cus
 
 ## Current phase
 
-Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton, public registry from fixtures) is in.
+Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton and guest registry) and C2 (Postgres, seed, API read path) are in.
 
 | Document                                                 | What it is                                                           |
 | -------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -45,11 +45,12 @@ Shape of the product as currently locked:
 ## Repo layout
 
 ```
-apps/web/         Next.js (App Router, TS, Tailwind v4), Hebrew RTL — the guest registry and, later, the couple editor
-services/api/     FastAPI, modules: registry, catalog, gifting, identity
-services/api/seed/  catalog_snapshot.json — 180 real products harvested once from four Israeli chains
-tools/            harvest_catalog.py (catalog harvester), build_fixtures.mjs (fixture generator)
-docs/             decisions, PRD, Figma Make prompts, council briefs
+apps/web/            Next.js (App Router, TS, Tailwind v4), Hebrew RTL — the guest registry and, later, the couple editor
+services/api/        FastAPI + SQLAlchemy, modules: registry, catalog, gifting, identity
+services/api/migrations/  Alembic
+services/api/seed/   catalog_snapshot.json (180 real products from four chains) and demo_registries.json
+tools/               harvest_catalog.py (catalog harvester), build_demo_registries.mjs (demo composer)
+docs/                decisions, PRD, Figma Make prompts, council briefs
 ```
 
 ## Running it locally
@@ -59,30 +60,36 @@ Backing services run in Docker; the web app runs on the host, because containeri
 ```bash
 cp .env.example .env
 npm install
-npm run services:up      # postgres :5433, mailpit :8025, api :8000
+npm run services:up      # postgres :5433, mailpit :8025, api :8000 (migrates on start)
+npm run seed             # harvested catalog + the five demo registries, idempotent
 npm run dev              # next dev on :3000
 ```
+
+The web app has no data of its own: every page is server-rendered from `GET /api/v1/public/registries/{slug}`, so the API and a seeded database have to be up.
+
+`npm run dev:bg` starts the same dev server detached, logging to `.logs/web-dev.log`, and `npm run dev:stop` stops it. It exists for scripted screenshot runs, which cannot block on a process that never exits.
 
 | URL                                           | What                                        |
 | --------------------------------------------- | ------------------------------------------- |
 | http://localhost:3000                         | Dev index — links to every demo registry    |
 | http://localhost:3000/r/noa-itai-k4m2xq8vp3wt | The main demo registry (נועה ואיתי)         |
 | http://localhost:3000/dev/states              | State gallery — every PRD state on one page |
-| http://localhost:8000/health                  | API health                                  |
+| http://localhost:8000/docs                    | API docs, and the public read endpoint      |
 | http://localhost:8025                         | Mailpit, for magic links (C4)               |
 
 Checks: `npm run typecheck`, `npm run lint`, `npm run format`. API tests: `docker compose exec api pytest`.
 
-Regenerating catalog data (rarely needed — the snapshot is committed):
+Regenerating seed data (rarely needed — both files are committed):
 
 ```bash
 npm run harvest          # re-scrape the four chains into services/api/seed/
-npm run fixtures         # rebuild apps/web/src/lib/fixtures/registries.ts
+npm run demo-data        # recompose the five demo registries from the snapshot
+npm run seed             # load both into Postgres
 ```
 
 ## Status
 
-C1 done: monorepo, compose, harvested catalog, public guest registry rendering all guest sheets from fixtures, state gallery, API health. Next is C2 — Postgres schema and migrations, seed from the harvest, and moving the read path from fixtures to the API.
+C2 done: Postgres schema and Alembic migrations, an idempotent seed from the harvest, the public read endpoint, and the guest registry reading through it — the TypeScript fixtures are gone. Next is C3, the guest write loop: reserve, self-report, contribute, blessing, and the race and idempotency tests that go with them.
 
 ## License
 

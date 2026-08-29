@@ -20,7 +20,9 @@
     "services:logs": "docker compose logs -f api",
     "full:up": "docker compose --profile full up -d",
     "harvest": "python3 tools/harvest_catalog.py",
-    "fixtures": "node tools/build_fixtures.mjs",
+    "demo-data": "node tools/build_demo_registries.mjs",
+    "migrate": "docker compose exec api alembic upgrade head",
+    "seed": "docker compose exec api python -m app.seed",
     "shoot": "node tools/shoot.mjs"
   },
   "devDependencies": {

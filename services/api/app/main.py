@@ -12,7 +12,10 @@ Cross-module traffic goes through a module's service layer only. No module
 imports another's models, and no foreign key crosses into catalog - catalog
 output is snapshotted onto the item instead.
 
-At C1 only /health exists. The modules arrive with C2.
+At C2 `registry` serves the public read and `catalog` holds the harvested seed.
+`gifting` arrives with the guest write loop in C3, `identity` with magic links
+in C4; `identity` already owns the couples table so ownership does not have to
+be migrated onto registries later.
 """
 
 from fastapi import FastAPI
@@ -20,6 +23,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
 from app.health import router as health_router
+from app.registry.router import router as registry_router
 
 settings = get_settings()
 
@@ -44,3 +48,4 @@ if settings.cors_origin_list:
     )
 
 app.include_router(health_router)
+app.include_router(registry_router)

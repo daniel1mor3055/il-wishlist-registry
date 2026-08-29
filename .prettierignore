@@ -1,8 +1,8 @@
 node_modules/
 .next/
-# Generated from the catalog snapshot; regenerate rather than reformat.
-apps/web/src/lib/fixtures/registries.ts
+# Harvested and generated seed data; regenerate rather than reformat.
 services/api/seed/catalog_snapshot.json
+services/api/seed/demo_registries.json
 package-lock.json
 
 # Hand-written prose. Hebrew copy, RTL-aware tables and deliberate line breaks

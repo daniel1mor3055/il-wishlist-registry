@@ -8,6 +8,9 @@ dependencies = [
     "uvicorn[standard]==0.34.0",
     "pydantic==2.10.4",
     "pydantic-settings==2.7.1",
+    "sqlalchemy==2.0.36",
+    "alembic==1.14.0",
+    "psycopg[binary]==3.2.3",
 ]
 
 [project.optional-dependencies]
@@ -23,6 +26,11 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "SIM"]
+
+[tool.ruff.lint.flake8-bugbear]
+# `Depends(...)` in a default is how FastAPI declares a dependency, not the
+# mutable-default bug B008 is looking for.
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Path", "fastapi.Body", "fastapi.Header"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

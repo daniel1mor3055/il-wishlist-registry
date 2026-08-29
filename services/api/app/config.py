@@ -14,8 +14,9 @@ class Settings(BaseSettings):
     log_level: str = "info"
     version: str = "0.1.0"
 
-    # Lands at C2. Declared now so the shape is fixed.
-    database_url: str = ""
+    # Default is the compose topology, so the container and its tests work
+    # without an env file. Overridden by DATABASE_URL everywhere else.
+    database_url: str = "postgresql+psycopg://registry:registry@db:5432/registry"
 
     # Lands at C4 (magic links via Mailpit).
     smtp_host: str = "mailpit"

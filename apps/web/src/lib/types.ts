@@ -2,9 +2,12 @@
  * The public read contract.
  *
  * These types mirror the API's `PublicRegistry` and `PublicItem` response
- * models exactly. At C1 they are satisfied by fixtures; at C2 they are
- * generated from the FastAPI OpenAPI schema and these hand-written versions
- * are deleted, so C2 replaces a loader rather than a data model.
+ * models exactly, and are hand-written rather than generated from the OpenAPI
+ * schema as the council brief proposed. Codegen would make `tsc` depend on a
+ * running API or on a committed schema dump, and the payload is twenty fields
+ * that change once per checkpoint. What keeps the two sides honest instead is
+ * the golden-key test in `services/api/tests/test_public_read.py`, which
+ * asserts the exact key set the API emits.
  *
  * Nothing here may ever carry a giver's identity or a per-guest amount
  * (D8, D15), or a blessing (D17). The payload is server-rendered into the page

@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import { ProductCard } from "@/components/registry/ProductCard";
 import { MoneyCard } from "@/components/registry/MoneyCard";
-import { mainRegistry } from "@/lib/fixtures/registries";
+import { getPublicRegistry } from "@/lib/api";
+import { MAIN_SLUG } from "@/app/page";
 import type { PublicItem } from "@/lib/types";
 
 /**
@@ -11,9 +12,12 @@ import type { PublicItem } from "@/lib/types";
  * path, so every one needs its own frame. This page is the review checklist:
  * a missing state shows up as a hole rather than as an omission nobody noticed.
  *
- * It is also the C1 comparison surface. Registry-level states render as real
- * routes inside a 390x844 frame, which is a true side-by-side against the Make
- * render without the app itself having to be a device mockup.
+ * It is also the visual comparison surface. Registry-level states render as
+ * real routes inside a 390x844 frame, which is a true side-by-side against the
+ * Make render without the app itself having to be a device mockup.
+ *
+ * Item-level states are derived from the seeded demo registry rather than from
+ * hand-written props, so a card here is a card built from a real payload.
  */
 
 type Status = "c1" | "c3" | "c5";
@@ -87,88 +91,90 @@ type CardState = {
   item: PublicItem;
 };
 
-const items = mainRegistry.items;
-const find = (predicate: (item: PublicItem) => boolean, label: string): PublicItem => {
-  const found = items.find(predicate);
-  if (!found) throw new Error(`Fixture missing for gallery state: ${label}`);
-  return found;
-};
+/**
+ * Item-level states, taken from the seeded demo registry. A state with no item
+ * behind it throws by name, so a seed that stops covering a state fails loudly
+ * instead of quietly dropping a frame from the review.
+ */
+function cardStates(items: PublicItem[]): CardState[] {
+  const find = (predicate: (item: PublicItem) => boolean, label: string): PublicItem => {
+    const found = items.find(predicate);
+    if (!found) throw new Error(`Seed has no item for gallery state: ${label}`);
+    return found;
+  };
 
-const groupGift = find((i) => i.groupGiftEnabled && i.kind === "product", "group gift");
-const takenItem = find((i) => i.claimState !== "available", "taken item");
-const partialQty = find((i) => i.quantityWanted > 1, "partial quantity");
-const envelope = find((i) => i.kind === "fund", "cash envelope");
-const voucher = find((i) => i.kind === "voucher", "voucher");
-const longName = items
-  .filter((i) => i.kind === "product")
-  .reduce(
-    (longest, i) => (i.title.length > longest.title.length ? i : longest),
-    items[0],
-  );
+  const groupGift = find((i) => i.groupGiftEnabled && i.kind === "product", "group gift");
+  const takenItem = find((i) => i.claimState !== "available", "taken item");
+  const partialQty = find((i) => i.quantityWanted > 1, "partial quantity");
+  const envelope = find((i) => i.kind === "fund", "cash envelope");
+  const voucher = find((i) => i.kind === "voucher", "voucher");
+  const longName = items
+    .filter((i) => i.kind === "product")
+    .reduce((longest, i) => (i.title.length > longest.title.length ? i : longest));
 
-/** Item-level states, rendered as isolated cards. */
-const CARD_STATES: CardState[] = [
-  {
-    id: "group-partial",
-    prd: "G2, G6 — group gift partly funded",
-    hebrew: "נותרו ₪X מתוך ₪Y",
-    status: "c1",
-    item: groupGift,
-  },
-  {
-    id: "group-complete",
-    prd: "G6 — group gift complete",
-    hebrew: "המתנה הושלמה. תודה לכל מי שהשתתף",
-    status: "c1",
-    item: {
-      ...groupGift,
-      contributedAgorot: groupGift.targetAgorot ?? 0,
-      contributorCount: 14,
+  return [
+    {
+      id: "group-partial",
+      prd: "G2, G6 — group gift partly funded",
+      hebrew: "נותרו ₪X מתוך ₪Y",
+      status: "c1",
+      item: groupGift,
     },
-  },
-  {
-    id: "taken",
-    prd: "G2, G3 — reserved by someone else",
-    hebrew: "כבר נתפס",
-    status: "c1",
-    item: takenItem,
-  },
-  {
-    id: "partial-qty",
-    prd: "G2, G3 — quantity partly fulfilled",
-    hebrew: "נשארו 2 מתוך 4",
-    status: "c1",
-    item: partialQty,
-  },
-  {
-    id: "long-name",
-    prd: "G2, G3 — long Hebrew name",
-    hebrew: "two-line clamp with reserved height",
-    status: "c1",
-    item: longName,
-  },
-  {
-    id: "broken-image",
-    prd: "G2, G3 — broken image",
-    hebrew: "branded 1:1 placeholder, category glyph, no layout shift",
-    status: "c1",
-    item: { ...groupGift, imageUrl: "https://cdn.shopify.com/does-not-exist.jpg" },
-  },
-  {
-    id: "envelope",
-    prd: "G7 — cash envelope tile",
-    hebrew: "כל סכום, ישירות אלינו בביט או בפייבוקס. בלי יעד ובלי מדחום",
-    status: "c1",
-    item: envelope,
-  },
-  {
-    id: "voucher",
-    prd: "G7 — voucher tile",
-    hebrew: "אתם בוחרים את הסכום באתר החנות",
-    status: "c1",
-    item: voucher,
-  },
-];
+    {
+      id: "group-complete",
+      prd: "G6 — group gift complete",
+      hebrew: "המתנה הושלמה. תודה לכל מי שהשתתף",
+      status: "c1",
+      item: {
+        ...groupGift,
+        contributedAgorot: groupGift.targetAgorot ?? 0,
+        contributorCount: 14,
+      },
+    },
+    {
+      id: "taken",
+      prd: "G2, G3 — reserved by someone else",
+      hebrew: "כבר נתפס",
+      status: "c1",
+      item: takenItem,
+    },
+    {
+      id: "partial-qty",
+      prd: "G2, G3 — quantity partly fulfilled",
+      hebrew: "נשארו 2 מתוך 4",
+      status: "c1",
+      item: partialQty,
+    },
+    {
+      id: "long-name",
+      prd: "G2, G3 — long Hebrew name",
+      hebrew: "two-line clamp with reserved height",
+      status: "c1",
+      item: longName,
+    },
+    {
+      id: "broken-image",
+      prd: "G2, G3 — broken image",
+      hebrew: "branded 1:1 placeholder, category glyph, no layout shift",
+      status: "c1",
+      item: { ...groupGift, imageUrl: "https://cdn.shopify.com/does-not-exist.jpg" },
+    },
+    {
+      id: "envelope",
+      prd: "G7 — cash envelope tile",
+      hebrew: "כל סכום, ישירות אלינו בביט או בפייבוקס. בלי יעד ובלי מדחום",
+      status: "c1",
+      item: envelope,
+    },
+    {
+      id: "voucher",
+      prd: "G7 — voucher tile",
+      hebrew: "אתם בוחרים את הסכום באתר החנות",
+      status: "c1",
+      item: voucher,
+    },
+  ];
+}
 
 /** States that need the guest write loop and therefore land later. */
 const PENDING_STATES: Array<{ prd: string; hebrew: string; status: Status }> = [
@@ -220,21 +226,25 @@ function Label({ prd, hebrew, status }: { prd: string; hebrew: string; status: S
   );
 }
 
-export default function StateGallery() {
+export default async function StateGallery() {
   // Dev-only surface. Never part of the product.
   if (process.env.NODE_ENV === "production") notFound();
 
-  const c1Count = FRAME_STATES.length + CARD_STATES.length;
-  const total = c1Count + PENDING_STATES.length;
+  const main = await getPublicRegistry(MAIN_SLUG);
+  if (!main) notFound();
+
+  const CARD_STATES = cardStates(main.items);
+  const doneCount = FRAME_STATES.length + CARD_STATES.length;
+  const total = doneCount + PENDING_STATES.length;
 
   return (
     <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-2">
         <h1 className="text-h1 font-bold text-ink">גלריית המצבים</h1>
         <p className="text-small text-ink-muted">
-          PRD section 7. <span className="ltr-token">{c1Count}</span> מתוך{" "}
-          <span className="ltr-token">{total}</span> מצבים ממומשים ב־C1. השאר דורשים את
-          לופ הכתיבה של האורח.
+          PRD section 7. <span className="ltr-token">{doneCount}</span> מתוך{" "}
+          <span className="ltr-token">{total}</span> מצבים ממומשים. השאר דורשים את לופ
+          הכתיבה של האורח.
         </p>
         <p className="text-small text-ink-muted">
           המסגרת היא <span className="ltr-token">390×844</span> לצורך השוואה מול ה־Figma

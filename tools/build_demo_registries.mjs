@@ -1,15 +1,20 @@
 #!/usr/bin/env node
 /**
- * Build the C1 web fixtures from the harvested catalog snapshot.
+ * Compose the demo registries from the harvested catalog snapshot.
  *
- * C1 renders from fixtures, not from a database. Those fixtures are typed as
- * the real API contract (`PublicRegistry`, `PublicItem`), so C2 replaces a
- * loader rather than a data model.
+ * This is the single source of demo-data composition. It emits one JSON file
+ * that `services/api/app/seed.py` loads into Postgres; the web then reads
+ * everything back through the API, so there is no second copy of this data in
+ * TypeScript to drift from it.
  *
- * The seed needs five registries, not one: five of the PRD section 7 states are
+ * The output is in the database's own shape - snake_case, agorot, real column
+ * names - because its only consumer is the seed. Choosing catalog items is the
+ * interesting part; mapping them is not.
+ *
+ * Five registries, not one: five of the PRD section 7 states are
  * registry-level and cannot coexist in a single registry.
  *
- * Usage: node tools/build_fixtures.mjs
+ * Usage: node tools/build_demo_registries.mjs
  */
 
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
@@ -19,7 +24,7 @@ import { fileURLToPath } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = join(HERE, "..");
 const SNAPSHOT = join(REPO, "services", "api", "seed", "catalog_snapshot.json");
-const OUT = join(REPO, "apps", "web", "src", "lib", "fixtures", "registries.ts");
+const OUT = join(REPO, "services", "api", "seed", "demo_registries.json");
 
 const snapshot = JSON.parse(readFileSync(SNAPSHOT, "utf8"));
 const catalog = snapshot.items;
@@ -41,30 +46,27 @@ const and =
   (item) =>
     fns.every((fn) => fn(item));
 
-let itemSeq = 0;
-const nextId = () => `itm_${String(++itemSeq).padStart(3, "0")}`;
-
-/** Map a catalog row onto a PublicItem, with the registry-specific state applied. */
+/** Map a catalog row onto a registry item, with its per-registry state applied. */
 function productItem(source, overrides = {}) {
   return {
-    id: nextId(),
     kind: "product",
     title: source.title,
-    sourceTitle: source.source_title ?? null,
+    source_title: source.source_title ?? null,
     note: null,
     category: source.category,
-    imageUrl: source.image_url,
-    chainSlug: source.chain_slug,
-    chainNameHe: source.chain_name_he,
-    canonicalUrl: source.canonical_url,
-    priceAgorot: source.price_agorot,
-    quantityWanted: 1,
-    quantityClaimed: 0,
-    claimState: "available",
-    groupGiftEnabled: false,
-    targetAgorot: null,
-    contributedAgorot: 0,
-    contributorCount: 0,
+    image_url: source.image_url,
+    chain_slug: source.chain_slug,
+    chain_name_he: source.chain_name_he,
+    external_id: source.external_id,
+    canonical_url: source.canonical_url,
+    price_agorot: source.price_agorot,
+    quantity_wanted: 1,
+    quantity_claimed: 0,
+    claim_state: "available",
+    group_gift_enabled: false,
+    target_agorot: null,
+    contributed_agorot: 0,
+    contributor_count: 0,
     subtitle: null,
     caption: null,
     ...overrides,
@@ -78,24 +80,24 @@ function productItem(source, overrides = {}) {
  */
 function envelopeItem(overrides = {}) {
   return {
-    id: nextId(),
     kind: "fund",
     title: `מעטפה ל${COUPLE}`,
-    sourceTitle: null,
+    source_title: null,
     note: null,
     category: null,
-    imageUrl: null,
-    chainSlug: null,
-    chainNameHe: null,
-    canonicalUrl: null,
-    priceAgorot: null,
-    quantityWanted: 1,
-    quantityClaimed: 0,
-    claimState: "available",
-    groupGiftEnabled: false,
-    targetAgorot: null,
-    contributedAgorot: 180_000,
-    contributorCount: 9,
+    image_url: null,
+    chain_slug: null,
+    chain_name_he: null,
+    external_id: null,
+    canonical_url: null,
+    price_agorot: null,
+    quantity_wanted: 1,
+    quantity_claimed: 0,
+    claim_state: "available",
+    group_gift_enabled: false,
+    target_agorot: null,
+    contributed_agorot: 180_000,
+    contributor_count: 9,
     subtitle: "כל סכום, ישירות אלינו בביט או בפייבוקס",
     caption: null,
     ...overrides,
@@ -104,24 +106,24 @@ function envelopeItem(overrides = {}) {
 
 function voucherItem(overrides = {}) {
   return {
-    id: nextId(),
     kind: "voucher",
     title: "שובר שילב",
-    sourceTitle: null,
+    source_title: null,
     note: null,
     category: null,
-    imageUrl: null,
-    chainSlug: "shilav",
-    chainNameHe: "שילב",
-    canonicalUrl: "https://www.shilav.co.il/products/gift-card",
-    priceAgorot: null,
-    quantityWanted: 1,
-    quantityClaimed: 0,
-    claimState: "available",
-    groupGiftEnabled: false,
-    targetAgorot: null,
-    contributedAgorot: 0,
-    contributorCount: 0,
+    image_url: null,
+    chain_slug: "shilav",
+    chain_name_he: "שילב",
+    external_id: null,
+    canonical_url: "https://www.shilav.co.il/products/gift-card",
+    price_agorot: null,
+    quantity_wanted: 1,
+    quantity_claimed: 0,
+    claim_state: "available",
+    group_gift_enabled: false,
+    target_agorot: null,
+    contributed_agorot: 0,
+    contributor_count: 0,
     subtitle: "כרטיס מתנה באתר שילב",
     caption: "אתם בוחרים את הסכום באתר החנות",
     ...overrides,
@@ -163,21 +165,17 @@ if (longName) used.add(longName.external_id);
 const mainItems = [
   // The group gift: partially funded, which is the PRD's headline state.
   productItem(stroller, {
-    groupGiftEnabled: true,
-    targetAgorot: stroller.price_agorot,
-    contributedAgorot: Math.round(stroller.price_agorot * 0.57),
-    contributorCount: 6,
+    group_gift_enabled: true,
+    target_agorot: stroller.price_agorot,
+    contributed_agorot: Math.round(stroller.price_agorot * 0.57),
+    contributor_count: 6,
     caption: "נשלח אחרי הלידה",
   }),
   productItem(carSeat),
   // Already taken by another guest (D8): state is public, identity is not.
-  productItem(crib, { quantityClaimed: 1, claimState: "purchased" }),
+  productItem(crib, { quantity_claimed: 1, claim_state: "purchased" }),
   // Quantity partly fulfilled.
-  productItem(bottles, {
-    quantityWanted: 4,
-    quantityClaimed: 2,
-    claimState: "available",
-  }),
+  productItem(bottles, { quantity_wanted: 4, quantity_claimed: 2 }),
   // Carries a couple note.
   productItem(nursingPillow, {
     note: "זה אחד הדברים שבאמת יעזרו לנו בלילות הראשונים",
@@ -185,10 +183,7 @@ const mainItems = [
   productItem(breastPump),
   // Reserved, not yet confirmed bought (D12). To a guest this reads the same as
   // bought — which is exactly the point of keeping claim state public (D8).
-  productItem(changingMat, {
-    quantityClaimed: 1,
-    claimState: "reserved",
-  }),
+  productItem(changingMat, { quantity_claimed: 1, claim_state: "reserved" }),
   productItem(mobile),
   productItem(bodysuits),
   envelopeItem(),
@@ -199,112 +194,77 @@ if (longName) {
   mainItems.splice(6, 0, productItem(longName));
 }
 
-const claimedCount = (items) =>
-  items.filter((i) => i.kind === "product" && i.claimState !== "available").length;
-
 const main = {
   slug: "noa-itai-k4m2xq8vp3wt",
-  coupleNames: COUPLE,
+  couple_names: COUPLE,
   story:
     "יעל בדרך, ואנחנו מתרגשים לקבל אתכם לתוך הסיפור הזה. כל מתנה עוזרת לנו להתכונן. באהבה, נועה ואיתי",
-  coverImageUrl: COVER,
+  cover_image_url: COVER,
   city: "תל אביב",
-  dueDate: "2026-02-12",
-  babyName: "יעל",
-  lifecycle: "published",
-  itemsTotal: mainItems.filter((i) => i.kind === "product").length,
-  itemsClaimed: claimedCount(mainItems),
+  due_date: "2026-02-12",
+  baby_name: "יעל",
+  published: true,
+  closed: false,
+  payment_method: "bit",
+  payment_handle: "050-123-4567",
+  payment_display_name: "נועה",
   items: mainItems,
 };
 
 /* ---------- the registry-level state variants ---------- */
 
-const empty = {
-  ...main,
-  slug: "empty-registry-demo",
-  items: [],
-  itemsTotal: 0,
-  itemsClaimed: 0,
-};
+const empty = { ...main, slug: "empty-registry-demo", items: [] };
 
-const singleItemList = [
-  productItem(
-    pick(and(byCategory("mobility"), priceBetween(50_000, 900_000)), "single hero item"),
-  ),
-];
 const single = {
   ...main,
   slug: "single-item-demo",
-  items: singleItemList,
-  itemsTotal: 1,
-  itemsClaimed: 0,
+  items: [
+    productItem(
+      pick(
+        and(byCategory("mobility"), priceBetween(50_000, 900_000)),
+        "single hero item",
+      ),
+    ),
+  ],
 };
 
 // Every product taken, the envelope still open: the celebratory band promotes it.
-const fullyClaimedItems = mainItems.map((item) =>
-  item.kind === "product"
-    ? { ...item, quantityClaimed: item.quantityWanted, claimState: "purchased" }
-    : item,
-);
 const fullyClaimed = {
   ...main,
   slug: "fully-claimed-demo",
-  items: fullyClaimedItems,
-  itemsTotal: fullyClaimedItems.filter((i) => i.kind === "product").length,
-  itemsClaimed: fullyClaimedItems.filter((i) => i.kind === "product").length,
+  items: mainItems.map((item) =>
+    item.kind === "product"
+      ? { ...item, quantity_claimed: item.quantity_wanted, claim_state: "purchased" }
+      : item,
+  ),
 };
 
-const closed = { ...main, slug: "closed-demo", lifecycle: "closed" };
+const closed = { ...main, slug: "closed-demo", closed: true };
 
 /* ---------- emit ---------- */
 
-const registries = { main, empty, single, fullyClaimed, closed };
+const registries = [main, empty, single, fullyClaimed, closed].map((registry) => ({
+  ...registry,
+  items: registry.items.map((item, index) => ({ ...item, position: index })),
+}));
 
-const banner = `/**
- * GENERATED FILE - do not edit by hand.
- *
- * Written by tools/build_fixtures.mjs from services/api/seed/catalog_snapshot.json.
- * Regenerate with: npm run fixtures --workspace=@il-registry/web
- *
- * Product data is real, harvested from each chain's public Shopify feed per
- * D22. These fixtures exist only for C1, where there is no database yet, and
- * for the /dev/states gallery thereafter.
- *
- * Catalog harvested at: ${snapshot.harvested_at}
- */
-
-import type { PublicRegistry } from "../types";
-`;
-
-const body = Object.entries(registries)
-  .map(
-    ([name, registry]) =>
-      `export const ${name}Registry: PublicRegistry = ${JSON.stringify(registry, null, 2)};`,
-  )
-  .join("\n\n");
-
-const footer = `
-export const ALL_REGISTRIES: Record<string, PublicRegistry> = {
-${Object.values(registries)
-  .map(
-    (r) =>
-      `  "${r.slug}": ${Object.keys(registries).find((k) => registries[k] === r)}Registry,`,
-  )
-  .join("\n")}
+const payload = {
+  note: "Generated by tools/build_demo_registries.mjs. Loaded by services/api/app/seed.py.",
+  catalog_snapshot_harvested_at: snapshot.harvested_at,
+  couple: { display_name: COUPLE, email: "noa.itai@example.com" },
+  registries,
 };
-`;
 
 mkdirSync(dirname(OUT), { recursive: true });
-writeFileSync(OUT, `${banner}\n${body}\n${footer}`, "utf8");
+writeFileSync(OUT, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 
-console.log(`Wrote ${OUT.replace(REPO + "/", "")}`);
-console.log(`  ${Object.keys(registries).length} registries`);
-console.log(
-  `  main registry: ${main.items.length} items, ${main.itemsClaimed}/${main.itemsTotal} claimed`,
-);
-for (const item of main.items) {
-  const price = item.priceAgorot
-    ? `₪${(item.priceAgorot / 100).toLocaleString("en-US")}`
-    : "—";
-  console.log(`    ${item.kind.padEnd(8)} ${price.padStart(9)}  ${item.title}`);
+console.log(`Wrote ${OUT.replace(`${REPO}/`, "")}`);
+console.log(`  ${registries.length} registries`);
+for (const registry of registries) {
+  const products = registry.items.filter((i) => i.kind === "product");
+  const claimed = products.filter((i) => i.claim_state !== "available").length;
+  const state = registry.closed ? "closed" : registry.published ? "published" : "draft";
+  console.log(
+    `    ${registry.slug.padEnd(24)} ${state.padEnd(10)} ${products.length} products, ${claimed} claimed`,
+  );
 }
