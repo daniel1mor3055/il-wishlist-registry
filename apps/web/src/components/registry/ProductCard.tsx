@@ -37,6 +37,9 @@ export function ProductCard({
       data-testid="item-card"
       data-kind={isGroup ? "group" : "product"}
       data-claim={item.claimState}
+      // Lets tools/shoot.mjs stage a real race: another guest takes this exact
+      // item while the page still shows it as free.
+      data-item-id={item.id}
       className={`flex flex-col overflow-hidden rounded-card border border-border bg-surface text-right transition-transform active:scale-[0.98] ${
         taken ? "opacity-70" : ""
       } ${featured ? "col-span-2" : ""}`}

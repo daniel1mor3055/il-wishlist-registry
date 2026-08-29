@@ -83,6 +83,23 @@ export interface PublicRegistry {
 }
 
 /**
+ * What a guest write answers with: the guest's own hold, plus the item exactly
+ * as the read path would now return it. Nothing about anyone else's hold (D8).
+ */
+export interface ReservationView {
+  reservationId: string;
+  state: "held" | "purchased" | "released";
+  item: PublicItem;
+}
+
+/**
+ * Guest writes fail for ordinary reasons - someone else took the last unit -
+ * so the failure is a value the caller has to handle, not an exception. The
+ * code is an API error code; `errorCopy` turns it into Hebrew.
+ */
+export type WriteResult<T> = { ok: true; data: T } | { ok: false; code: string };
+
+/**
  * Revealed only on explicit guest interaction (D13), never part of the
  * registry payload. Present here because the same client code consumes it.
  */

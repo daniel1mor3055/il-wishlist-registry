@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { ProductCard } from "./ProductCard";
 import { MoneyCard } from "./MoneyCard";
 import { Toast } from "@/components/feedback/Toast";
@@ -15,7 +16,8 @@ import {
   ReportModal,
   TakenSheet,
 } from "@/components/sheets/GuestSheets";
-import { copy, FILTERS, type FilterId } from "@/lib/copy";
+import { copy, errorCopy, FILTERS, type FilterId } from "@/lib/copy";
+import { releaseReservation, reportPurchase, reserveItem } from "@/lib/guest-actions";
 import { isFundComplete } from "@/lib/money";
 import { DEMO_PAYMENT_HANDLE } from "@/lib/fixtures/payment";
 import type { PublicItem, PublicRegistry } from "@/lib/types";
@@ -25,23 +27,37 @@ import type { PublicItem, PublicRegistry } from "@/lib/types";
  *
  * Everything above this component is server-rendered, including the hero and
  * the Open Graph metadata. Everything interactive lives here: the filter chips,
- * the sheet state machine ported from the reference's `SheetState` union, and
- * the toast.
+ * the sheet state machine ported from the reference's `SheetState` union, the
+ * three guest writes, and the toast.
  *
  * This component stays a coordinator - state and handlers only. Markup belongs
- * in the section and sheet components, or this becomes unreviewable by C3.
+ * in the section and sheet components.
+ *
+ * Two things about the writes are worth knowing before changing anything here.
+ *
+ * **The hold is optimistic and reversible.** Tapping "אני קונה את זה" patches
+ * the item locally and opens the handoff sheet immediately, before the API has
+ * answered. If the API says another guest got there first, the patch is thrown
+ * away and the guest lands on the taken sheet instead. The way out to the shop
+ * stays disabled until the hold is confirmed, so nobody is ever sent off to buy
+ * something we failed to secure.
+ *
+ * **Server data always wins.** Every write is followed by `router.refresh()`,
+ * and any local patch is dropped the moment fresh server data arrives.
  */
 
 type SheetState =
   | { type: "detail"; itemId: string }
-  | { type: "handoff"; itemId: string }
-  | { type: "report"; itemId: string }
+  /** `reservationId: null` means the hold is still in flight. */
+  | { type: "handoff"; itemId: string; reservationId: string | null }
+  | { type: "report"; itemId: string; reservationId: string | null }
   | { type: "group"; itemId: string }
   | { type: "cashVoucher"; itemId: string }
   | { type: "contact"; itemId: string }
   | { type: "blessing" }
   | { type: "confirmed" }
-  | { type: "taken"; itemId: string }
+  /** `raceLost` separates "taken while you decided" from "taken before you arrived". */
+  | { type: "taken"; itemId: string; raceLost: boolean }
   | null;
 
 function matchesFilter(item: PublicItem, filter: FilterId): boolean {
@@ -71,20 +87,82 @@ function matchesFilter(item: PublicItem, filter: FilterId): boolean {
   }
 }
 
+/**
+ * The optimistic hold, mirroring the rule the API applies: a unit is taken, and
+ * the item only closes once the last one is gone.
+ */
+function claimedLocally(item: PublicItem): PublicItem {
+  const quantityClaimed = Math.min(item.quantityClaimed + 1, item.quantityWanted);
+  return {
+    ...item,
+    quantityClaimed,
+    claimState: quantityClaimed >= item.quantityWanted ? "reserved" : item.claimState,
+  };
+}
+
+type Patches = Record<string, PublicItem>;
+
+/** Stable identity, so an unpatched render does not invalidate the memos. */
+const NO_PATCHES: Patches = {};
+
+function withoutItem(patches: Patches, itemId: string): Patches {
+  return Object.fromEntries(Object.entries(patches).filter(([id]) => id !== itemId));
+}
+
 export function RegistryClient({ registry }: { registry: PublicRegistry }) {
+  const router = useRouter();
   const [filter, setFilter] = useState<FilterId>("all");
   const [sheet, setSheet] = useState<SheetState>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [reporting, setReporting] = useState(false);
+  const [giverName, setGiverName] = useState("");
 
-  const shown = useMemo(
-    () => registry.items.filter((item) => matchesFilter(item, filter)),
-    [registry.items, filter],
+  // Patches are tagged with the server payload they were made against, so fresh
+  // server data supersedes them by simply not matching. A patch stands in for
+  // the server's answer; it stops mattering the moment the real one arrives.
+  const [optimistic, setOptimistic] = useState({
+    source: registry,
+    patches: NO_PATCHES,
+  });
+  const patches = optimistic.source === registry ? optimistic.patches : NO_PATCHES;
+
+  const patchItem = (item: PublicItem) =>
+    setOptimistic({ source: registry, patches: { ...patches, [item.id]: item } });
+  const dropPatch = (itemId: string) =>
+    setOptimistic({ source: registry, patches: withoutItem(patches, itemId) });
+
+  const items = useMemo(
+    () => registry.items.map((item) => patches[item.id] ?? item),
+    [registry.items, patches],
   );
 
-  const byId = (id: string) => registry.items.find((item) => item.id === id);
-  const firstFund = registry.items.find((item) => item.kind === "fund");
+  /**
+   * The cross-window half of D8. Another guest taking an item is invisible to
+   * an already-open page, and the guest who just came back from the chain is
+   * looking at a page rendered before they left. Refetching when the tab
+   * regains attention covers both without a socket or a polling loop.
+   */
+  useEffect(() => {
+    const refresh = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    window.addEventListener("focus", refresh);
+    document.addEventListener("visibilitychange", refresh);
+    return () => {
+      window.removeEventListener("focus", refresh);
+      document.removeEventListener("visibilitychange", refresh);
+    };
+  }, [router]);
 
-  const products = registry.items.filter((item) => item.kind === "product");
+  const shown = useMemo(
+    () => items.filter((item) => matchesFilter(item, filter)),
+    [items, filter],
+  );
+
+  const byId = (id: string) => items.find((item) => item.id === id);
+  const firstFund = items.find((item) => item.kind === "fund");
+
+  const products = items.filter((item) => item.kind === "product");
   const allProductsClaimed =
     products.length > 0 && products.every((item) => item.claimState !== "available");
 
@@ -97,7 +175,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
     if (item.kind === "fund" || item.kind === "voucher") {
       setSheet({ type: "cashVoucher", itemId: item.id });
     } else if (item.claimState !== "available") {
-      setSheet({ type: "taken", itemId: item.id });
+      setSheet({ type: "taken", itemId: item.id, raceLost: false });
     } else if (item.groupGiftEnabled) {
       setSheet({ type: "group", itemId: item.id });
     } else {
@@ -107,9 +185,91 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
 
   const closeSheet = () => setSheet(null);
 
+  /* ---------- the guest writes ---------- */
+
+  const reserve = async (item: PublicItem) => {
+    patchItem(claimedLocally(item));
+    setSheet({ type: "handoff", itemId: item.id, reservationId: null });
+
+    const result = await reserveItem(registry.slug, item.id);
+
+    if (!result.ok) {
+      dropPatch(item.id);
+      if (result.code === "item_already_reserved") {
+        setSheet({ type: "taken", itemId: item.id, raceLost: true });
+      } else {
+        setSheet(null);
+        showToast(errorCopy(result.code));
+      }
+      router.refresh();
+      return;
+    }
+
+    patchItem(result.data.item);
+    setSheet({
+      type: "handoff",
+      itemId: item.id,
+      reservationId: result.data.reservationId,
+    });
+    router.refresh();
+  };
+
+  const continueToChain = (itemId: string, reservationId: string | null) => {
+    const item = byId(itemId);
+    if (item?.canonicalUrl) {
+      window.open(item.canonicalUrl, "_blank", "noopener,noreferrer");
+    }
+    // The report modal waits here for their return, which is the whole of D12.
+    setSheet({ type: "report", itemId, reservationId });
+  };
+
+  /**
+   * Leaving the handoff sheet without going to the shop hands the unit back.
+   * The hold is already placed by the time this sheet is open, so keeping it
+   * would freeze the item for everyone else over a change of mind.
+   */
+  const abandonHold = async (itemId: string, reservationId: string | null) => {
+    setSheet(null);
+    // No id yet means the hold is still being written. It stays, and the couple
+    // can release it (D16); catching a millisecond window would need a queue.
+    if (!reservationId) return;
+
+    dropPatch(itemId);
+    await releaseReservation(registry.slug, reservationId);
+    router.refresh();
+  };
+
+  const report = async (
+    itemId: string,
+    reservationId: string | null,
+    purchased: boolean,
+  ) => {
+    if (reservationId) {
+      setReporting(true);
+      const result = await reportPurchase(
+        registry.slug,
+        reservationId,
+        purchased,
+        giverName,
+      );
+      setReporting(false);
+
+      if (result.ok) {
+        patchItem(result.data.item);
+      } else {
+        showToast(errorCopy(result.code));
+      }
+      router.refresh();
+    }
+
+    // "עוד לא" keeps the hold and just closes (PRD section 7). "כן, רכשתי"
+    // continues to the blessing.
+    setSheet(purchased ? { type: "blessing" } : null);
+  };
+
   /* ---------- empty and single-item grids ---------- */
 
-  if (registry.items.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="px-5 py-10">
         <div className="rounded-card border border-border bg-surface p-6 text-center">
@@ -119,7 +279,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
     );
   }
 
-  const singleItem = registry.items.length === 1 ? registry.items[0] : null;
+  const singleItem = items.length === 1 ? items[0] : null;
 
   return (
     <>
@@ -206,7 +366,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
             <ItemDetailSheet
               item={item}
               onClose={closeSheet}
-              onReserve={() => setSheet({ type: "handoff", itemId: item.id })}
+              onReserve={() => void reserve(item)}
             />
           );
         })()}
@@ -215,23 +375,32 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
         (() => {
           const item = byId(sheet.itemId);
           if (!item) return null;
+          const { itemId, reservationId } = sheet;
           return (
             <HandoffSheet
               item={item}
-              onClose={closeSheet}
-              onContinue={() => setSheet({ type: "report", itemId: item.id })}
+              pending={reservationId === null}
+              giverName={giverName}
+              onGiverNameChange={setGiverName}
+              onClose={() => void abandonHold(itemId, reservationId)}
+              onContinue={() => continueToChain(itemId, reservationId)}
             />
           );
         })()}
 
-      {sheet?.type === "report" && (
-        <ReportModal
-          onClose={closeSheet}
-          onPurchased={() => setSheet({ type: "blessing" })}
-          // "עוד לא" keeps the hold rather than releasing it (PRD section 7).
-          onNotYet={closeSheet}
-        />
-      )}
+      {sheet?.type === "report" &&
+        (() => {
+          const { itemId, reservationId } = sheet;
+          return (
+            <ReportModal
+              pending={reporting}
+              // Dismissing the question is not an answer, and it keeps the hold.
+              onClose={closeSheet}
+              onPurchased={() => void report(itemId, reservationId, true)}
+              onNotYet={() => void report(itemId, reservationId, false)}
+            />
+          );
+        })()}
 
       {sheet?.type === "group" &&
         (() => {
@@ -279,6 +448,8 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
       {sheet?.type === "blessing" && (
         <BlessingSheet
           coupleNames={registry.coupleNames}
+          giverName={giverName}
+          onGiverNameChange={setGiverName}
           onClose={closeSheet}
           onSubmit={() => setSheet({ type: "confirmed" })}
         />
@@ -292,6 +463,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
         <TakenSheet
           coupleNames={registry.coupleNames}
           hasFund={Boolean(firstFund)}
+          raceLost={sheet.raceLost}
           onClose={closeSheet}
           onFundInstead={() =>
             firstFund

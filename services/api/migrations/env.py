@@ -15,6 +15,7 @@ from sqlalchemy import engine_from_config, pool
 from app.catalog import models as catalog_models  # noqa: F401
 from app.config import get_settings
 from app.db import Base
+from app.gifting import models as gifting_models  # noqa: F401
 from app.identity import models as identity_models  # noqa: F401
 from app.registry import models as registry_models  # noqa: F401
 

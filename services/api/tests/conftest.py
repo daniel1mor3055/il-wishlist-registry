@@ -11,15 +11,20 @@ from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
+from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
 # Imported so create_all sees every table on a database that has never been
 # migrated. In the container Alembic has already made them.
 from app.catalog import models as catalog_models  # noqa: F401
-from app.db import Base, engine, get_session
+from app.db import Base, SessionFactory, engine, get_session
+from app.gifting import models as gifting_models  # noqa: F401
 from app.identity import models as identity_models  # noqa: F401
+from app.identity.models import Couple
 from app.main import app
 from app.registry import models as registry_models  # noqa: F401
+from app.registry.models import Registry
+from tests.factories import make_registry
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -47,3 +52,24 @@ def client(session: Session) -> Generator[TestClient, None, None]:
         yield TestClient(app)
     finally:
         app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def committed_registry() -> Generator[Registry, None, None]:
+    """A registry that is really committed, for the tests that need to race.
+
+    The `session` fixture above hands every caller the same connection, which
+    makes two overlapping transactions impossible - and two overlapping
+    transactions are the entire point of the reserve path. So this one commits
+    for real and deletes itself afterwards, through the couple, whose foreign
+    keys cascade to the registry, its items and their reservations.
+    """
+    setup = SessionFactory()
+    registry = make_registry(setup)
+    setup.commit()
+
+    yield registry
+
+    setup.execute(delete(Couple).where(Couple.id == registry.couple_id))
+    setup.commit()
+    setup.close()

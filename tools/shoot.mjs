@@ -9,14 +9,23 @@
  * Scripts are declared below in SCENES. Each step is one of:
  *   { goto }        navigate and wait for the network to settle
  *   { click }       CSS selector, or { text } to match visible text
+ *   { steal }       another guest reserves the item this selector points at
+ *   { require }     fail unless this text is on screen
  *   { shot }        write a PNG named after the value
  *   { wait }        milliseconds
+ *
+ * Since C3 the reserve steps write to the database, so a scene can now fail by
+ * landing on a *different* real screen - lose the race and the handoff sheet
+ * becomes the taken sheet. `require` is how a scene says which screen it is
+ * supposed to be on; the identical-PNG check cannot see that kind of failure.
+ * `npm run seed` resets the demo registries, reservations included.
  *
  * Shots are viewport-only on purpose. Sheets are position: fixed, so a
  * full-page capture would strand them halfway down a very tall image.
  *
  * Usage: node tools/shoot.mjs [scene ...]        (default: every scene)
  *   OUT=/tmp/shots  BASE=http://localhost:3000  WIDTH=390  HEIGHT=844
+ *   API=http://localhost:8000                   (only the steal step uses it)
  */
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -31,7 +40,9 @@ const OUT = process.env.OUT ?? "/tmp/shots";
 const WIDTH = Number(process.env.WIDTH ?? 390);
 const HEIGHT = Number(process.env.HEIGHT ?? 844);
 const PORT = Number(process.env.PORT ?? 9333);
+const API = process.env.API ?? "http://localhost:8000";
 const MAIN = "/r/noa-itai-k4m2xq8vp3wt";
+const MAIN_SLUG = MAIN.slice("/r/".length);
 const CLAIMED = "/r/fully-claimed-demo";
 
 const PRODUCT = "[data-testid='item-card'][data-kind='product'][data-claim='available']";
@@ -49,6 +60,8 @@ const SCENES = {
     { wait: 400 },
     { text: "אני קונה את זה" },
     { wait: 600 },
+    // The hold is real now, so prove it was granted rather than lost.
+    { require: "הפריט נשמר לך" },
     { shot: "sheet-handoff" },
   ],
   report: [
@@ -56,10 +69,24 @@ const SCENES = {
     { click: PRODUCT, nth: 0 },
     { wait: 400 },
     { text: "אני קונה את זה" },
-    { wait: 400 },
+    { wait: 600 },
     { text: "להמשיך לאתר" },
     { wait: 800 },
+    { require: "האם רכשת את הפריט?" },
     { shot: "sheet-report" },
+  ],
+  // D12 all the way through: the hold, the handoff, the yes, the blessing.
+  blessing: [
+    { goto: MAIN },
+    { click: PRODUCT, nth: 0 },
+    { wait: 400 },
+    { text: "אני קונה את זה" },
+    { wait: 600 },
+    { text: "להמשיך לאתר" },
+    { wait: 600 },
+    { text: "כן, רכשתי" },
+    { wait: 900 },
+    { shot: "sheet-blessing" },
   ],
   "group-gift": [
     { goto: MAIN },
@@ -89,6 +116,24 @@ const SCENES = {
     { click: "[data-testid='item-card'][data-claim='reserved']", nth: 0 },
     { wait: 500 },
     { shot: "sheet-taken" },
+  ],
+  /**
+   * The race, from the losing side. The page renders the item as free, another
+   * guest takes it, and only then does this guest tap.
+   *
+   * The scene cannot pass by accident: if the page had somehow refreshed after
+   * the steal, tapping the card would open the taken sheet directly and the
+   * "אני קונה את זה" step would find nothing to click.
+   */
+  "race-lost": [
+    { goto: MAIN },
+    { steal: PRODUCT },
+    { click: PRODUCT, nth: 0 },
+    { wait: 400 },
+    { text: "אני קונה את זה" },
+    { wait: 1200 },
+    { require: "אורח אחר כבר לקח את זה" },
+    { shot: "sheet-race-lost" },
   ],
   "all-claimed": [{ goto: CLAIMED }, { wait: 600 }, { shot: "registry-all-claimed" }],
   registry: [{ goto: MAIN }, { wait: 400 }, { shot: "registry-top" }],
@@ -186,6 +231,41 @@ async function click(ws, { selector, text, nth = 0 }) {
 }
 
 /**
+ * Another guest, arriving between this page's render and its next tap.
+ *
+ * Talks to the API directly rather than through /bff, because the point is to
+ * be a *different* guest: the BFF would hand it this browser's cookie.
+ */
+async function steal(ws, selector) {
+  const itemId = await evaluate(
+    ws,
+    `(document.querySelector(${JSON.stringify(selector)})?.dataset.itemId) ?? ''`,
+  );
+  if (!itemId) throw new Error(`nothing to steal: ${selector}`);
+
+  const response = await fetch(
+    `${API}/api/v1/public/registries/${MAIN_SLUG}/items/${itemId}/reservations`,
+    {
+      method: "POST",
+      headers: {
+        "X-Guest-Id": crypto.randomUUID(),
+        "Idempotency-Key": crypto.randomUUID(),
+      },
+    },
+  );
+  if (!response.ok) throw new Error(`steal failed: HTTP ${response.status}`);
+}
+
+/** Asserts the screen is the one the scene thinks it is on. */
+async function require_(ws, needle) {
+  const found = await evaluate(
+    ws,
+    `document.body.innerText.includes(${JSON.stringify(needle)})`,
+  );
+  if (!found) throw new Error(`not on screen: ${needle}`);
+}
+
+/**
  * Two identical PNGs in one run means a step did not take effect, which is the
  * failure mode this driver cannot otherwise see: every step reported ok and the
  * shot is of the screen before it.
@@ -268,6 +348,10 @@ try {
           await new Promise((r) => setTimeout(r, 2500));
         } else if (step.click || step.text) {
           await click(page, { selector: step.click, text: step.text, nth: step.nth });
+        } else if (step.steal) {
+          await steal(page, step.steal);
+        } else if (step.require) {
+          await require_(page, step.require);
         } else if (step.wait) {
           await new Promise((r) => setTimeout(r, step.wait));
         } else if (step.shot) {

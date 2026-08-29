@@ -14,7 +14,12 @@ from app.registry.models import Registry, RegistryItem
 from app.registry.schemas import PublicItem, PublicRegistry
 
 
-def _to_public_item(item: RegistryItem) -> PublicItem:
+def to_public_item(item: RegistryItem) -> PublicItem:
+    """One item, exactly as any guest may see it.
+
+    Shared with the guest write path, so a reserve response and a page load can
+    never disagree about what an item looks like.
+    """
     return PublicItem(
         id=item.id,
         kind=item.kind,
@@ -65,5 +70,5 @@ def get_public_registry(session: Session, slug: str) -> PublicRegistry | None:
         # so counting it would make a full list unreachable.
         items_total=len(products),
         items_claimed=sum(1 for item in products if item.claim_state != "available"),
-        items=[_to_public_item(item) for item in items],
+        items=[to_public_item(item) for item in items],
     )

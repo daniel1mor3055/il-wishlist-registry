@@ -66,6 +66,19 @@ Taken with the human after C1, before the C2 schema was written. Every one of th
 
 Consequence for the C2 schema: `registry_items` has no `priority`, no `out_of_stock`; `catalog_items` has no `in_stock`; `registries` has no `lifecycle` enum and no `born_on`. The council's [domain brief](council/impl-domain.md) still lists all of those, and is superseded here.
 
+## Locked, round five (the guest write loop)
+
+Taken while implementing C3. These are implementation decisions, small enough that they were not worth interrupting for, and load-bearing enough that reversing one should be deliberate.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D31 | The web mints the guest cookie, the API only reads a header | The council settled that a guest is identified by an `HttpOnly` per-registry cookie; this decides where it lives. The cookie is set by the `/bff` route handlers on the web origin and forwarded to the API as `X-Guest-Id`, because the browser never talks to the API and the API therefore has no origin to set a cookie on. There is no `guests` table: the cookie value *is* the guest, and presenting it is the entire authorisation model for reporting or releasing your own hold. | LOCKED |
+| D32 | Idempotency is a unique column, not an idempotency store | `Idempotency-Key` is unique on `reservations`, and a replay returns the reservation the first attempt created. No generic key-to-response table, because only one guest write is not already idempotent: reporting and releasing set a state, so a double tap changes nothing, while creating a hold moves a counter. The same one-line pattern extends to contributions when they land. | LOCKED |
+| D33 | The hold is placed before the handoff, so leaving the handoff sheet releases it | Reserving on tap is what makes the item go dark for other guests immediately, which is the whole of D8. The cost is a hold that exists before the guest has done anything, so dismissing the handoff sheet - the X or `ביטול`, either one - hands the unit back. Dismissing the *report* question does not: "עוד לא" and a dismissal both keep the hold, per D16. | LOCKED |
+| D34 | A closed registry refuses new holds and still accepts reports | A guest holding a unit must always be able to say what happened to it, or a couple who closes their list freezes the ledger mid-truth. Closing stops new holds only. | LOCKED |
+
+One thing C3 measured rather than assumed: regressing the reserve path to a read-then-write and re-running the concurrency tests, the two-guest race still passed - the threads did not overlap - while six guests on two units produced five winners. A small race is a timing coincidence; the crowd is the test that detects an oversell. Noted in `tests/test_reserve_race.py` so nobody trims it.
+
 ## Target retailers
 
 Design content should look like these chains. None of them is integrated in this phase; all catalog data is mock.

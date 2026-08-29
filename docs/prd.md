@@ -88,7 +88,7 @@ Sample data for every mock: couple **נועה ואיתי** (Noa and Itai), baby 
 | G1 | Hero / land | Couple photo, names, one-line story, progress, reassurance strip, "how this works" in three lines | `לראות את הרשימה` (see the list) |
 | G2 | Item grid + filters | Chips: `הכול` / `מה שעוד חסר` / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` / `מעטפה ושוברים`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
 | G3 | Item detail sheet | Image, full name, price, chain chip, quantity line, couple note, price disclaimer | `אני קונה את זה` (I'm buying this) |
-| G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Optional first name, framed `למי להגיד תודה?` | `להמשיך לאתר שילב` (continue to Shilav) |
+| G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Optional first name, framed `למי להגיד תודה?`. Leaving this sheet without continuing hands the unit back (D33) | `להמשיך לאתר שילב` (continue to Shilav) |
 | G5 | Return self-report modal | The D12 moment. `האם רכשת את הפריט?` with `כן, רכשתי` and `עוד לא` | `כן, רכשתי` (yes, I bought it) |
 | G6 | Group gift sheet | Funding meter, `נותרו ₪550 מתוך ₪1,290`, `6 אורחים כבר השתתפו`, amount chips, then the contact reveal | `להשתתף במתנה` (join this gift) |
 | G7 | Envelope / gift card sheet | One plain cash envelope with no target and no meter (D28), and voucher types. Amount chips, then contact reveal or outbound merchant | `לשלוח מתנה` (send a gift) |
@@ -144,7 +144,7 @@ Figma Make defaults to the happy path and to full lists, so every state below ne
 | Closed registry | G10 | Read-only thank-you summary | `הרשימה נסגרה. תודה לכל מי שהשתתף` |
 | Not found | G10 | Assume a truncated WhatsApp link | `הרשימה לא נמצאה. אולי הקישור לא הועתק במלואו` |
 | Offline while browsing | G2 | Inline retry row, keeps cached items | `משהו נתקע. לנסות שוב?` |
-| Reserve race | G4 | Optimistic UI must be reversible | `בזמן שמילאת, אורח אחר לקח את הפריט` |
+| Reserve race | G3, G4 | Optimistic UI must be reversible: the hold is taken on tap, so the guest lands on the taken sheet with this line instead of the handoff sheet. Reworded from `בזמן שמילאת` because the hold now precedes the form (D33) | `בזמן שהתלבטת, אורח אחר לקח את הפריט` |
 
 ## 8. RTL rules
 

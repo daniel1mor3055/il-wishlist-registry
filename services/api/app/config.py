@@ -18,7 +18,7 @@ class Settings(BaseSettings):
     # without an env file. Overridden by DATABASE_URL everywhere else.
     database_url: str = "postgresql+psycopg://registry:registry@db:5432/registry"
 
-    # Lands at C4 (magic links via Mailpit).
+    # Lands at C5 (magic links via Mailpit).
     smtp_host: str = "mailpit"
     smtp_port: int = 1025
 

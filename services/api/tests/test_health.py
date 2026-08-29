@@ -18,7 +18,7 @@ def test_no_payment_endpoints_exist():
 
     Nothing in this product may accept a payment. This asserts the surface has
     no route that even suggests one, and it will keep asserting that as the API
-    grows through C7.
+    grows through the last checkpoint.
     """
     paths = app.openapi()["paths"].keys()
     forbidden = ("checkout", "payment", "charge", "card", "refund", "escrow")

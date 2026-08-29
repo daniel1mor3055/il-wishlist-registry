@@ -32,6 +32,14 @@ export const FILTERS = [
 
 export type FilterId = (typeof FILTERS)[number]["id"];
 
+/**
+ * Said in two places - the error table and the taken sheet - so it is written
+ * once. "בזמן שהתלבטת" rather than the PRD's original "בזמן שמילאת": the hold
+ * is placed on tap, before the handoff form (D33), so a guest who loses the
+ * race loses it while deciding, not while filling anything in.
+ */
+const RACE_LOST = "בזמן שהתלבטת, אורח אחר לקח את הפריט";
+
 export const copy = {
   /** G1 hero and reassurance. */
   hero: {
@@ -69,6 +77,8 @@ export const copy = {
        that there is no stock state to carry part of it (D26). */
     priceMayDiffer: "המחיר מתעדכן באתר החנות",
     fullName: "השם המלא בחנות",
+    /* The couple removed it while a guest had the page open. */
+    gone: "הפריט הזה כבר לא ברשימה",
     detailCta: "אני קונה את זה",
     contributeCta: "להשתתף במתנה",
     sendGiftCta: "לשלוח מתנה",
@@ -82,8 +92,9 @@ export const copy = {
     nameLabel: "למי להגיד תודה?",
     namePlaceholder: "השם הפרטי שלך (לא חובה)",
     continueTo: (chain: string) => `להמשיך לאתר ${chain}`,
+    /* Hands the unit back rather than just closing the sheet (D33). */
     cancel: "ביטול",
-    raceLost: "בזמן שמילאת, אורח אחר לקח את הפריט",
+    raceLost: RACE_LOST,
   },
 
   /** G5 the D12 self-report moment. */
@@ -149,6 +160,10 @@ export const copy = {
     title: "אורח אחר כבר לקח את זה",
     body: (names: string) =>
       `הפריט הזה כבר נתפס. אפשר לבחור מתנה אחרת מהרשימה, או לשלוח מעטפה ל${names}.`,
+    /* Losing a live race is a different experience from opening something that
+       was already gone, and the guest deserves to be told which happened. */
+    raceBody: (names: string) =>
+      `${RACE_LOST}. אפשר לבחור מתנה אחרת מהרשימה, או לשלוח מעטפה ל${names}.`,
     fundInstead: "לשלוח מעטפה במקום",
   },
 
@@ -168,11 +183,19 @@ export const copy = {
   },
 } as const;
 
-/** API error code to Hebrew. Unknown codes fall through to the generic row. */
+/**
+ * API error code to Hebrew. Unknown codes fall through to the generic row.
+ *
+ * Deliberately not exhaustive. `reservation_not_found`, `reservation_released`
+ * and `idempotency_key_reused` are real codes with no row here: each means the
+ * client and the server disagree about state, and the honest thing to show for
+ * that is "משהו נתקע. לנסות שוב?" rather than an explanation of our bug.
+ */
 export const ERROR_COPY: Record<string, string> = {
   registry_not_found: copy.shell.notFound,
   registry_closed: copy.shell.closed,
   item_already_reserved: copy.handoff.raceLost,
+  item_not_found: copy.item.gone,
   fund_complete: copy.group.complete,
   rate_limited: copy.shell.rateLimited,
 };

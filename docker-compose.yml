@@ -28,7 +28,7 @@ services:
       timeout: 3s
       retries: 10
 
-  # Catches the magic-link emails from C4. Web UI on 8025.
+  # Catches the magic-link emails from C5. Web UI on 8025.
   mailpit:
     image: axllent/mailpit:latest
     ports:

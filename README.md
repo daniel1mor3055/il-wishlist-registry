@@ -25,7 +25,7 @@ A B2B2C platform that Israeli retailers can embed or integrate, giving their cus
 
 ## Current phase
 
-Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton and guest registry) and C2 (Postgres, seed, API read path) are in.
+Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton and guest registry), C2 (Postgres, seed, API read path) and C3 (the double-buy core: reserve, self-report, release) are in.
 
 | Document                                                 | What it is                                                           |
 | -------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -67,6 +67,16 @@ npm run dev              # next dev on :3000
 
 The web app has no data of its own: every page is server-rendered from `GET /api/v1/public/registries/{slug}`, so the API and a seeded database have to be up.
 
+Guest writes go the same way round, through route handlers under `/bff` — the browser never learns the API origin, and the guest cookie is set on the web origin, `HttpOnly`, one per registry:
+
+```
+POST   /bff/registries/{slug}/items/{itemId}/reservations   take one unit
+POST   /bff/registries/{slug}/reservations/{id}/report       "כן, רכשתי" or "עוד לא" (D12)
+DELETE /bff/registries/{slug}/reservations/{id}             hand the unit back
+```
+
+`npm run seed` is also the reset: demo registry items are replaced wholesale, which drops every hold placed against them.
+
 `npm run dev:bg` starts the same dev server detached, logging to `.logs/web-dev.log`, and `npm run dev:stop` stops it. It exists for scripted screenshot runs, which cannot block on a process that never exits.
 
 | URL                                           | What                                        |
@@ -75,9 +85,9 @@ The web app has no data of its own: every page is server-rendered from `GET /api
 | http://localhost:3000/r/noa-itai-k4m2xq8vp3wt | The main demo registry (נועה ואיתי)         |
 | http://localhost:3000/dev/states              | State gallery — every PRD state on one page |
 | http://localhost:8000/docs                    | API docs, and the public read endpoint      |
-| http://localhost:8025                         | Mailpit, for magic links (C4)               |
+| http://localhost:8025                         | Mailpit, for magic links (C5)               |
 
-Checks: `npm run typecheck`, `npm run lint`, `npm run format`. API tests: `docker compose exec api pytest`.
+Checks: `npm run typecheck`, `npm run lint`, `npm run format`. API tests: `docker compose exec api pytest`. `npm run shoot` drives headless Chrome through the guest flow and writes a PNG per state, including a real lost race staged against a live page.
 
 Regenerating seed data (rarely needed — both files are committed):
 
@@ -89,7 +99,9 @@ npm run seed             # load both into Postgres
 
 ## Status
 
-C2 done: Postgres schema and Alembic migrations, an idempotent seed from the harvest, the public read endpoint, and the guest registry reading through it — the TypeScript fixtures are gone. Next is C3, the guest write loop: reserve, self-report, contribute, blessing, and the race and idempotency tests that go with them.
+C3 done: the double-buy core. Taking an item is one conditional `UPDATE ... WHERE quantity_claimed < quantity_wanted RETURNING`, so two guests on the last unit get one `201` and one `409` rather than an oversold gift; the hold is optimistic in the client and reverts to the taken sheet when the race is lost. Self-reporting (D12), handing a unit back, the per-registry guest cookie and idempotent re-POSTs are in, with the concurrency, replay and counter-reconciliation tests that guard them.
+
+Next is C4, the money surface: group-gift and envelope contributions, the D13 contact reveal, and the private blessing (D17) — the flows that currently look finished in the UI and write nothing.
 
 ## License
 

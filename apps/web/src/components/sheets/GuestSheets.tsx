@@ -22,7 +22,19 @@ import {
 } from "@/lib/money";
 import type { PaymentHandle, PublicItem } from "@/lib/types";
 
-function NameField({ label }: { label: string }) {
+/**
+ * "למי להגיד תודה?" - optional, and the only thing we ever ask a guest for.
+ * It reaches the couple's tracker (D7) and no other guest (D8).
+ */
+function NameField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
   return (
     <div className="flex flex-col gap-1.5">
       <label className="text-small font-medium text-ink" htmlFor="giver-name">
@@ -31,6 +43,8 @@ function NameField({ label }: { label: string }) {
       <input
         id="giver-name"
         name="giverName"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
         placeholder={copy.handoff.namePlaceholder}
         className="rounded-btn border border-border bg-panel px-4 py-3 text-body text-ink outline-none focus:border-primary"
       />
@@ -110,13 +124,26 @@ export function ItemDetailSheet({
   );
 }
 
-/** G4. The hold is placed, then the guest is sent out to the chain. */
+/**
+ * G4. The hold is placed, then the guest is sent out to the chain.
+ *
+ * `pending` is the hold still being written. The sheet opens optimistically so
+ * the tap feels instant, but the way out to the shop stays disabled until the
+ * unit is really ours - sending someone off to buy something we have not
+ * secured is the one failure this whole path exists to prevent.
+ */
 export function HandoffSheet({
   item,
+  pending,
+  giverName,
+  onGiverNameChange,
   onClose,
   onContinue,
 }: {
   item: PublicItem;
+  pending: boolean;
+  giverName: string;
+  onGiverNameChange: (value: string) => void;
   onClose: () => void;
   onContinue: () => void;
 }) {
@@ -126,7 +153,7 @@ export function HandoffSheet({
       labelledBy="handoff-title"
       cta={
         <div className="flex flex-col items-center gap-2">
-          <PrimaryButton onClick={onContinue}>
+          <PrimaryButton onClick={onContinue} disabled={pending}>
             {copy.handoff.continueTo(item.chainNameHe ?? "")}
           </PrimaryButton>
           <TextButton onClick={onClose}>{copy.handoff.cancel}</TextButton>
@@ -143,7 +170,11 @@ export function HandoffSheet({
         <p className="text-small text-ink">
           {copy.handoff.body(item.title, item.chainNameHe ?? "")}
         </p>
-        <NameField label={copy.handoff.nameLabel} />
+        <NameField
+          label={copy.handoff.nameLabel}
+          value={giverName}
+          onChange={onGiverNameChange}
+        />
       </div>
     </Sheet>
   );
@@ -151,10 +182,12 @@ export function HandoffSheet({
 
 /** G5. The D12 moment: purchase is self-reported, never derived. */
 export function ReportModal({
+  pending,
   onClose,
   onPurchased,
   onNotYet,
 }: {
+  pending: boolean;
   onClose: () => void;
   onPurchased: () => void;
   onNotYet: () => void;
@@ -167,9 +200,13 @@ export function ReportModal({
         </h2>
         <p className="text-small text-ink-muted">{copy.report.body}</p>
         <div className="mt-2 flex flex-col gap-2">
-          <PrimaryButton onClick={onPurchased}>{copy.report.yes}</PrimaryButton>
+          <PrimaryButton onClick={onPurchased} disabled={pending}>
+            {copy.report.yes}
+          </PrimaryButton>
           {/* "עוד לא" keeps the hold. It is not a decline. */}
-          <SecondaryButton onClick={onNotYet}>{copy.report.notYet}</SecondaryButton>
+          <SecondaryButton onClick={onNotYet} disabled={pending}>
+            {copy.report.notYet}
+          </SecondaryButton>
         </div>
       </div>
     </Modal>
@@ -382,13 +419,23 @@ export function ContactRevealSheet({
 /** G9a. A blessing is private to the couple (D17). */
 export function BlessingSheet({
   coupleNames,
+  giverName,
+  onGiverNameChange,
   onClose,
   onSubmit,
 }: {
   coupleNames: string;
+  /* Shared with the handoff sheet: a guest who already answered "למי להגיד
+     תודה?" on the way out should not be asked again on the way back. */
+  giverName: string;
+  onGiverNameChange: (value: string) => void;
   onClose: () => void;
   onSubmit: () => void;
 }) {
+  // The blessing text itself goes nowhere until the write lands in C4, so it
+  // stays local rather than pretending to be part of a flow.
+  const [message, setMessage] = useState("");
+
   return (
     <Sheet
       onClose={onClose}
@@ -407,9 +454,15 @@ export function BlessingSheet({
           </h2>
           <p className="text-small text-ink-muted">{copy.blessing.privateNote}</p>
         </div>
-        <NameField label={copy.blessing.nameLabel} />
+        <NameField
+          label={copy.blessing.nameLabel}
+          value={giverName}
+          onChange={onGiverNameChange}
+        />
         <textarea
           rows={4}
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
           placeholder={copy.blessing.messagePlaceholder(coupleNames)}
           className="resize-none rounded-btn border border-border bg-panel px-4 py-3 text-body text-ink outline-none focus:border-primary"
         />
@@ -445,17 +498,24 @@ export function ConfirmedSheet({
   );
 }
 
-/** The item is already claimed. Redirects the guest to the fund instead. */
+/**
+ * The item is already claimed. Redirects the guest to the envelope instead.
+ *
+ * `raceLost` means it was taken between this page rendering and the guest
+ * tapping, which is the version that needs explaining rather than just stating.
+ */
 export function TakenSheet({
   coupleNames,
   onClose,
   onFundInstead,
   hasFund,
+  raceLost = false,
 }: {
   coupleNames: string;
   onClose: () => void;
   onFundInstead: () => void;
   hasFund: boolean;
+  raceLost?: boolean;
 }) {
   return (
     <Sheet
@@ -478,7 +538,9 @@ export function TakenSheet({
         <h2 id="taken-title" className="text-h2 font-bold text-ink">
           {copy.taken.title}
         </h2>
-        <p className="text-small text-ink-muted">{copy.taken.body(coupleNames)}</p>
+        <p className="text-small text-ink-muted">
+          {raceLost ? copy.taken.raceBody(coupleNames) : copy.taken.body(coupleNames)}
+        </p>
       </div>
     </Sheet>
   );

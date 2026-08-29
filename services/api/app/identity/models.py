@@ -1,6 +1,6 @@
 """Couples.
 
-Present at C2 with nothing but an identity, so that C4 adds magic links to an
+Present at C2 with nothing but an identity, so that C5 adds magic links to an
 existing owner rather than migrating ownership onto `registries` after the fact.
 Security is deliberately deferred (D23): there is no password, no session and
 no authorisation here yet.
