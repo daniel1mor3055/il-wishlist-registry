@@ -38,6 +38,8 @@ from sqlalchemy.orm import Session
 from app.gifting.models import Blessing, Contribution, Reservation
 from app.gifting.schemas import (
     ContributionView,
+    HoldView,
+    MyHoldsView,
     PaymentHandleView,
     ReservationView,
     ShippingAddressView,
@@ -446,6 +448,26 @@ def add_blessing(
     except IntegrityError:
         # A replayed submit that arrived while the first was still committing.
         session.rollback()
+
+
+def list_my_holds(session: Session, *, slug: str, guest_id: UUID) -> MyHoldsView:
+    """The holds that belong to this cookie, and only the ones still open.
+
+    Public `claimState` is the same for every guest (D8), so a holder who
+    dismissed G5 would otherwise see their own item as `כבר נתפס`. This list
+    is how the page tells "yours, still at the shop" from "someone else took
+    it". Purchased and released rows are gone: those are finished answers.
+    """
+    registry = _load_registry(session, slug)
+    stmt = select(Reservation).where(
+        Reservation.registry_id == registry.id,
+        Reservation.guest_id == guest_id,
+        Reservation.state == "held",
+    )
+    rows = session.execute(stmt).scalars().all()
+    return MyHoldsView(
+        holds=[HoldView(reservation_id=row.id, item_id=row.item_id) for row in rows]
+    )
 
 
 def reveal_payment_handle(session: Session, *, slug: str) -> PaymentHandleView:

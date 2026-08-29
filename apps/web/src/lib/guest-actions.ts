@@ -1,5 +1,6 @@
 import type {
   ContributionView,
+  MyHolds,
   PaymentHandle,
   ReservationView,
   ShippingAddress,
@@ -157,6 +158,22 @@ export async function sendBlessing(
     });
     if (!response.ok) return { ok: false, code: await codeFrom(response) };
     return { ok: true, data: null };
+  } catch {
+    return { ok: false, code: NETWORK_FAILED };
+  }
+}
+
+/**
+ * The holds that belong to this browser's cookie. Empty when they have never
+ * written; the page uses it to tell "שמור לך" from "כבר נתפס".
+ */
+export async function fetchMyHolds(slug: string): Promise<WriteResult<MyHolds>> {
+  try {
+    const response = await fetch(`${base(slug)}/holds`, {
+      credentials: "same-origin",
+    });
+    if (!response.ok) return { ok: false, code: await codeFrom(response) };
+    return { ok: true, data: (await response.json()) as MyHolds };
   } catch {
     return { ok: false, code: NETWORK_FAILED };
   }

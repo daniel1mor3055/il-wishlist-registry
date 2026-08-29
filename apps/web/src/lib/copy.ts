@@ -69,6 +69,9 @@ export const copy = {
   /** Item card and detail. */
   item: {
     taken: "כבר נתפס",
+    /* The guest who holds it, after dismissing the report (D35). Other guests
+       still see `taken`. */
+    heldByYou: "שמור לך",
     groupGiftBadge: "מתנה משותפת",
     quantityRemaining: (remaining: number, wanted: number) =>
       `נשארו ${remaining} מתוך ${wanted}`,

@@ -99,6 +99,14 @@ export interface ReservationView {
 }
 
 /**
+ * This guest's still-open holds. A reservation id is a capability, so this
+ * never lives on `PublicRegistry` - only the cookie-backed read.
+ */
+export interface MyHolds {
+  holds: { itemId: string; reservationId: string }[];
+}
+
+/**
  * The same idea for money: the guest's own contribution id, and the item with
  * its new public total. Their own amount is deliberately not echoed back - they
  * just typed it, and no response should be a place to read one from (D15).
