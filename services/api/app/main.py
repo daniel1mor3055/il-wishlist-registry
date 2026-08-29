@@ -12,20 +12,24 @@ Cross-module traffic goes through a module's service layer only. No module
 imports another's models, and no foreign key crosses into catalog - catalog
 output is snapshotted onto the item instead.
 
-At C3 `registry` serves the public read, `catalog` holds the harvested seed and
-`gifting` owns the reserve path. `identity` arrives with magic links in C5; it
-already owns the couples table so ownership does not have to be migrated onto
-registries later.
+At C5 `registry` serves both the public read and the couple's own writes,
+`catalog` holds the harvested seed and its search, `gifting` owns the reserve and
+money paths, and `identity` owns the login stub every `/me` route depends on.
 """
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.catalog.router import router as catalog_router
 from app.config import get_settings
 from app.gifting.router import router as gifting_router
 from app.gifting.service import GiftingError
 from app.health import router as health_router
+from app.identity.router import router as identity_router
+from app.identity.service import AuthError
+from app.registry.owner_router import router as owner_router
+from app.registry.owner_service import OwnerError
 from app.registry.router import router as registry_router
 
 settings = get_settings()
@@ -52,11 +56,15 @@ if settings.cors_origin_list:
 
 
 @app.exception_handler(GiftingError)
-def handle_gifting_error(request: Request, exc: GiftingError) -> JSONResponse:
-    """One shape for every failed guest write: `{"detail": {"code": ...}}`.
+@app.exception_handler(OwnerError)
+@app.exception_handler(AuthError)
+def handle_coded_error(
+    request: Request, exc: GiftingError | OwnerError | AuthError
+) -> JSONResponse:
+    """One shape for every refused write: `{"detail": {"code": ...}}`.
 
     Same envelope as `HTTPException` on the read path, so the web has one error
-    parser and one Hebrew lookup table rather than two.
+    parser and one Hebrew lookup table rather than four.
     """
     return JSONResponse(status_code=exc.status_code, content={"detail": {"code": exc.code}})
 
@@ -64,3 +72,6 @@ def handle_gifting_error(request: Request, exc: GiftingError) -> JSONResponse:
 app.include_router(health_router)
 app.include_router(registry_router)
 app.include_router(gifting_router)
+app.include_router(identity_router)
+app.include_router(owner_router)
+app.include_router(catalog_router)

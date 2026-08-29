@@ -118,3 +118,86 @@ export interface PaymentHandle {
   handle: string;
   displayName: string;
 }
+
+/* ---------- the couple's own view ---------- */
+
+/**
+ * The mirror of the public types: everything above is what a guest may see, and
+ * these carry what only the couple may. They reach the browser exclusively
+ * through server components under `/editor`, never through `/bff`.
+ *
+ * Still absent: who gave what. Giver names and blessings belong to the gift
+ * tracker, so loading the editor cannot leak them by accident.
+ */
+export interface OwnerItem {
+  id: string;
+  position: number;
+  kind: ItemKind;
+
+  title: string;
+  sourceTitle: string | null;
+  note: string | null;
+  category: Category | null;
+  imageUrl: string | null;
+  subtitle: string | null;
+  caption: string | null;
+
+  chainSlug: string | null;
+  chainNameHe: string | null;
+  canonicalUrl: string | null;
+  priceAgorot: number | null;
+
+  quantityWanted: number;
+  quantityClaimed: number;
+  claimState: ClaimState;
+
+  groupGiftEnabled: boolean;
+  targetAgorot: number | null;
+  contributedAgorot: number;
+  contributorCount: number;
+
+  /** Hidden from guests without being deleted, so history survives a removal. */
+  isActive: boolean;
+}
+
+export interface OwnerRegistry {
+  id: string;
+  slug: string;
+  coupleNames: string;
+  story: string;
+  coverImageUrl: string | null;
+  city: string | null;
+  dueDate: string | null;
+  babyName: string | null;
+
+  /** Null means guests get "not found" on the link, including the couple (D30). */
+  publishedAt: string | null;
+  closedAt: string | null;
+
+  paymentMethod: "bit" | "paybox" | null;
+  paymentHandle: string | null;
+  paymentDisplayName: string | null;
+
+  itemsTotal: number;
+  itemsClaimed: number;
+  items: OwnerItem[];
+}
+
+/** One row of catalog search, as the add-item screen renders it. */
+export interface CatalogResult {
+  id: string;
+  title: string;
+  sourceTitle: string | null;
+  category: Category;
+  priceAgorot: number;
+  imageUrl: string;
+  canonicalUrl: string;
+  chainSlug: string;
+  chainNameHe: string;
+}
+
+export interface CatalogPage {
+  results: CatalogResult[];
+  /** All matches, not just this page, so the screen can say there are more. */
+  total: number;
+}

@@ -196,7 +196,127 @@ export const copy = {
     back: "חזרה",
     footer: "רשימת לידה",
   },
+
+  /** The couple's side. Nothing here is ever shown to a guest. */
+  editor: {
+    /* ed-C0, the door. Deliberately not called "התחברות": there is no account to
+       log into, and the mail is the whole mechanism (D23). */
+    enter: {
+      title: "לערוך את הרשימה שלכם",
+      body: "נשלח קישור למייל. אין סיסמה ואין הרשמה.",
+      emailLabel: "מייל",
+      emailPlaceholder: "you@example.com",
+      submit: "לשלוח לי קישור",
+      sending: "שולחים…",
+      /* Says nothing about whether the address is known. */
+      sent: (email: string) => `שלחנו קישור ל${email}. הוא תקף ל-20 דקות.`,
+      sentHint: "לא הגיע? אפשר לבקש עוד אחד בעוד רגע.",
+      invalidEmail: "כתובת המייל לא נראית תקינה",
+      linkDead: "הקישור לא תקף יותר. אפשר לבקש חדש.",
+      signOut: "יציאה",
+    },
+
+    /* ed-C1, three questions. */
+    wizard: {
+      title: "בואו נתחיל",
+      step: (current: number, total: number) => `שלב ${current} מתוך ${total}`,
+      namesLabel: "איך לקרוא לכם?",
+      namesPlaceholder: "נועה ואיתי",
+      namesHint: "זה מה שהאורחים יראו בכותרת",
+      dueDateLabel: "מתי התאריך המשוער?",
+      dueDateHint: "אפשר לדלג ולהוסיף אחר כך",
+      cityLabel: "עיר",
+      starterTitle: "מאיפה נתחיל?",
+      starterHint: "נוסיף לכם כמה פריטים מהקטגוריות שתבחרו. אפשר למחוק כל דבר אחר כך.",
+      starterBlank: "להתחיל מרשימה ריקה",
+      envelopeLabel: "להוסיף מעטפה לכסף",
+      envelopeHint: "אורחים שיעדיפו לשלוח כסף יעשו את זה בביט או בפייבוקס, ישירות אליכם",
+      next: "הלאה",
+      create: "ליצור את הרשימה",
+      creating: "מכינים…",
+    },
+
+    /* ed-C2, the home screen. */
+    home: {
+      title: "הרשימה שלכם",
+      itemCount: (n: number) => (n === 1 ? "פריט אחד" : `${n} פריטים`),
+      claimed: (claimed: number, total: number) => `${claimed} מתוך ${total} נתפסו`,
+      addItem: "להוסיף פריט",
+      addEnvelope: "להוסיף מעטפה לכסף",
+      preview: "לראות איך זה נראה לאורחים",
+      /* D30: the only place an unpublished list is ever named, and it is named to
+         its owner, not to a guest. */
+      unpublishedTitle: "הרשימה עוד לא פורסמה",
+      unpublishedBody: "אף אחד לא יכול לראות אותה עד שתפרסמו. הקישור לא יעבוד עד אז.",
+      publish: "לפרסם את הרשימה",
+      publishing: "מפרסמים…",
+      publishedTitle: "הרשימה פורסמה",
+      linkLabel: "הקישור לשליחה",
+      copyLink: "העתקה",
+      copiedLink: "הקישור הועתק",
+      emptyTitle: "אין עוד כלום ברשימה",
+      emptyBody: "מוסיפים פריט ראשון, ואז מפרסמים.",
+      /* Item rows. A claimed item is not editable down to zero (see the API), so
+         the row says why rather than offering a control that will refuse. */
+      itemTaken: "נתפס",
+      itemHidden: "מוסתר מהאורחים",
+      itemGroupGift: "מתנה משותפת",
+      itemContributed: (amount: string) => `${amount} כבר נאספו`,
+      settings: "הגדרות",
+    },
+
+    /* ed-C3, adding. */
+    add: {
+      title: "להוסיף פריט",
+      searchTab: "מהחנויות",
+      manualTab: "משהו אחר",
+      searchPlaceholder: "מה מחפשים? עגלה, מיטה, בקבוקים…",
+      search: "חיפוש",
+      resultCount: (shown: number, total: number) =>
+        total > shown ? `${shown} מתוך ${total} תוצאות` : `${total} תוצאות`,
+      noResults: "לא מצאנו כלום. אפשר להוסיף את זה ידנית.",
+      browsePrompt: "אפשר לחפש, או לבחור קטגוריה",
+      addThis: "להוסיף",
+      added: "נוסף לרשימה",
+      manualTitleLabel: "מה זה?",
+      manualTitlePlaceholder: "משאבת חלב ידנית",
+      manualPriceLabel: "מחיר משוער",
+      manualPricePlaceholder: "בשקלים, לא חובה",
+      manualLinkLabel: "קישור",
+      manualLinkPlaceholder: "אם יש לכם קישור לחנות",
+      manualCategoryLabel: "קטגוריה",
+      manualSubmit: "להוסיף לרשימה",
+      quantityLabel: "כמה מהם?",
+      noteLabel: "הערה לאורחים",
+      notePlaceholder: "למשל: בצבע אפור, או ׳יש לנו כבר אחד׳",
+    },
+
+    /* ed-C4, item settings. */
+    itemSettings: {
+      title: "הגדרות פריט",
+      quantityLabel: "כמה מהם אתם רוצים?",
+      quantityClaimed: (n: number) => `${n} כבר נתפסו — אי אפשר לרדת מתחת לזה`,
+      noteLabel: "הערה לאורחים",
+      priceLabel: "מחיר",
+      groupGiftLabel: "לאפשר מתנה משותפת",
+      groupGiftHint: "כמה אורחים משתתפים בסכום. מתאים לפריטים יקרים.",
+      groupGiftHintExpensive: "פריט יקר — שווה לאפשר מתנה משותפת",
+      groupGiftLocked: "אורחים כבר השתתפו בסכום, אז אי אפשר לכבות את זה",
+      quantityLocked: "אורחים כבר תפסו את הפריטים האלה, אז אי אפשר לרדת מתחת לזה",
+      groupGiftNeedsPrice: "צריך מחיר כדי לאפשר מתנה משותפת",
+      groupGiftNeedsSingle: "מתנה משותפת עובדת על פריט אחד",
+      save: "לשמור",
+      saving: "שומרים…",
+      saved: "נשמר",
+      remove: "להסיר מהרשימה",
+      removeTaken: "הפריט נתפס, אז הוא ייעלם מהאורחים אבל יישאר אצלכם",
+      removeConfirm: "להסיר את הפריט מהרשימה?",
+    },
+  },
 } as const;
+
+/** Above this, the item settings screen suggests group gifting (PRD ed-C4). */
+export const GROUP_GIFT_HINT_AGOROT = 40_000;
 
 /**
  * API error code to Hebrew. Unknown codes fall through to the generic row.
@@ -213,6 +333,18 @@ export const ERROR_COPY: Record<string, string> = {
   item_not_found: copy.item.gone,
   fund_complete: copy.group.complete,
   rate_limited: copy.shell.rateLimited,
+
+  // The couple's side. A refusal here is almost always the API protecting
+  // something a guest already did, so it is worth saying which thing.
+  invalid_email: copy.editor.enter.invalidEmail,
+  link_invalid: copy.editor.enter.linkDead,
+  link_used: copy.editor.enter.linkDead,
+  link_expired: copy.editor.enter.linkDead,
+  quantity_below_claimed: copy.editor.itemSettings.quantityLocked,
+  group_gift_has_money: copy.editor.itemSettings.groupGiftLocked,
+  group_gift_needs_price: copy.editor.itemSettings.groupGiftNeedsPrice,
+  group_gift_needs_single_unit: copy.editor.itemSettings.groupGiftNeedsSingle,
+  registry_empty: copy.editor.home.emptyBody,
 };
 
 export function errorCopy(code: string | undefined): string {

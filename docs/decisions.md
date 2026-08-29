@@ -100,6 +100,26 @@ instead of letting Postgres evaluate `contributed_agorot + :amount` against the
 locked row left ₪410 of ₪940 in the couple's tracker, while every sequential
 test still passed. Noted in `tests/test_contribute_race.py`.
 
+## Locked, round seven (the couple's editor)
+
+Taken while implementing C5. D23 already said the magic link is a stub; these
+decide what the stub is allowed to touch, and what the editor may not undo.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D42 | The API owns the session token, the web owns the cookie | Same split as the guest id (D31), for the same reason: the browser never reaches the API, so the API has no origin to set a cookie on. `POST /auth/session` answers with an opaque token in the body, the web app stores it `HttpOnly` on its own origin, and every `/me` route reads it from `X-Session-Token`. The whole of what the rest of the API knows about identity is `load_session(token) -> Couple`, which is the line a real identity provider replaces. | LOCKED |
+| D43 | Asking for a magic link creates nothing, and always answers `202` | The token row carries the email; the couple row is created when the link is followed. So mailing a stranger cannot fill the table with half-registered people, and the response cannot be used to ask whether an address has an account - including when the mail server is down, where a `500` would be exactly that oracle. Tokens are stored as sha256 and compared in constant time, because doing otherwise would be a habit rather than a shortcut. | LOCKED |
+| D44 | One registry per couple, enforced by a unique index | The editor's routes are `/me/registry` and carry no identifier, which removes every ownership comparison from the code: a wrong id and someone else's id are the same `404` because the query filters on the session. That only holds if a couple has exactly one list, so the constraint lives in the database. The five demo registries were re-pointed onto five couples to match. A second list is a product question - whose link is in the group chat? - with no evidence for it yet. | LOCKED |
+| D45 | The couple may not edit away a guest's action | Quantity cannot drop below what is already claimed, group gifting cannot be switched off while contributions are attached, and an item with history is deactivated rather than deleted. The item settings screen disables those controls with the reason next to them, and the API refuses them anyway. Losing a guest's gift to fix a typo is the one failure this product cannot absorb. | LOCKED |
+| D46 | Group gifting has no target field: the target *is* the price | Turning the toggle on copies `price_agorot` into `target_agorot`, and repricing the item moves the target with it. One number, so the meter cannot drift from the thing being bought (D28). It also means group gifting requires a price and a single unit - a crowd cannot fund "three of these". | LOCKED |
+| D47 | The editor writes through server actions, not `/bff` route handlers | The one place this codebase uses two patterns for the same job, so the reason is written down: the guest surface writes from inside a client component holding optimistic state, which needs a URL to fetch; the editor is forms and navigation, where an action is the whole mechanism. The magic link is the exception that proves it - following it has to set a cookie, which only a route handler may do, so `/editor/session` is one. | LOCKED |
+| D48 | Publish lands in C5, the share screen does not | The plan put publishing with the share surface. But a checkpoint that builds a list and cannot make its link work has no gate a human can check, and publishing is one timestamp and one button. WhatsApp, the QR code and the Open Graph preview stay in the next checkpoint; what ships here is the link and a copy button. | LOCKED |
+
+One thing C5 changed after measuring rather than assuming: the editor home was
+handing its client component the whole `OwnerRegistry`, and a client component's
+props are serialised into the page - so the couple's Bit number was in the HTML
+of a screen that never displays it. The prop is now field by field.
+
 ## Target retailers
 
 Design content should look like these chains. None of them is integrated in this phase; all catalog data is mock.

@@ -4,11 +4,15 @@ Run it as often as you like. Chains and catalog items are keyed on their
 natural keys - chain slug, and (chain, external_id) - so a re-run updates a
 product's price or title instead of inserting a second copy of it.
 
-Demo registries are different, and deliberately so: their items are replaced
-wholesale on every run, because the registry composition in
+Demo registries are different, and deliberately so: each one is dropped and
+rebuilt on every run, because the registry composition in
 `tools/build_demo_registries.mjs` is the authority for what a demo registry
 contains. That means a re-seed discards guest activity against a demo
 registry, which is the right trade for data whose purpose is to be a fixture.
+
+The couples survive, keyed on the address that signs in to each list. Asking for
+a magic link as `noa.itai@example.com` therefore lands in the editor on the main
+demo registry, with ten items already on it.
 
 Usage (from the repo root):
     npm run seed
@@ -114,42 +118,56 @@ def seed_catalog(session: Session) -> tuple[int, int]:
     return len(snapshot["chains"]), written
 
 
-def seed_demo_registries(session: Session) -> int:
-    demo = load(DEMO_PATH)
+def _owner(session: Session, *, email: str, display_name: str) -> Couple:
+    """One couple per demo registry, keyed on the address that signs in to it.
 
-    couple_row = demo["couple"]
-    couple = session.execute(
-        select(Couple).where(Couple.email == couple_row["email"])
-    ).scalar_one_or_none()
+    The main demo registry keeps `noa.itai@example.com`, so asking for a magic
+    link with that address lands on a list that already has things on it. That is
+    the only reason the seed knows about couples at all.
+    """
+    couple = session.execute(select(Couple).where(Couple.email == email)).scalar_one_or_none()
     if couple is None:
-        couple = Couple(display_name=couple_row["display_name"], email=couple_row["email"])
+        couple = Couple(display_name=display_name, email=email)
         session.add(couple)
         session.flush()
+    return couple
 
+
+def seed_demo_registries(session: Session) -> int:
+    demo = load(DEMO_PATH)
+    display_name = demo["couple"]["display_name"]
     now = datetime.now(UTC)
 
-    for row in demo["registries"]:
-        registry = session.execute(
-            select(Registry).where(Registry.slug == row["slug"])
-        ).scalar_one_or_none()
-        if registry is None:
-            registry = Registry(slug=row["slug"], couple_id=couple.id)
-            session.add(registry)
+    # The whole demo set goes first, then gets rebuilt. Dropped rather than
+    # updated in place because the demo JSON is the authority for what a fixture
+    # contains, and because a registry now belongs to exactly one couple: moving
+    # five lists onto five owners in place would mean shuffling rows past a
+    # unique constraint to reach the same end state. The cascade takes the items
+    # and any guest activity with them, which is what the docstring promises.
+    slugs = [row["slug"] for row in demo["registries"]]
+    session.execute(delete(Registry).where(Registry.slug.in_(slugs)))
+    session.flush()
 
-        registry.couple_names = row["couple_names"]
-        registry.story = row["story"]
-        registry.cover_image_url = row["cover_image_url"]
-        registry.city = row["city"]
-        registry.due_date = date.fromisoformat(row["due_date"]) if row["due_date"] else None
-        registry.baby_name = row["baby_name"]
-        registry.published_at = now if row["published"] else None
-        registry.closed_at = now if row["closed"] else None
-        registry.payment_method = row["payment_method"]
-        registry.payment_handle = row["payment_handle"]
-        registry.payment_display_name = row["payment_display_name"]
+    for row in demo["registries"]:
+        couple = _owner(session, email=row["owner_email"], display_name=display_name)
+        registry = Registry(
+            slug=row["slug"],
+            couple_id=couple.id,
+            couple_names=row["couple_names"],
+            story=row["story"],
+            cover_image_url=row["cover_image_url"],
+            city=row["city"],
+            due_date=date.fromisoformat(row["due_date"]) if row["due_date"] else None,
+            baby_name=row["baby_name"],
+            published_at=now if row["published"] else None,
+            closed_at=now if row["closed"] else None,
+            payment_method=row["payment_method"],
+            payment_handle=row["payment_handle"],
+            payment_display_name=row["payment_display_name"],
+        )
+        session.add(registry)
         session.flush()
 
-        session.execute(delete(RegistryItem).where(RegistryItem.registry_id == registry.id))
         for item_row in row["items"]:
             session.add(
                 RegistryItem(
@@ -159,6 +177,17 @@ def seed_demo_registries(session: Session) -> int:
             )
 
     return len(demo["registries"])
+
+
+#: Every run of `tools/shoot.mjs` signs a brand-new couple in to photograph the
+#: create wizard, and leaves a real registry behind. This is where they go.
+DRIVER_EMAIL_PATTERN = "c5-%@example.com"
+
+
+def clear_driver_couples(session: Session) -> int:
+    """Remove the couples the screenshot driver created. Cascades to their lists."""
+    result = session.execute(delete(Couple).where(Couple.email.like(DRIVER_EMAIL_PATTERN)))
+    return result.rowcount or 0
 
 
 def main() -> int:
@@ -173,6 +202,9 @@ def main() -> int:
         if not args.catalog_only:
             registries = seed_demo_registries(session)
             print(f"demo: {registries} registries")
+            dropped = clear_driver_couples(session)
+            if dropped:
+                print(f"cleaned: {dropped} registries left by the screenshot driver")
 
         session.commit()
 

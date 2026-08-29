@@ -3,6 +3,8 @@ fastapi==0.115.6
 uvicorn[standard]==0.34.0
 pydantic==2.10.4
 pydantic-settings==2.7.1
+# What `EmailStr` needs. A login address is worth validating before mailing it.
+email-validator==2.2.0
 sqlalchemy==2.0.36
 alembic==1.14.0
 # Binary wheel: the slim image has no libpq and no compiler.

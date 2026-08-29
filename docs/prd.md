@@ -102,10 +102,11 @@ Emotional register: guest surfaces read like a message from friends. First perso
 
 | ID | Screen | Job | Primary CTA |
 |---|---|---|---|
-| C1 | Create wizard, 3 steps | `מי אתם` → `התאריך המשוער ללידה` → `מאיפה נתחיל` (starter template or blank) | `נתחיל את הרשימה` |
-| C2 | Editor home | Sectioned list, drag to reorder, progress ring, and while `published_at` is null an unpublished banner with `לפרסם את הרשימה`. This banner is the only place unpublished is ever surfaced (D30) | `הוספת פריט` |
-| C3 | Add item | Tabs: `לחפש בחנויות` (mock cross-chain catalog), `להדביק קישור` (paste with parsed preview), `להוסיף ידנית` | `להוסיף לרשימה` |
-| C4 | Item settings | `כמה נשמח לקבל` (quantity), couple note, `לאפשר מתנה משותפת` with hint `מומלץ בפריטים מעל ₪400` | `לשמור` |
+| C0 | Get in | One email field, no password. A mailed one-time link, and a note that it is valid for twenty minutes. Says nothing about whether the address is known (D43) | `לשלוח לי קישור` |
+| C1 | Create wizard, 3 steps | `איך לקרוא לכם` → `התאריך המשוער ללידה` + city → `מאיפה נתחיל` (starter categories or blank, and the envelope offered) | `ליצור את הרשימה` |
+| C2 | Editor home | The list, the progress line, and while `published_at` is null an unpublished banner with `לפרסם את הרשימה`. This banner is the only place unpublished is ever surfaced (D30). Once published it shows the link and a copy button; the full share surface is C8. Drag to reorder is not built yet | `להוסיף פריט` |
+| C3 | Add item | Tabs: `מהחנויות` (search the harvested catalog), `משהו אחר` (title, price, category, a link as plain text). `להדביק קישור` with a parsed preview needs the resolver and lands with it | `להוסיף לרשימה` |
+| C4 | Item settings | Quantity with a floor at what guests already hold, couple note, `לאפשר מתנה משותפת` with a hint above ₪400. Controls the couple may not undo are disabled with the reason beside them (D45) | `לשמור` |
 | C5 | Envelope, vouchers and payment details | Turn the cash envelope on or off, pick voucher types, and enter the Bit or PayBox handle that D13 reveals to guests. There is nothing to name and no target to set (D28) | `לשמור` |
 | C6 | Story and cover | Photo, two-line story | `לשמור` |
 | C7 | Preview as guest | Real guest render in a device frame, banner `זו התצוגה שהאורחים רואים` | `חזרה לעריכה` |
@@ -174,6 +175,7 @@ Concrete values, because abstract style words produce abstract output.
 | Primary | `#2F6F62` | Primary CTA, active chips. Deliberately not pink or baby blue |
 | Accent | `#E5A24B` | Funding meters, progress, the envelope tile |
 | Success | `#3E7D55` | Confirmed and received states |
+| Danger | `#A8443B` | Editor only: a refused save, the remove action. The guest surface states problems in words |
 | Muted / taken | `#9A938C` | Claimed items, disabled |
 | Border | `#E8E3DC` | Hairlines, card strokes |
 

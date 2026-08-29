@@ -56,8 +56,11 @@ class Registry(Base):
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    #: Unique: one registry per couple, which is why the editor's routes are
+    #: `/me/registry` and carry no id. A second list is a product question - whose
+    #: link is in the group chat? - and there is no evidence for it yet.
     couple_id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), ForeignKey("couples.id", ondelete="CASCADE"), index=True
+        UUID(as_uuid=True), ForeignKey("couples.id", ondelete="CASCADE"), unique=True
     )
 
     #: The capability. Readable prefix plus a random suffix, so the link is

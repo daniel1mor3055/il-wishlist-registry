@@ -11,6 +11,7 @@
  *   { click }       CSS selector, or { text } to match visible text
  *   { type }        text into { into } (a CSS selector), the way a human would
  *   { scrollTo }    bring the element this selector points at into view
+ *   { mail }        follow the newest magic link Mailpit holds for this address
  *   { steal }       another guest reserves the item this selector points at
  *   { require }     fail unless this text is on screen
  *   { shot }        write a PNG named after the value
@@ -28,6 +29,7 @@
  * Usage: node tools/shoot.mjs [scene ...]        (default: every scene)
  *   OUT=/tmp/shots  BASE=http://localhost:3000  WIDTH=390  HEIGHT=844
  *   API=http://localhost:8000                   (only the steal step uses it)
+ *   MAILPIT=http://localhost:8025               (only the mail step uses it)
  */
 import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
@@ -43,12 +45,19 @@ const WIDTH = Number(process.env.WIDTH ?? 390);
 const HEIGHT = Number(process.env.HEIGHT ?? 844);
 const PORT = Number(process.env.PORT ?? 9333);
 const API = process.env.API ?? "http://localhost:8000";
+const MAILPIT = process.env.MAILPIT ?? "http://localhost:8025";
 const MAIN = "/r/noa-itai-k4m2xq8vp3wt";
 const MAIN_SLUG = MAIN.slice("/r/".length);
 const CLAIMED = "/r/fully-claimed-demo";
 const SINGLE = "/r/single-item-demo";
 
 const PRODUCT = "[data-testid='item-card'][data-kind='product'][data-claim='available']";
+
+/** Owns the main demo registry, so signing in as them lands on a full list. */
+const DEMO_COUPLE = "noa.itai@example.com";
+
+/** Nobody, until this run signs them in. Fresh each run, so the wizard is clean. */
+const NEW_COUPLE = `c5-${Date.now()}@example.com`;
 
 const SCENES = {
   "item-detail": [
@@ -243,6 +252,108 @@ const SCENES = {
   ],
   "all-claimed": [{ goto: CLAIMED }, { wait: 600 }, { shot: "registry-all-claimed" }],
   registry: [{ goto: MAIN }, { wait: 400 }, { shot: "registry-top" }],
+
+  /* ---------- the couple's side ---------- */
+
+  /** The door. One field, and a confirmation that says nothing about the address. */
+  "editor-enter": [
+    { goto: "/editor/enter" },
+    { shot: "editor-enter" },
+    { type: DEMO_COUPLE, into: "input[type='email']" },
+    { wait: 200 },
+    { text: "לשלוח לי קישור" },
+    { wait: 1200 },
+    { require: "שלחנו קישור" },
+    { shot: "editor-link-sent" },
+  ],
+  /**
+   * The whole login, through a real mail.
+   *
+   * The `mail` step reads Mailpit, so this scene fails if the message never went
+   * out, if the link is malformed, or if the token cannot be spent. Landing on a
+   * populated editor is the proof that all three worked.
+   */
+  "editor-home": [
+    { goto: "/editor/enter" },
+    { type: DEMO_COUPLE, into: "input[type='email']" },
+    { text: "לשלוח לי קישור" },
+    { wait: 1000 },
+    { mail: DEMO_COUPLE },
+    { require: "הרשימה שלכם" },
+    { require: "הרשימה פורסמה" },
+    { shot: "editor-home" },
+  ],
+  /**
+   * A couple who has never been here: three steps, a starter list, and the
+   * unpublished banner that is the only place D30's state is ever named.
+   */
+  "editor-wizard": [
+    { goto: "/editor/enter" },
+    { type: NEW_COUPLE, into: "input[type='email']" },
+    { text: "לשלוח לי קישור" },
+    { wait: 1000 },
+    { mail: NEW_COUPLE },
+    { require: "בואו נתחיל" },
+    { type: "רוני ואלון", into: "input" },
+    { wait: 200 },
+    { shot: "editor-wizard-names" },
+    { text: "הלאה" },
+    { wait: 300 },
+    { text: "הלאה" },
+    { wait: 300 },
+    { require: "מאיפה נתחיל?" },
+    { text: "ניידות" },
+    { text: "רחצה והחתלה" },
+    { wait: 200 },
+    { shot: "editor-wizard-starter" },
+    { text: "ליצור את הרשימה" },
+    { wait: 2500 },
+    { require: "הרשימה עוד לא פורסמה" },
+    { shot: "editor-unpublished" },
+    { text: "לפרסם את הרשימה" },
+    { wait: 2500 },
+    { require: "הרשימה פורסמה" },
+    { shot: "editor-published" },
+  ],
+  /** Search the harvested catalog, and put a real product on the list. */
+  "editor-add": [
+    { goto: "/editor/enter" },
+    { type: DEMO_COUPLE, into: "input[type='email']" },
+    { text: "לשלוח לי קישור" },
+    { wait: 1000 },
+    { mail: DEMO_COUPLE },
+    { goto: "/editor/add?q=%D7%9E%D7%99%D7%98%D7%94" },
+    { require: "תוצאות" },
+    { shot: "editor-add-search" },
+    { text: "להוסיף", nth: 0 },
+    { wait: 1800 },
+    { require: "נוסף לרשימה" },
+    { shot: "editor-add-added" },
+  ],
+  /** Item settings, including the toggle the API will not let a couple undo. */
+  "editor-item": [
+    { goto: "/editor/enter" },
+    { type: DEMO_COUPLE, into: "input[type='email']" },
+    { text: "לשלוח לי קישור" },
+    { wait: 1000 },
+    { mail: DEMO_COUPLE },
+    { click: "a[href^='/editor/items/']", nth: 1 },
+    { wait: 2000 },
+    { require: "לאפשר מתנה משותפת" },
+    { shot: "editor-item-settings" },
+  ],
+  /** The group gift the guests have already put money into. It cannot be undone. */
+  "editor-item-locked": [
+    { goto: "/editor/enter" },
+    { type: DEMO_COUPLE, into: "input[type='email']" },
+    { text: "לשלוח לי קישור" },
+    { wait: 1000 },
+    { mail: DEMO_COUPLE },
+    { click: "a[href^='/editor/items/']", nth: 0 },
+    { wait: 2000 },
+    { require: "אורחים כבר השתתפו בסכום" },
+    { shot: "editor-item-locked" },
+  ],
 };
 
 /* ---------- CDP plumbing ---------- */
@@ -403,6 +514,35 @@ async function scrollTo(ws, selector) {
   if (outcome !== "ok") throw new Error(outcome);
 }
 
+/**
+ * Follow the magic link, out of a real mailbox.
+ *
+ * Reads Mailpit rather than the database, so the step covers the whole path a
+ * couple takes: the API sent a mail, the mail contains a URL, and the URL works
+ * once in this browser. Returns after the landing page has redirected.
+ */
+async function mail(ws, address) {
+  for (let attempt = 0; attempt < 20; attempt++) {
+    const list = await (await fetch(`${MAILPIT}/api/v1/messages?limit=30`)).json();
+    const message = list.messages?.find((one) =>
+      one.To?.some((to) => to.Address === address),
+    );
+    if (message) {
+      const full = await (await fetch(`${MAILPIT}/api/v1/message/${message.ID}`)).json();
+      const link = /https?:\/\/\S*\?token=[A-Za-z0-9_-]+/.exec(full.Text ?? "");
+      if (!link) throw new Error(`no link in the mail to ${address}`);
+      // Through BASE, so the browser keeps one origin and one cookie jar even if
+      // the API was configured with a different web base URL.
+      const url = new URL(link[0]);
+      await send(ws, "Page.navigate", { url: `${BASE}${url.pathname}${url.search}` });
+      await new Promise((r) => setTimeout(r, 2500));
+      return;
+    }
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  throw new Error(`no mail arrived for ${address}`);
+}
+
 /** Asserts the screen is the one the scene thinks it is on. */
 async function require_(ws, needle) {
   const found = await evaluate(
@@ -499,6 +639,8 @@ try {
           await type(page, { into: step.into, text: step.type });
         } else if (step.scrollTo) {
           await scrollTo(page, step.scrollTo);
+        } else if (step.mail) {
+          await mail(page, step.mail);
         } else if (step.steal) {
           await steal(page, step.steal);
         } else if (step.require) {

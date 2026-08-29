@@ -18,9 +18,14 @@ class Settings(BaseSettings):
     # without an env file. Overridden by DATABASE_URL everywhere else.
     database_url: str = "postgresql+psycopg://registry:registry@db:5432/registry"
 
-    # Lands at C5 (magic links via Mailpit).
+    # Magic links go out through Mailpit, which accepts anything and shows it
+    # at :8025.
     smtp_host: str = "mailpit"
     smtp_port: int = 1025
+
+    # Where a magic link points. The link lands on the web app, not here: the
+    # browser talks to the web origin only.
+    web_base_url: str = "http://localhost:3000"
 
     # Only needed if the browser ever talks to the API directly. It does not:
     # guest writes go through the web app's route handlers.

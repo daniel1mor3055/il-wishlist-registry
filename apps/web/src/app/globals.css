@@ -10,6 +10,9 @@
   --color-primary: #2f6f62;
   --color-accent: #e5a24b;
   --color-success: #3e7d55;
+  /* Only the couple ever sees this: a refused save, or the remove action. The
+     guest surface states problems in words, never in red. */
+  --color-danger: #a8443b;
   --color-muted: #9a938c;
   --color-border: #e8e3dc;
 

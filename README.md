@@ -25,7 +25,7 @@ A B2B2C platform that Israeli retailers can embed or integrate, giving their cus
 
 ## Current phase
 
-Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton and guest registry), C2 (Postgres, seed, API read path), C3 (the double-buy core: reserve, self-report, release) and C4 (the money surface: contributions, contact reveal, private blessings) are in.
+Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton and guest registry), C2 (Postgres, seed, API read path), C3 (the double-buy core: reserve, self-report, release), C4 (the money surface: contributions, contact reveal, private blessings) and C5 (the couple's editor: magic-link login, create wizard, catalog search, item settings, publish) are in.
 
 | Document                                                 | What it is                                                           |
 | -------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -45,7 +45,7 @@ Shape of the product as currently locked:
 ## Repo layout
 
 ```
-apps/web/            Next.js (App Router, TS, Tailwind v4), Hebrew RTL — the guest registry and, later, the couple editor
+apps/web/            Next.js (App Router, TS, Tailwind v4), Hebrew RTL — /r/{slug} for guests, /editor for the couple
 services/api/        FastAPI + SQLAlchemy, modules: registry, catalog, gifting, identity
 services/api/migrations/  Alembic
 services/api/seed/   catalog_snapshot.json (180 real products from four chains) and demo_registries.json
@@ -78,19 +78,33 @@ POST   /bff/registries/{slug}/blessings                      private message plu
 GET    /bff/registries/{slug}/payment-handle                 the D13 reveal, on interaction only
 ```
 
-`npm run seed` is also the reset: demo registry items are replaced wholesale, which drops every hold placed against them.
+The couple's side works the other way round: `/editor` pages read the API from the server and write through server actions, because the editor is forms and navigation rather than optimistic client state (D47). Same cookie split as the guest id — the session token is `HttpOnly` on the web origin and travels to the API as `X-Session-Token` (D42).
+
+```
+/editor/enter      ask for a magic link
+/editor/session    where the link lands: spends the token, sets the cookie, redirects
+/editor/new        the three-step create wizard
+/editor            the list, the publish banner, the link to share
+/editor/add        search the harvested catalog, or add something by hand
+/editor/items/{id} quantity, note, group gifting, remove
+```
+
+To sign in to the seeded demo list, ask for a link as `noa.itai@example.com` and open it from [Mailpit](http://localhost:8025). Any other address creates a new couple and lands in the wizard.
+
+`npm run seed` is also the reset: demo registries are dropped and rebuilt, which drops every hold and contribution placed against them, and it clears the registries left behind by screenshot runs.
 
 `npm run dev:bg` starts the same dev server detached, logging to `.logs/web-dev.log`, and `npm run dev:stop` stops it. It exists for scripted screenshot runs, which cannot block on a process that never exits.
 
-| URL                                           | What                                        |
-| --------------------------------------------- | ------------------------------------------- |
-| http://localhost:3000                         | Dev index — links to every demo registry    |
-| http://localhost:3000/r/noa-itai-k4m2xq8vp3wt | The main demo registry (נועה ואיתי)         |
-| http://localhost:3000/dev/states              | State gallery — every PRD state on one page |
-| http://localhost:8000/docs                    | API docs, and the public read endpoint      |
-| http://localhost:8025                         | Mailpit, for magic links (C5)               |
+| URL                                           | What                                          |
+| --------------------------------------------- | --------------------------------------------- |
+| http://localhost:3000                         | Dev index — links to every demo registry      |
+| http://localhost:3000/r/noa-itai-k4m2xq8vp3wt | The main demo registry (נועה ואיתי)           |
+| http://localhost:3000/editor                  | The couple's editor (magic link, no password) |
+| http://localhost:3000/dev/states              | State gallery — every PRD state on one page   |
+| http://localhost:8000/docs                    | API docs, guest and owner endpoints alike     |
+| http://localhost:8025                         | Mailpit — where the magic links arrive        |
 
-Checks: `npm run typecheck`, `npm run lint`, `npm run format`. API tests: `docker compose exec api pytest`. `npm run shoot` drives headless Chrome through the guest flow and writes a PNG per state, including a real lost race staged against a live page.
+Checks: `npm run typecheck`, `npm run lint`, `npm run format`. API tests: `docker compose exec api pytest`. `npm run shoot` drives headless Chrome through both surfaces and writes a PNG per state, including a real lost race staged against a live page and a login that goes through an actual mail in Mailpit.
 
 Regenerating seed data (rarely needed — both files are committed):
 
@@ -102,11 +116,13 @@ npm run seed             # load both into Postgres
 
 ## Status
 
-C4 done: the money surface, which completes the guest side. Every guest flow now writes — a group-gift or envelope contribution recorded at "שלחתי" (D38), the couple's Bit handle revealed by its own request and never in the page payload (D13), and a private blessing that carries the guest's name to the gift it came with (D17, D40). The reserve path from C3 is unchanged: one conditional `UPDATE ... WHERE quantity_claimed < quantity_wanted RETURNING`, so two guests on the last unit get one `201` and one `409` rather than an oversold gift.
+C5 done: the couple can now build the list a guest buys from. A magic link mailed to Mailpit and exchanged for a session (D42, D43), a three-step wizard that seeds a starter list from the harvested catalog, search over that catalog, item settings, and one button that makes the link work (D48). Before it, every registry in the product came from the seed script.
 
-Both counters are guarded by concurrency tests that were checked by regression rather than by inspection: a read-then-write reserve oversold a two-unit item to five guests, and a read-then-write contribution lost ₪410 of ₪940, while in both cases every sequential test still passed.
+The rule the editor is built around is that the couple may not edit away a guest's action (D45): quantity will not drop below what is already held, group gifting will not switch off over real contributions, and an item with history is hidden from guests rather than deleted. Ownership is a query filter, not a comparison — `/me/registry` carries no id, so someone else's item and a made-up one are the same `404`.
 
-Next is C5, the couple's editor: magic-link identity, the create wizard, adding items from the harvested catalog, and item settings — the first surface where the couple, rather than a guest, writes.
+Earlier checkpoints stand: the reserve path is one conditional `UPDATE ... WHERE quantity_claimed < quantity_wanted RETURNING`, and both it and the contribution counter are guarded by concurrency tests checked by regression rather than inspection — a read-then-write reserve oversold a two-unit item to five guests, and a read-then-write contribution lost ₪410 of ₪940, while every sequential test still passed.
+
+Next is C6: the envelope and voucher settings, the payment handle the couple enters for D13, story and cover, preview-as-guest, and the share surface — WhatsApp message, link preview card, QR.
 
 ## License
 
