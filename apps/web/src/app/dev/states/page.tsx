@@ -89,6 +89,7 @@ type CardState = {
   hebrew: string;
   status: Status;
   item: PublicItem;
+  heldByYou?: boolean;
 };
 
 /**
@@ -139,6 +140,14 @@ function cardStates(items: PublicItem[]): CardState[] {
       item: takenItem,
     },
     {
+      id: "held-by-you",
+      prd: "G2, G5 — held by you",
+      hebrew: "שמור לך",
+      status: "c3",
+      item: takenItem,
+      heldByYou: true,
+    },
+    {
       id: "partial-qty",
       prd: "G2, G3 — quantity partly fulfilled",
       hebrew: "נשארו 2 מתוך 4",
@@ -178,11 +187,6 @@ function cardStates(items: PublicItem[]): CardState[] {
 
 /** States that need the guest write loop and therefore land later. */
 const PENDING_STATES: Array<{ prd: string; hebrew: string; status: Status }> = [
-  {
-    prd: "G5 — handoff pending",
-    hebrew: "„עוד לא” keeps the item reserved, not purchased",
-    status: "c3",
-  },
   {
     prd: "G4 — reserve race",
     hebrew: "בזמן שמילאת, אורח אחר לקח את הפריט",
@@ -260,7 +264,7 @@ export default async function StateGallery() {
               <Label prd={state.prd} hebrew={state.hebrew} status={state.status} />
               <div className="grid grid-cols-1">
                 {state.item.kind === "product" ? (
-                  <ProductCard item={state.item} />
+                  <ProductCard item={state.item} heldByYou={state.heldByYou} />
                 ) : (
                   <MoneyCard item={state.item} />
                 )}

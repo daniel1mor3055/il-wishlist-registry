@@ -19,13 +19,17 @@ export function ProductCard({
   item,
   onClick,
   featured = false,
+  heldByYou = false,
 }: {
   item: PublicItem;
   /** Optional so the card can be rendered statically from a server component. */
   onClick?: () => void;
   featured?: boolean;
+  /** This guest still holds it. Other guests see `taken` (D35). */
+  heldByYou?: boolean;
 }) {
-  const taken = item.claimState !== "available";
+  const held = heldByYou && item.claimState !== "purchased";
+  const taken = item.claimState !== "available" && !held;
   const remainingQty = item.quantityWanted - item.quantityClaimed;
   const showQty = item.quantityWanted > 1 && remainingQty > 0;
   const isGroup = item.groupGiftEnabled && item.targetAgorot !== null;
@@ -37,6 +41,7 @@ export function ProductCard({
       data-testid="item-card"
       data-kind={isGroup ? "group" : "product"}
       data-claim={item.claimState}
+      data-held-by-you={held ? "true" : undefined}
       // Lets tools/shoot.mjs stage a real race: another guest takes this exact
       // item while the page still shows it as free.
       data-item-id={item.id}
@@ -59,7 +64,11 @@ export function ProductCard({
               : "(max-width: 640px) 50vw, 240px"
           }
         />
-        {taken ? (
+        {held ? (
+          <span className="absolute start-2 top-2">
+            <Pill tone="primary">{copy.item.heldByYou}</Pill>
+          </span>
+        ) : taken ? (
           <span className="absolute start-2 top-2">
             <Pill tone="muted">{copy.item.taken}</Pill>
           </span>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ProductCard } from "./ProductCard";
 import { MoneyCard } from "./MoneyCard";
@@ -19,6 +19,7 @@ import {
 import { copy, errorCopy, FILTERS, type FilterId } from "@/lib/copy";
 import {
   contribute,
+  fetchMyHolds,
   fetchPaymentHandle,
   releaseReservation,
   reportPurchase,
@@ -71,12 +72,19 @@ type SheetState =
   | { type: "taken"; itemId: string; raceLost: boolean }
   | null;
 
-function matchesFilter(item: PublicItem, filter: FilterId): boolean {
+function matchesFilter(
+  item: PublicItem,
+  filter: FilterId,
+  heldByYou: boolean,
+): boolean {
   const price = item.priceAgorot;
   switch (filter) {
     case "all":
       return true;
     case "missing":
+      // A hold this guest still has is missing for them: they have not
+      // reported a purchase, and they need to find the card to reopen G5.
+      if (heldByYou) return true;
       if (item.kind === "product") {
         return (
           item.claimState === "available" && item.quantityClaimed < item.quantityWanted
@@ -120,6 +128,37 @@ function withoutItem(patches: Patches, itemId: string): Patches {
   return Object.fromEntries(Object.entries(patches).filter(([id]) => id !== itemId));
 }
 
+/** itemId → reservationId, for the units this guest still holds. */
+type Holds = Record<string, string>;
+
+function holdsCacheKey(slug: string) {
+  return `ilwr.holds.${slug}`;
+}
+
+function readCachedHolds(slug: string): Holds {
+  try {
+    const raw = sessionStorage.getItem(holdsCacheKey(slug));
+    if (!raw) return {};
+    const parsed: unknown = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return {};
+    return Object.fromEntries(
+      Object.entries(parsed as Record<string, unknown>).filter(
+        (entry): entry is [string, string] => typeof entry[1] === "string",
+      ),
+    );
+  } catch {
+    return {};
+  }
+}
+
+function writeCachedHolds(slug: string, holds: Holds) {
+  try {
+    sessionStorage.setItem(holdsCacheKey(slug), JSON.stringify(holds));
+  } catch {
+    // Private mode or quota. The cookie-backed GET is the real source.
+  }
+}
+
 export function RegistryClient({ registry }: { registry: PublicRegistry }) {
   const router = useRouter();
   const [filter, setFilter] = useState<FilterId>("all");
@@ -131,6 +170,32 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
   // Fetched when the contact sheet opens and never held longer than the page
   // (D13). Null while in flight, which the sheet renders as a placeholder.
   const [handle, setHandle] = useState<PaymentHandle | null>(null);
+  // Units this guest still holds. Starts empty to match the server render, then
+  // the cache and the cookie-backed GET fill it so a dismissed report does not
+  // look like someone else took the item.
+  const [holds, setHolds] = useState<Holds>({});
+  const [holdsCacheReady, setHoldsCacheReady] = useState(false);
+  const pendingRelease = useRef(new Set<string>());
+
+  const rememberHold = (itemId: string, reservationId: string) => {
+    pendingRelease.current.delete(itemId);
+    setHolds((current) => {
+      if (current[itemId] === reservationId) return current;
+      const next = { ...current, [itemId]: reservationId };
+      writeCachedHolds(registry.slug, next);
+      return next;
+    });
+  };
+  const forgetHold = (itemId: string) => {
+    pendingRelease.current.add(itemId);
+    setHolds((current) => {
+      if (!(itemId in current)) return current;
+      const next = { ...current };
+      delete next[itemId];
+      writeCachedHolds(registry.slug, next);
+      return next;
+    });
+  };
 
   // Patches are tagged with the server payload they were made against, so fresh
   // server data supersedes them by simply not matching. A patch stands in for
@@ -169,9 +234,48 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
     };
   }, [router]);
 
+  useEffect(() => {
+    setHolds(readCachedHolds(registry.slug));
+    setHoldsCacheReady(true);
+  }, [registry.slug]);
+
+  useEffect(() => {
+    if (!holdsCacheReady) return;
+    writeCachedHolds(registry.slug, holds);
+  }, [registry.slug, holds, holdsCacheReady]);
+
+  /**
+   * The cookie is HttpOnly, so a returning guest cannot know their holds from
+   * the public payload. This GET is the same pattern as the Bit reveal: a
+   * second request that identifies this guest only.
+   */
+  useEffect(() => {
+    let cancelled = false;
+    void fetchMyHolds(registry.slug).then((result) => {
+      if (cancelled || !result.ok) return;
+      setHolds((current) => {
+        const next: Holds = {};
+        for (const hold of result.data.holds) {
+          if (pendingRelease.current.has(hold.itemId)) continue;
+          next[hold.itemId] = hold.reservationId;
+        }
+        // A hold placed after this GET left the browser would be missing
+        // from the response. Keep ours unless we already handed it back.
+        for (const [itemId, reservationId] of Object.entries(current)) {
+          if (pendingRelease.current.has(itemId)) continue;
+          if (!(itemId in next)) next[itemId] = reservationId;
+        }
+        return next;
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [registry.slug, registry]);
+
   const shown = useMemo(
-    () => items.filter((item) => matchesFilter(item, filter)),
-    [items, filter],
+    () => items.filter((item) => matchesFilter(item, filter, Boolean(holds[item.id]))),
+    [items, filter, holds],
   );
 
   const byId = (id: string) => items.find((item) => item.id === id);
@@ -179,7 +283,8 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
 
   const products = items.filter((item) => item.kind === "product");
   const allProductsClaimed =
-    products.length > 0 && products.every((item) => item.claimState !== "available");
+    products.length > 0 &&
+    products.every((item) => item.claimState !== "available" && !holds[item.id]);
 
   const showToast = (message: string) => {
     setToast(message);
@@ -187,6 +292,12 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
   };
 
   const openItem = (item: PublicItem) => {
+    const mine = holds[item.id];
+    if (mine && item.claimState !== "purchased") {
+      // Dismissing G5 kept the hold. Tapping the card asks the question again.
+      setSheet({ type: "report", itemId: item.id, reservationId: mine });
+      return;
+    }
     if (item.kind === "fund" || item.kind === "voucher") {
       setSheet({ type: "cashVoucher", itemId: item.id });
     } else if (item.claimState !== "available") {
@@ -207,25 +318,38 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
     setSheet({ type: "handoff", itemId: item.id, reservationId: null });
 
     const result = await reserveItem(registry.slug, item.id);
+    const abandoned = pendingRelease.current.has(item.id);
 
     if (!result.ok) {
+      pendingRelease.current.delete(item.id);
       dropPatch(item.id);
-      if (result.code === "item_already_reserved") {
-        setSheet({ type: "taken", itemId: item.id, raceLost: true });
-      } else {
-        setSheet(null);
-        showToast(errorCopy(result.code));
+      if (!abandoned) {
+        if (result.code === "item_already_reserved") {
+          setSheet({ type: "taken", itemId: item.id, raceLost: true });
+        } else {
+          setSheet(null);
+          showToast(errorCopy(result.code));
+        }
       }
       router.refresh();
       return;
     }
 
+    if (abandoned) {
+      dropPatch(item.id);
+      await releaseReservation(registry.slug, result.data.reservationId);
+      pendingRelease.current.delete(item.id);
+      router.refresh();
+      return;
+    }
+
+    rememberHold(item.id, result.data.reservationId);
     patchItem(result.data.item);
-    setSheet({
-      type: "handoff",
-      itemId: item.id,
-      reservationId: result.data.reservationId,
-    });
+    setSheet((current) =>
+      current?.type === "handoff" && current.itemId === item.id
+        ? { type: "handoff", itemId: item.id, reservationId: result.data.reservationId }
+        : current,
+    );
     router.refresh();
   };
 
@@ -234,6 +358,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
     if (item?.canonicalUrl) {
       window.open(item.canonicalUrl, "_blank", "noopener,noreferrer");
     }
+    if (reservationId) rememberHold(itemId, reservationId);
     // The report modal waits here for their return, which is the whole of D12.
     setSheet({ type: "report", itemId, reservationId });
   };
@@ -245,11 +370,10 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
    */
   const abandonHold = async (itemId: string, reservationId: string | null) => {
     setSheet(null);
-    // No id yet means the hold is still being written. It stays, and the couple
-    // can release it (D16); catching a millisecond window would need a queue.
+    forgetHold(itemId);
+    dropPatch(itemId);
     if (!reservationId) return;
 
-    dropPatch(itemId);
     await releaseReservation(registry.slug, reservationId);
     router.refresh();
   };
@@ -259,7 +383,12 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
    * blessing; "לא רכשתי" hands the unit straight back (D35). Dismissing the
    * question instead is what keeps a hold alive, and that is `closeSheet`.
    */
-  const report = async (reservationId: string | null, purchased: boolean) => {
+  const report = async (
+    itemId: string,
+    reservationId: string | null,
+    purchased: boolean,
+  ) => {
+    forgetHold(itemId);
     if (reservationId) {
       setReporting(true);
       // The name is asked for later, on the blessing sheet, so it is not part
@@ -398,6 +527,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
               {singleItem.kind === "product" ? (
                 <ProductCard
                   item={singleItem}
+                  heldByYou={Boolean(holds[singleItem.id])}
                   onClick={() => openItem(singleItem)}
                   featured
                 />
@@ -414,7 +544,12 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
           <div className="grid grid-cols-2 gap-3 p-4">
             {shown.map((item) =>
               item.kind === "product" ? (
-                <ProductCard key={item.id} item={item} onClick={() => openItem(item)} />
+                <ProductCard
+                  key={item.id}
+                  item={item}
+                  heldByYou={Boolean(holds[item.id])}
+                  onClick={() => openItem(item)}
+                />
               ) : (
                 <MoneyCard key={item.id} item={item} onClick={() => openItem(item)} />
               ),
@@ -464,14 +599,14 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
 
       {sheet?.type === "report" &&
         (() => {
-          const { reservationId } = sheet;
+          const { itemId, reservationId } = sheet;
           return (
             <ReportModal
               pending={reporting}
               // Dismissing the question is not an answer, and it keeps the hold.
               onClose={closeSheet}
-              onPurchased={() => void report(reservationId, true)}
-              onNotPurchased={() => void report(reservationId, false)}
+              onPurchased={() => void report(itemId, reservationId, true)}
+              onNotPurchased={() => void report(itemId, reservationId, false)}
             />
           );
         })()}

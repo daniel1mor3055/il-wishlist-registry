@@ -134,11 +134,12 @@ Figma Make defaults to the happy path and to full lists, so every state below ne
 | Single item | G2 | One full-width hero card, never a lonely grid cell | `בינתיים יש פריט אחד ברשימה` |
 | Fully claimed | G2 | Celebratory band, the envelope promoted | `כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה` |
 | Reserved by someone else | G2, G3 | Muted card, badge, CTA demoted | `כבר נתפס` / `לשלוח מעטפה במקום` |
+| Held by you | G2, G5 | Live card, primary badge. Dismissing the report keeps the hold (D35); tapping the card reopens G5. Other guests still see `כבר נתפס` | `שמור לך` |
 | Group gift partly funded | G3, G6 | RTL meter, remaining amount is the headline, never the percent | `נותרו ₪550 מתוך ₪1,290` |
 | Group gift complete | G6 | Full meter, closed CTA | `המתנה הושלמה. תודה לכל מי שהשתתף` |
 | Envelope with gifts in it | G2, G7 | Collected total and contributor count, no meter and no `מתוך` (D28) | `נאספו עד כה ₪2,150` |
 | Quantity partly fulfilled | G2, G3 | Counter chip, CTA stays live | `נשארו 2 מתוך 4` |
-| Handoff pending | G5 | Guest went out and came back without answering. Dismissing the question keeps the hold; an explicit `לא רכשתי` releases it (D35) | `עוד באמצע? אפשר לסגור — הפריט נשאר שמור לכם` |
+| Handoff pending | G2, G5 | Guest went out and came back without answering. Dismissing the question keeps the hold; an explicit `לא רכשתי` releases it (D35). The holder's card reads `שמור לך`, not `כבר נתפס` | `עוד באמצע? אפשר לסגור — הפריט נשאר שמור לכם` |
 | Gift card sent | G9, C9 | Neutral chip, never an error color | `השובר נשלח לנועה ואיתי` |
 | Price may differ | G3 | Permanent, quiet, never a warning color. Carries the whole "reality lives at the chain" message now that stock is gone (D26) | `המחיר מתעדכן באתר החנות` |
 | Broken image | G2, G3 | Branded 1:1 placeholder with category glyph and product name. Never a gray box with alt text, never a layout shift | none |

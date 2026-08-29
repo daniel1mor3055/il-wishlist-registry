@@ -26,6 +26,7 @@ from app.gifting.schemas import (
     BlessingRequest,
     ContributeRequest,
     ContributionView,
+    MyHoldsView,
     PaymentHandleView,
     ReportRequest,
     ReservationView,
@@ -34,6 +35,7 @@ from app.gifting.schemas import (
 from app.gifting.service import (
     add_blessing,
     contribute,
+    list_my_holds,
     release_reservation,
     report_reservation,
     reserve_item,
@@ -166,6 +168,20 @@ def create_blessing(
         reservation_id=body.reservation_id,
         contribution_id=body.contribution_id,
     )
+
+
+@router.get(
+    "/registries/{slug}/holds",
+    response_model=MyHoldsView,
+    responses={404: {"description": "No such registry"}},
+)
+def my_holds(
+    slug: str,
+    guest_id: UUID = GUEST_ID,
+    session: Session = Depends(get_session),
+) -> MyHoldsView:
+    """This guest's still-held units. Empty if they have none, never anyone else's."""
+    return list_my_holds(session, slug=slug, guest_id=guest_id)
 
 
 @router.get(

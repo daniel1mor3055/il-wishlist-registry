@@ -38,6 +38,27 @@ class ReservationView(BaseModel):
     item: PublicItem
 
 
+class HoldView(BaseModel):
+    """One unit this guest still holds. Never anyone else's (D8)."""
+
+    model_config = WireModel
+
+    reservation_id: UUID
+    item_id: UUID
+
+
+class MyHoldsView(BaseModel):
+    """The holds a returning guest needs in order to reopen the report (D35).
+
+    Absent from `PublicRegistry` on purpose: the public payload is the same for
+    every link-holder, and a reservation id is a capability.
+    """
+
+    model_config = WireModel
+
+    holds: list[HoldView]
+
+
 class ContributeRequest(BaseModel):
     model_config = WireModel
 

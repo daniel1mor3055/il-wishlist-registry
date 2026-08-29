@@ -67,6 +67,13 @@ def release(client: TestClient, registry: Registry, reservation_id: str, who: st
     )
 
 
+def my_holds(client: TestClient, registry: Registry, who: str):
+    return client.get(
+        f"/api/v1/public/registries/{registry.slug}/holds",
+        headers={"X-Guest-Id": who},
+    )
+
+
 def refetch(session: Session, item: RegistryItem) -> RegistryItem:
     return session.get(RegistryItem, item.id, populate_existing=True)
 
@@ -388,3 +395,89 @@ def test_the_counter_reconciles_with_the_ledger(client: TestClient, session: Ses
 
     assert fresh.quantity_claimed == occupying == 2
     assert fresh.claim_state == "available"
+
+
+def test_a_guest_can_read_back_their_own_holds(client: TestClient, session: Session):
+    """Dismissing the report keeps the hold (D35). The page needs the id back
+    so the holder sees `שמור לך` instead of everyone else's `כבר נתפס`."""
+    registry = make_registry(session)
+    item = add_product(session, registry)
+    who = guest()
+    held = reserve(client, registry, item, who).json()
+
+    response = my_holds(client, registry, who)
+
+    assert response.status_code == 200
+    assert response.json() == {
+        "holds": [{"itemId": str(item.id), "reservationId": held["reservationId"]}]
+    }
+    # A capability, so it must not leak through the page every guest reads.
+    public = client.get(f"/api/v1/public/registries/{registry.slug}")
+    assert held["reservationId"] not in public.text
+
+
+def test_another_guest_cannot_see_someone_elses_hold(
+    client: TestClient, session: Session
+):
+    registry = make_registry(session)
+    item = add_product(session, registry)
+    reserve(client, registry, item, guest())
+
+    response = my_holds(client, registry, guest())
+
+    assert response.status_code == 200
+    assert response.json() == {"holds": []}
+
+
+def test_a_released_or_purchased_hold_drops_out_of_my_holds(
+    client: TestClient, session: Session
+):
+    registry = make_registry(session)
+    first = add_product(session, registry)
+    second = add_product(session, registry)
+    who = guest()
+
+    dropped = reserve(client, registry, first, who).json()
+    release(client, registry, dropped["reservationId"], who)
+    bought = reserve(client, registry, second, who).json()
+    report(client, registry, bought["reservationId"], who, purchased=True)
+
+    response = my_holds(client, registry, who)
+
+    assert response.status_code == 200
+    assert response.json() == {"holds": []}
+
+
+def test_a_closed_registry_still_lists_this_guests_holds(
+    client: TestClient, session: Session
+):
+    """D34: they must still be able to report, so they must still find the hold."""
+    registry = make_registry(session)
+    item = add_product(session, registry)
+    who = guest()
+    held = reserve(client, registry, item, who).json()
+
+    registry.closed_at = datetime.now(UTC)
+    session.flush()
+
+    response = my_holds(client, registry, who)
+
+    assert response.status_code == 200
+    assert response.json()["holds"] == [
+        {"itemId": str(item.id), "reservationId": held["reservationId"]}
+    ]
+
+
+def test_an_unpublished_registry_hides_holds_like_a_wrong_slug(
+    client: TestClient, session: Session
+):
+    registry = make_registry(session, published=False)
+
+    unpublished = my_holds(client, registry, guest())
+    missing = client.get(
+        "/api/v1/public/registries/no-such-registry/holds",
+        headers={"X-Guest-Id": guest()},
+    )
+
+    assert unpublished.status_code == missing.status_code == 404
+    assert unpublished.json() == missing.json() == {"detail": {"code": "registry_not_found"}}
