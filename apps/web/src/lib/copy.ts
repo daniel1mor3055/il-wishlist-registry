@@ -102,7 +102,12 @@ export const copy = {
     title: "האם רכשת את הפריט?",
     body: "הסימון עוזר לשאר האורחים לא לקנות את אותו דבר. אפשר לתקן אחר כך.",
     yes: "כן, רכשתי",
-    notYet: "עוד לא",
+    /* Was "עוד לא", which read as "not yet" and kept the item locked. An
+       explicit no now frees it (D35), so the button says what it does. */
+    no: "לא רכשתי, לשחרר את הפריט",
+    /* The "I am still in the middle" answer is to dismiss the question, so it
+       has to be stated rather than left for the guest to guess. */
+    stillDeciding: "עוד באמצע? אפשר לסגור — הפריט נשאר שמור לכם",
   },
 
   /** G6 group gift. */
@@ -112,14 +117,15 @@ export const copy = {
     contributors: (n: number) => `${n} אורחים כבר השתתפו`,
     anyAmountHelps: "כל סכום עוזר — גם קטן",
     otherAmount: "סכום אחר",
+    customAmountPlaceholder: "כמה?",
     complete: "המתנה הושלמה. תודה לכל מי שהשתתף",
   },
 
   /** G7 the cash envelope and vouchers. */
   fund: {
     /* No target and no meter, so the subtitle carries "any amount" instead of
-       a remaining sum (D28). */
-    envelopeSubtitle: "כל סכום, ישירות אלינו בביט או בפייבוקס",
+       a remaining sum (D28). The envelope's own title names Bit and PayBox. */
+    envelopeSubtitle: "כל סכום, ישירות אלינו",
     sendViaBit: "לשלוח בביט",
     voucherBody: (chain: string) => `הקנייה מתבצעת באתר ${chain}, לא כאן`,
     voucherContinue: (chain: string) => `להמשיך לאתר ${chain}`,

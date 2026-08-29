@@ -54,7 +54,8 @@ type SheetState =
   | { type: "group"; itemId: string }
   | { type: "cashVoucher"; itemId: string }
   | { type: "contact"; itemId: string }
-  | { type: "blessing" }
+  /** Carries the hold so the name typed here can be attached to it. */
+  | { type: "blessing"; reservationId: string | null }
   | { type: "confirmed" }
   /** `raceLost` separates "taken while you decided" from "taken before you arrived". */
   | { type: "taken"; itemId: string; raceLost: boolean }
@@ -239,19 +240,17 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
     router.refresh();
   };
 
-  const report = async (
-    itemId: string,
-    reservationId: string | null,
-    purchased: boolean,
-  ) => {
+  /**
+   * D12, both answers. "כן, רכשתי" records the purchase and goes on to the
+   * blessing; "לא רכשתי" hands the unit straight back (D35). Dismissing the
+   * question instead is what keeps a hold alive, and that is `closeSheet`.
+   */
+  const report = async (reservationId: string | null, purchased: boolean) => {
     if (reservationId) {
       setReporting(true);
-      const result = await reportPurchase(
-        registry.slug,
-        reservationId,
-        purchased,
-        giverName,
-      );
+      // The name is asked for later, on the blessing sheet, so it is not part
+      // of this call.
+      const result = await reportPurchase(registry.slug, reservationId, purchased, "");
       setReporting(false);
 
       if (result.ok) {
@@ -262,9 +261,20 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
       router.refresh();
     }
 
-    // "עוד לא" keeps the hold and just closes (PRD section 7). "כן, רכשתי"
-    // continues to the blessing.
-    setSheet(purchased ? { type: "blessing" } : null);
+    setSheet(purchased ? { type: "blessing", reservationId } : null);
+  };
+
+  /**
+   * The blessing text itself lands with the money surface in C4. What can be
+   * recorded now is the name, and since reporting is idempotent, attaching it
+   * is simply the same report again.
+   */
+  const finishGift = async (reservationId: string | null) => {
+    setSheet({ type: "confirmed" });
+    if (!reservationId || !giverName.trim()) return;
+
+    const result = await reportPurchase(registry.slug, reservationId, true, giverName);
+    if (result.ok) patchItem(result.data.item);
   };
 
   /* ---------- empty and single-item grids ---------- */
@@ -380,8 +390,6 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
             <HandoffSheet
               item={item}
               pending={reservationId === null}
-              giverName={giverName}
-              onGiverNameChange={setGiverName}
               onClose={() => void abandonHold(itemId, reservationId)}
               onContinue={() => continueToChain(itemId, reservationId)}
             />
@@ -390,14 +398,14 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
 
       {sheet?.type === "report" &&
         (() => {
-          const { itemId, reservationId } = sheet;
+          const { reservationId } = sheet;
           return (
             <ReportModal
               pending={reporting}
               // Dismissing the question is not an answer, and it keeps the hold.
               onClose={closeSheet}
-              onPurchased={() => void report(itemId, reservationId, true)}
-              onNotYet={() => void report(itemId, reservationId, false)}
+              onPurchased={() => void report(reservationId, true)}
+              onNotPurchased={() => void report(reservationId, false)}
             />
           );
         })()}
@@ -423,9 +431,10 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
             <CashVoucherSheet
               item={item}
               onClose={closeSheet}
+              // The amount goes nowhere until contributions land in C4.
               onSend={() =>
                 item.kind === "voucher"
-                  ? setSheet({ type: "blessing" })
+                  ? setSheet({ type: "blessing", reservationId: null })
                   : setSheet({ type: "contact", itemId: item.id })
               }
             />
@@ -437,7 +446,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
           coupleNames={registry.coupleNames}
           handle={DEMO_PAYMENT_HANDLE}
           onClose={closeSheet}
-          onSent={() => setSheet({ type: "blessing" })}
+          onSent={() => setSheet({ type: "blessing", reservationId: null })}
           onCopy={() => {
             void navigator.clipboard?.writeText(DEMO_PAYMENT_HANDLE.handle);
             showToast(copy.contact.copied);
@@ -445,15 +454,19 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
         />
       )}
 
-      {sheet?.type === "blessing" && (
-        <BlessingSheet
-          coupleNames={registry.coupleNames}
-          giverName={giverName}
-          onGiverNameChange={setGiverName}
-          onClose={closeSheet}
-          onSubmit={() => setSheet({ type: "confirmed" })}
-        />
-      )}
+      {sheet?.type === "blessing" &&
+        (() => {
+          const { reservationId } = sheet;
+          return (
+            <BlessingSheet
+              coupleNames={registry.coupleNames}
+              giverName={giverName}
+              onGiverNameChange={setGiverName}
+              onClose={closeSheet}
+              onSubmit={() => void finishGift(reservationId)}
+            />
+          );
+        })()}
 
       {sheet?.type === "confirmed" && (
         <ConfirmedSheet coupleNames={registry.coupleNames} onClose={closeSheet} />

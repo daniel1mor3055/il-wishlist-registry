@@ -69,7 +69,13 @@ export function Sheet({
   );
 }
 
-/** A centred modal, used for the D12 self-report moment. */
+/**
+ * A centred modal, used for the D12 self-report moment.
+ *
+ * Dismissable by tap, not only by Escape. On the report modal, dismissal is a
+ * real answer - "still at the shop, keep my hold" (D35) - and a keyboard key is
+ * not an answer a phone can give.
+ */
 export function Modal({
   children,
   onClose,
@@ -83,13 +89,20 @@ export function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
-      <div className="animate-fade absolute inset-0 bg-black/45" aria-hidden="true" />
+      <div
+        className="animate-fade absolute inset-0 bg-black/45"
+        onClick={onClose}
+        aria-hidden="true"
+      />
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
-        className="animate-fade relative w-full max-w-[382px] rounded-card bg-surface p-6"
+        className="animate-fade relative w-full max-w-[382px] rounded-card bg-surface px-6 pb-6 pt-3"
       >
+        <div className="mb-1 flex">
+          <CloseButton onClick={onClose} />
+        </div>
         {children}
       </div>
     </div>

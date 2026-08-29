@@ -15,7 +15,7 @@ Remove the priority badges ("חובה", "רצוי", "נחמד שיהיה") from 
 ```
 
 ```
-Rename the "קופה לעגלה" card to "מעטפה לנועה ואיתי" and delete its target amount and funding meter, so it is a plain cash envelope with amount chips only.
+Rename the "קופה לעגלה" card to "חיבוק בביט / פייבוקס 💛" with the subtitle "כל סכום, ישירות אלינו", and delete its target amount and funding meter, so it is a plain cash envelope with amount chips only.
 ```
 
 ## Required states

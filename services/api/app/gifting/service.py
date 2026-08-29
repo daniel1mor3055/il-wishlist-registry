@@ -211,22 +211,32 @@ def report_reservation(
 ) -> ReservationView:
     """D12: the purchase is self-reported, and it is the only evidence we get.
 
-    Idempotent by construction - it sets a state rather than moving a counter -
-    which is why this write needs no idempotency key.
+    `purchased=False` is an explicit "לא רכשתי" and hands the unit back (D35).
+    The guest who is still at the shop does not answer this question at all -
+    they dismiss it, and their hold stands untouched.
+
+    Idempotent either way, because both branches set a state rather than moving
+    a counter by a delta. That is why this write needs no idempotency key.
     """
     registry = _load_registry(session, slug)
     reservation = _load_reservation(session, registry, reservation_id, guest_id)
 
     if reservation.state == "released":
-        raise GiftingError("reservation_released", 409)
+        # Claiming a purchase after giving the unit up is a contradiction. Saying
+        # "no" twice is not, so a retried decline answers rather than errors.
+        if purchased:
+            raise GiftingError("reservation_released", 409)
+        return _view(session, reservation)
 
     if giver_name and giver_name.strip():
         reservation.giver_name = giver_name.strip()[:80]
     reservation.reported_at = datetime.now(UTC)
-    # "עוד לא" leaves the hold exactly as it was (D16). It is not a decline, and
-    # releasing the unit here is what would cause the double buy.
-    reservation.state = "purchased" if purchased else "held"
-    session.flush()
+
+    if purchased:
+        reservation.state = "purchased"
+        session.flush()
+    else:
+        _hand_back(session, reservation)
 
     _resettle_claim_state(session, _load_item(session, reservation.item_id))
     session.commit()
@@ -234,22 +244,8 @@ def report_reservation(
     return _view(session, reservation)
 
 
-def release_reservation(
-    session: Session,
-    *,
-    slug: str,
-    reservation_id: UUID,
-    guest_id: UUID,
-) -> None:
-    """The guest hands the unit back, and the item goes live for everyone else."""
-    registry = _load_registry(session, slug)
-    reservation = _load_reservation(session, registry, reservation_id, guest_id)
-
-    if reservation.state == "released":
-        return
-    if reservation.state == "purchased":
-        raise GiftingError("reservation_already_purchased", 409)
-
+def _hand_back(session: Session, reservation: Reservation) -> None:
+    """Give the unit up. Conditional on the counter, so it can never go negative."""
     reservation.state = "released"
     reservation.released_at = datetime.now(UTC)
 
@@ -261,5 +257,23 @@ def release_reservation(
     )
     session.flush()
 
+
+def release_reservation(
+    session: Session,
+    *,
+    slug: str,
+    reservation_id: UUID,
+    guest_id: UUID,
+) -> None:
+    """The guest abandons the handoff sheet, before ever reaching the question."""
+    registry = _load_registry(session, slug)
+    reservation = _load_reservation(session, registry, reservation_id, guest_id)
+
+    if reservation.state == "released":
+        return
+    if reservation.state == "purchased":
+        raise GiftingError("reservation_already_purchased", 409)
+
+    _hand_back(session, reservation)
     _resettle_claim_state(session, _load_item(session, reservation.item_id))
     session.commit()

@@ -165,9 +165,13 @@ def test_a_purchase_report_marks_the_item_purchased(client: TestClient, session:
     assert response.json()["item"]["claimState"] == "purchased"
 
 
-def test_not_yet_keeps_the_hold(client: TestClient, session: Session):
-    """ "עוד לא" is not a decline (D16). Handing the unit back here is precisely
-    the bug that produces the double buy the product exists to prevent."""
+def test_an_explicit_no_hands_the_unit_back(client: TestClient, session: Session):
+    """D35. "לא רכשתי" frees the item: a guest who answers that has decided, and
+    leaving the unit locked would strand the best item on the list.
+
+    A guest who is *still* at the shop does not answer at all - they dismiss the
+    question, which never reaches this endpoint.
+    """
     registry = make_registry(session)
     item = add_product(session, registry)
     who = guest()
@@ -175,9 +179,25 @@ def test_not_yet_keeps_the_hold(client: TestClient, session: Session):
 
     response = report(client, registry, held["reservationId"], who, purchased=False)
 
-    assert response.json()["state"] == "held"
-    assert response.json()["item"]["claimState"] == "reserved"
-    assert refetch(session, item).quantity_claimed == 1
+    assert response.json()["state"] == "released"
+    assert response.json()["item"]["claimState"] == "available"
+    assert refetch(session, item).quantity_claimed == 0
+    assert reserve(client, registry, item, guest()).status_code == 201
+
+
+def test_declining_twice_is_not_an_error(client: TestClient, session: Session):
+    """A retried decline - flaky connection, double tap - has nothing left to do,
+    and should not reach the guest as a failure."""
+    registry = make_registry(session)
+    item = add_product(session, registry)
+    who = guest()
+    held = reserve(client, registry, item, who).json()
+
+    first = report(client, registry, held["reservationId"], who, purchased=False)
+    second = report(client, registry, held["reservationId"], who, purchased=False)
+
+    assert (first.status_code, second.status_code) == (200, 200)
+    assert refetch(session, item).quantity_claimed == 0
 
 
 def test_reporting_twice_changes_nothing(client: TestClient, session: Session):

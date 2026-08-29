@@ -9,6 +9,7 @@
  * Scripts are declared below in SCENES. Each step is one of:
  *   { goto }        navigate and wait for the network to settle
  *   { click }       CSS selector, or { text } to match visible text
+ *   { type }        text into { into } (a CSS selector), the way a human would
  *   { steal }       another guest reserves the item this selector points at
  *   { require }     fail unless this text is on screen
  *   { shot }        write a PNG named after the value
@@ -44,6 +45,7 @@ const API = process.env.API ?? "http://localhost:8000";
 const MAIN = "/r/noa-itai-k4m2xq8vp3wt";
 const MAIN_SLUG = MAIN.slice("/r/".length);
 const CLAIMED = "/r/fully-claimed-demo";
+const SINGLE = "/r/single-item-demo";
 
 const PRODUCT = "[data-testid='item-card'][data-kind='product'][data-claim='available']";
 
@@ -75,7 +77,33 @@ const SCENES = {
     { require: "האם רכשת את הפריט?" },
     { shot: "sheet-report" },
   ],
-  // D12 all the way through: the hold, the handoff, the yes, the blessing.
+  /**
+   * D35, the answer that gives the item back.
+   *
+   * On the one-item registry, so it cannot pass by accident: PRODUCT matches
+   * only an *available* product, and there is exactly one card to match. A hold
+   * that survived the decline leaves the second click with nothing to click.
+   */
+  declined: [
+    { goto: SINGLE },
+    { click: PRODUCT, nth: 0 },
+    { wait: 400 },
+    { text: "אני קונה את זה" },
+    { wait: 600 },
+    { text: "להמשיך לאתר" },
+    { wait: 800 },
+    { text: "לא רכשתי, לשחרר את הפריט" },
+    { wait: 1500 },
+    { click: PRODUCT, nth: 0 },
+    { wait: 500 },
+    { require: "אני קונה את זה" },
+    { shot: "sheet-declined-then-free" },
+  ],
+  /**
+   * D12 all the way through: the hold, the handoff, the yes, the name, the
+   * thank-you. "למי להגיד תודה?" is asked here and nowhere else (D36), so this
+   * is also the only place the name can reach the couple.
+   */
   blessing: [
     { goto: MAIN },
     { click: PRODUCT, nth: 0 },
@@ -86,7 +114,14 @@ const SCENES = {
     { wait: 600 },
     { text: "כן, רכשתי" },
     { wait: 900 },
+    { require: "למי להגיד תודה?" },
     { shot: "sheet-blessing" },
+    { type: "שירה", into: "#giver-name" },
+    { wait: 200 },
+    { text: "לצרף ברכה" },
+    { wait: 1200 },
+    { require: "תודה, רשמנו את המתנה שלך" },
+    { shot: "sheet-confirmed" },
   ],
   "group-gift": [
     { goto: MAIN },
@@ -99,6 +134,25 @@ const SCENES = {
     { click: "[data-testid='item-card'][data-kind='fund']", nth: 0 },
     { wait: 500 },
     { shot: "sheet-fund" },
+  ],
+  /**
+   * "סכום אחר" used to be a chip that selected nothing: it lit up and left the
+   * guest with no way to say how much. It now opens a field, and the CTA stays
+   * disabled until that field holds a number.
+   */
+  "fund-other-amount": [
+    { goto: MAIN },
+    { click: "[data-testid='item-card'][data-kind='fund']", nth: 0 },
+    { wait: 400 },
+    { text: "סכום אחר" },
+    { wait: 200 },
+    { type: "360", into: "[role='dialog'] input[inputmode='numeric']" },
+    { wait: 300 },
+    { shot: "sheet-fund-other-amount" },
+    // Disabled targets throw, so reaching the next screen proves ₪360 took.
+    { text: "לשלוח בביט" },
+    { wait: 800 },
+    { require: "הכסף נשלח ישירות אליהם" },
   ],
   // The CTA stays disabled until an amount is chosen, so pick a chip first.
   "fund-contact": [
@@ -256,6 +310,29 @@ async function steal(ws, selector) {
   if (!response.ok) throw new Error(`steal failed: HTTP ${response.status}`);
 }
 
+/**
+ * Type into a field.
+ *
+ * Assigning to `.value` is invisible to React, which reads the value it cached
+ * on the DOM node. Going through the prototype's setter and then firing a
+ * bubbling `input` event is what a keystroke looks like from React's side.
+ */
+async function type(ws, { into, text }) {
+  const outcome = await evaluate(
+    ws,
+    `(() => {
+       const node = document.querySelector(${JSON.stringify(into)});
+       if (!node) return 'no field: ' + ${JSON.stringify(into)};
+       const setter = Object.getOwnPropertyDescriptor(
+         HTMLInputElement.prototype, 'value').set;
+       setter.call(node, ${JSON.stringify(text)});
+       node.dispatchEvent(new Event('input', { bubbles: true }));
+       return 'ok';
+     })()`,
+  );
+  if (outcome !== "ok") throw new Error(outcome);
+}
+
 /** Asserts the screen is the one the scene thinks it is on. */
 async function require_(ws, needle) {
   const found = await evaluate(
@@ -348,6 +425,8 @@ try {
           await new Promise((r) => setTimeout(r, 2500));
         } else if (step.click || step.text) {
           await click(page, { selector: step.click, text: step.text, nth: step.nth });
+        } else if (step.type) {
+          await type(page, { into: step.into, text: step.type });
         } else if (step.steal) {
           await steal(page, step.steal);
         } else if (step.require) {

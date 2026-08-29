@@ -25,6 +25,10 @@ import type { PaymentHandle, PublicItem } from "@/lib/types";
 /**
  * "למי להגיד תודה?" - optional, and the only thing we ever ask a guest for.
  * It reaches the couple's tracker (D7) and no other guest (D8).
+ *
+ * Asked exactly once, in the blessing sheet at the end of the flow. It used to
+ * be on the handoff sheet as well, which meant a guest who typed their name on
+ * the way out was asked for it again on the way back.
  */
 function NameField({
   label,
@@ -135,15 +139,11 @@ export function ItemDetailSheet({
 export function HandoffSheet({
   item,
   pending,
-  giverName,
-  onGiverNameChange,
   onClose,
   onContinue,
 }: {
   item: PublicItem;
   pending: boolean;
-  giverName: string;
-  onGiverNameChange: (value: string) => void;
   onClose: () => void;
   onContinue: () => void;
 }) {
@@ -170,27 +170,30 @@ export function HandoffSheet({
         <p className="text-small text-ink">
           {copy.handoff.body(item.title, item.chainNameHe ?? "")}
         </p>
-        <NameField
-          label={copy.handoff.nameLabel}
-          value={giverName}
-          onChange={onGiverNameChange}
-        />
+        {/* "למי להגיד תודה?" is asked once, on the way back (G9), not here and
+            there. On the way out the guest is trying to leave for the shop. */}
       </div>
     </Sheet>
   );
 }
 
-/** G5. The D12 moment: purchase is self-reported, never derived. */
+/**
+ * G5. The D12 moment: purchase is self-reported, never derived.
+ *
+ * Three answers, and the third one is dismissal. Yes records the purchase, no
+ * hands the unit straight back (D35), and closing the question keeps the hold
+ * for a guest who is still at the shop.
+ */
 export function ReportModal({
   pending,
   onClose,
   onPurchased,
-  onNotYet,
+  onNotPurchased,
 }: {
   pending: boolean;
   onClose: () => void;
   onPurchased: () => void;
-  onNotYet: () => void;
+  onNotPurchased: () => void;
 }) {
   return (
     <Modal onClose={onClose} labelledBy="report-title">
@@ -203,11 +206,11 @@ export function ReportModal({
           <PrimaryButton onClick={onPurchased} disabled={pending}>
             {copy.report.yes}
           </PrimaryButton>
-          {/* "עוד לא" keeps the hold. It is not a decline. */}
-          <SecondaryButton onClick={onNotYet} disabled={pending}>
-            {copy.report.notYet}
+          <SecondaryButton onClick={onNotPurchased} disabled={pending}>
+            {copy.report.no}
           </SecondaryButton>
         </div>
+        <p className="text-tiny text-muted">{copy.report.stillDeciding}</p>
       </div>
     </Modal>
   );
@@ -221,9 +224,10 @@ export function GroupGiftSheet({
 }: {
   item: PublicItem;
   onClose: () => void;
-  onContribute: (amount: number | "other") => void;
+  /** Agorot. Never null: the CTA is disabled until an amount exists. */
+  onContribute: (agorot: number) => void;
 }) {
-  const [amount, setAmount] = useState<number | "other" | null>(null);
+  const [amount, setAmount] = useState<number | null>(null);
   const remaining = remainingAgorot(item.contributedAgorot, item.targetAgorot);
   const complete = isFundComplete(item.contributedAgorot, item.targetAgorot);
 
@@ -305,9 +309,10 @@ export function CashVoucherSheet({
 }: {
   item: PublicItem;
   onClose: () => void;
-  onSend: (amount: number | "other" | null) => void;
+  /** Agorot for the envelope, null for a voucher, whose amount is set at the chain. */
+  onSend: (agorot: number | null) => void;
 }) {
-  const [amount, setAmount] = useState<number | "other" | null>(null);
+  const [amount, setAmount] = useState<number | null>(null);
   const isVoucher = item.kind === "voucher";
 
   if (isVoucher) {

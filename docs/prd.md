@@ -89,7 +89,7 @@ Sample data for every mock: couple **נועה ואיתי** (Noa and Itai), baby 
 | G2 | Item grid + filters | Chips: `הכול` / `מה שעוד חסר` / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` / `מעטפה ושוברים`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
 | G3 | Item detail sheet | Image, full name, price, chain chip, quantity line, couple note, price disclaimer | `אני קונה את זה` (I'm buying this) |
 | G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Optional first name, framed `למי להגיד תודה?`. Leaving this sheet without continuing hands the unit back (D33) | `להמשיך לאתר שילב` (continue to Shilav) |
-| G5 | Return self-report modal | The D12 moment. `האם רכשת את הפריט?` with `כן, רכשתי` and `עוד לא` | `כן, רכשתי` (yes, I bought it) |
+| G5 | Return self-report modal | The D12 moment. `האם רכשת את הפריט?` with `כן, רכשתי` and `לא רכשתי, לשחרר את הפריט`. Dismissing the question is the third answer and keeps the hold (D35) | `כן, רכשתי` (yes, I bought it) |
 | G6 | Group gift sheet | Funding meter, `נותרו ₪550 מתוך ₪1,290`, `6 אורחים כבר השתתפו`, amount chips, then the contact reveal | `להשתתף במתנה` (join this gift) |
 | G7 | Envelope / gift card sheet | One plain cash envelope with no target and no meter (D28), and voucher types. Amount chips, then contact reveal or outbound merchant | `לשלוח מתנה` (send a gift) |
 | G8 | Contact reveal | The D13 component. `צריכים את הפרטים של נועה ואיתי?` with the Bit or PayBox handle and a copy button, plus `שלחתי` (I sent it) | `העתקה` (copy) |
@@ -136,7 +136,7 @@ Figma Make defaults to the happy path and to full lists, so every state below ne
 | Group gift partly funded | G3, G6 | RTL meter, remaining amount is the headline, never the percent | `נותרו ₪550 מתוך ₪1,290` |
 | Group gift complete | G6 | Full meter, closed CTA | `המתנה הושלמה. תודה לכל מי שהשתתף` |
 | Quantity partly fulfilled | G2, G3 | Counter chip, CTA stays live | `נשארו 2 מתוך 4` |
-| Handoff pending | G5 | Guest went out and came back without confirming | `עוד לא` keeps the item reserved, not purchased |
+| Handoff pending | G5 | Guest went out and came back without answering. Dismissing the question keeps the hold; an explicit `לא רכשתי` releases it (D35) | `עוד באמצע? אפשר לסגור — הפריט נשאר שמור לכם` |
 | Gift card sent | G9, C9 | Neutral chip, never an error color | `השובר נשלח לנועה ואיתי` |
 | Price may differ | G3 | Permanent, quiet, never a warning color. Carries the whole "reality lives at the chain" message now that stock is gone (D26) | `המחיר מתעדכן באתר החנות` |
 | Broken image | G2, G3 | Branded 1:1 placeholder with category glyph and product name. Never a gray box with alt text, never a layout shift | none |

@@ -73,8 +73,8 @@ def add_envelope(session: Session, registry: Registry, **overrides: object) -> R
     defaults: dict[str, object] = {
         "kind": "fund",
         "position": 90,
-        "title": "מעטפה לנועה ואיתי",
-        "subtitle": "כל סכום, ישירות אלינו בביט או בפייבוקס",
+        "title": "חיבוק בביט / פייבוקס 💛",
+        "subtitle": "כל סכום, ישירות אלינו",
         "contributed_agorot": 180_000,
         "contributor_count": 9,
     }

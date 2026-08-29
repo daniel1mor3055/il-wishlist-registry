@@ -77,11 +77,15 @@ function productItem(source, overrides = {}) {
  * The cash envelope (D28). No target, no meter, and nothing in its name that
  * implies a specific purchase - collecting toward one item is what group
  * gifting on a real product does.
+ *
+ * "חיבוק" rather than "מעטפה": a Hebrew envelope is what you hand over at a
+ * wedding, and this is neither an object nor addressed to anyone. The title
+ * names the two apps the money actually travels through.
  */
 function envelopeItem(overrides = {}) {
   return {
     kind: "fund",
-    title: `מעטפה ל${COUPLE}`,
+    title: "חיבוק בביט / פייבוקס 💛",
     source_title: null,
     note: null,
     category: null,
@@ -98,7 +102,8 @@ function envelopeItem(overrides = {}) {
     target_agorot: null,
     contributed_agorot: 180_000,
     contributor_count: 9,
-    subtitle: "כל סכום, ישירות אלינו בביט או בפייבוקס",
+    // The title now names the apps, so the subtitle carries only "any amount".
+    subtitle: "כל סכום, ישירות אלינו",
     caption: null,
     ...overrides,
   };
