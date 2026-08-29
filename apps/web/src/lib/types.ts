@@ -93,6 +93,16 @@ export interface ReservationView {
 }
 
 /**
+ * The same idea for money: the guest's own contribution id, and the item with
+ * its new public total. Their own amount is deliberately not echoed back - they
+ * just typed it, and no response should be a place to read one from (D15).
+ */
+export interface ContributionView {
+  contributionId: string;
+  item: PublicItem;
+}
+
+/**
  * Guest writes fail for ordinary reasons - someone else took the last unit -
  * so the failure is a value the caller has to handle, not an exception. The
  * code is an API error code; `errorCopy` turns it into Hebrew.

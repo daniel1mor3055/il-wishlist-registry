@@ -139,6 +139,8 @@ export const copy = {
     body: "הכסף נשלח ישירות אליהם בביט או בפייבוקס. האתר הזה לא גובה תשלום ולא שומר פרטי אשראי.",
     copy: "העתקה",
     copied: "המספר הועתק",
+    loading: "רגע…",
+    amountReminder: "הסכום שבחרתם:",
     handleLabel: (name: string) => `מספר הביט של ${name}`,
     sent: "שלחתי",
     notSent: "עוד לא שלחתי",
@@ -158,6 +160,10 @@ export const copy = {
   confirmed: {
     title: "תודה, רשמנו את המתנה שלך",
     body: (names: string) => `${names} יראו שרכשת, וידעו למי להגיד תודה.`,
+    /* Money is not a purchase, and this screen must not tell a guest who just
+       sent ₪100 in Bit that the couple can see they bought something. Covers
+       the envelope, a group gift and a voucher alike. */
+    giftBody: (names: string) => `${names} יראו את המתנה שלך, וידעו למי להגיד תודה.`,
     back: "חזרה לרשימה",
   },
 

@@ -1,9 +1,12 @@
-"""The reserve path. This is the product.
+"""Every guest write: taking a unit, sending money, saying thank you.
 
-Everything else in the POC is a form over a ledger; this is the ledger. Two
-guests tapping "אני קונה את זה" on the last unit within the same second is
-normal traffic for a link dropped into a WhatsApp group, and exactly one of them
-must win.
+The reserve path at the top of this file is the product. Two guests tapping
+"אני קונה את זה" on the last unit within the same second is normal traffic for a
+link dropped into a WhatsApp group, and exactly one of them must win.
+
+The money path below it looks similar and is not: contributions have no scarce
+resource to race for, so the atomic statement there is about not losing an
+addition rather than about picking a winner.
 
 The mechanism is one statement:
 
@@ -32,8 +35,8 @@ from sqlalchemy import case, func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
-from app.gifting.models import Reservation
-from app.gifting.schemas import ReservationView
+from app.gifting.models import Blessing, Contribution, Reservation
+from app.gifting.schemas import ContributionView, PaymentHandleView, ReservationView
 from app.registry.models import Registry, RegistryItem
 from app.registry.service import to_public_item
 
@@ -96,6 +99,21 @@ def _load_reservation(
     if reservation is None:
         raise GiftingError("reservation_not_found", 404)
     return reservation
+
+
+def _load_contribution(
+    session: Session, registry: Registry, contribution_id: UUID, guest_id: UUID
+) -> Contribution:
+    """Same rule as a reservation: the cookie owns the row or the row is absent."""
+    stmt = select(Contribution).where(
+        Contribution.id == contribution_id,
+        Contribution.guest_id == guest_id,
+        Contribution.registry_id == registry.id,
+    )
+    contribution = session.execute(stmt).scalar_one_or_none()
+    if contribution is None:
+        raise GiftingError("contribution_not_found", 404)
+    return contribution
 
 
 def _resettle_claim_state(session: Session, item: RegistryItem) -> None:
@@ -277,3 +295,168 @@ def release_reservation(
     _hand_back(session, reservation)
     _resettle_claim_state(session, _load_item(session, reservation.item_id))
     session.commit()
+
+
+#: Money can only go where the couple pointed it: the one cash envelope, or a
+#: product the couple opened for group gifting (D28).
+def _load_money_item(session: Session, registry: Registry, item_id: UUID) -> RegistryItem:
+    item = _load_item(session, item_id)
+    if item.registry_id != registry.id or not item.is_active:
+        raise GiftingError("item_not_found", 404)
+    if item.kind != "fund" and not item.group_gift_enabled:
+        raise GiftingError("item_takes_no_money", 409)
+    return item
+
+
+def _contribution_view(session: Session, contribution: Contribution) -> ContributionView:
+    return ContributionView(
+        contribution_id=contribution.id,
+        item=to_public_item(_load_item(session, contribution.item_id)),
+    )
+
+
+def contribute(
+    session: Session,
+    *,
+    slug: str,
+    item_id: UUID,
+    guest_id: UUID,
+    idempotency_key: str,
+    amount_agorot: int,
+) -> tuple[ContributionView, bool]:
+    """Record money a guest says they sent. Returns the view and whether it was new.
+
+    Unlike taking a unit, this has no race to lose. The increment is still one
+    atomic statement so concurrent gifts cannot lose each other's addition, but
+    there is deliberately no upper bound to check: the guest sent the money
+    before they got here, so the only choice is between recording a real gift
+    and dropping it. Overshooting a group gift's target is the couple's happy
+    problem, not an error the guest should be shown.
+    """
+    registry = _load_open_registry(session, slug)
+
+    replay = session.execute(
+        select(Contribution).where(Contribution.idempotency_key == idempotency_key)
+    ).scalar_one_or_none()
+    if replay is not None:
+        if replay.guest_id != guest_id or replay.item_id != item_id:
+            raise GiftingError("idempotency_key_reused", 409)
+        return _contribution_view(session, replay), False
+
+    item = _load_money_item(session, registry, item_id)
+
+    contribution = Contribution(
+        registry_id=registry.id,
+        item_id=item.id,
+        guest_id=guest_id,
+        amount_agorot=amount_agorot,
+        idempotency_key=idempotency_key,
+    )
+    session.add(contribution)
+
+    session.execute(
+        update(RegistryItem)
+        .where(RegistryItem.id == item.id)
+        .values(
+            contributed_agorot=RegistryItem.contributed_agorot + amount_agorot,
+            contributor_count=RegistryItem.contributor_count + 1,
+        )
+        .execution_options(synchronize_session=False)
+    )
+
+    try:
+        session.commit()
+    except IntegrityError:
+        # Two identical POSTs in flight. The other one won the unique key, and
+        # rolling back hands it the increment too.
+        session.rollback()
+        winner = session.execute(
+            select(Contribution).where(Contribution.idempotency_key == idempotency_key)
+        ).scalar_one_or_none()
+        if winner is None:
+            raise
+        return _contribution_view(session, winner), False
+
+    return _contribution_view(session, contribution), True
+
+
+def add_blessing(
+    session: Session,
+    *,
+    slug: str,
+    guest_id: UUID,
+    idempotency_key: str,
+    giver_name: str | None,
+    message: str | None,
+    reservation_id: UUID | None,
+    contribution_id: UUID | None,
+) -> None:
+    """A private message to the couple (D17), and the moment a name is recorded.
+
+    "למי להגיד תודה?" is asked once, here (D36), so this is also where the name
+    reaches the gift it belongs to. Nothing comes back: there is no guest-facing
+    read path for a blessing, and answering with the row would create one.
+
+    Stays open on a closed registry, like reporting does - a guest finishing a
+    flow they started should not be told their thank-you note is too late.
+    """
+    registry = _load_registry(session, slug)
+
+    replay = session.execute(
+        select(Blessing).where(Blessing.idempotency_key == idempotency_key)
+    ).scalar_one_or_none()
+    if replay is not None:
+        return
+
+    name = (giver_name or "").strip()[:80] or None
+    text_ = (message or "").strip() or None
+
+    item_id: UUID | None = None
+
+    if reservation_id is not None:
+        reservation = _load_reservation(session, registry, reservation_id, guest_id)
+        item_id = reservation.item_id
+        if name:
+            reservation.giver_name = name
+
+    if contribution_id is not None:
+        contribution = _load_contribution(session, registry, contribution_id, guest_id)
+        item_id = contribution.item_id
+        if name:
+            contribution.giver_name = name
+
+    session.add(
+        Blessing(
+            registry_id=registry.id,
+            item_id=item_id,
+            guest_id=guest_id,
+            giver_name=name,
+            message=text_,
+            idempotency_key=idempotency_key,
+        )
+    )
+
+    try:
+        session.commit()
+    except IntegrityError:
+        # A replayed submit that arrived while the first was still committing.
+        session.rollback()
+
+
+def reveal_payment_handle(session: Session, *, slug: str) -> PaymentHandleView:
+    """D13, on explicit interaction only.
+
+    The handle is on the registry row but never in `PublicRegistry`, so seeing
+    it takes a deliberate second request. That is the whole mechanism: a page
+    scrape gets the list, not the couple's phone number.
+    """
+    registry = _load_open_registry(session, slug)
+
+    if not registry.payment_method or not registry.payment_handle:
+        raise GiftingError("payment_handle_unset", 404)
+
+    return PaymentHandleView(
+        method=registry.payment_method,
+        handle=registry.payment_handle,
+        display_name=registry.payment_display_name or registry.couple_names,
+    )

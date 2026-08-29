@@ -17,10 +17,16 @@ import {
   TakenSheet,
 } from "@/components/sheets/GuestSheets";
 import { copy, errorCopy, FILTERS, type FilterId } from "@/lib/copy";
-import { releaseReservation, reportPurchase, reserveItem } from "@/lib/guest-actions";
+import {
+  contribute,
+  fetchPaymentHandle,
+  releaseReservation,
+  reportPurchase,
+  reserveItem,
+  sendBlessing,
+} from "@/lib/guest-actions";
 import { isFundComplete } from "@/lib/money";
-import { DEMO_PAYMENT_HANDLE } from "@/lib/fixtures/payment";
-import type { PublicItem, PublicRegistry } from "@/lib/types";
+import type { PaymentHandle, PublicItem, PublicRegistry } from "@/lib/types";
 
 /**
  * The single client boundary for the guest page.
@@ -46,6 +52,9 @@ import type { PublicItem, PublicRegistry } from "@/lib/types";
  * and any local patch is dropped the moment fresh server data arrives.
  */
 
+/** The gift a blessing belongs to: a hold, a contribution, or neither. */
+type Gift = { reservationId?: string | null; contributionId?: string | null };
+
 type SheetState =
   | { type: "detail"; itemId: string }
   /** `reservationId: null` means the hold is still in flight. */
@@ -53,10 +62,11 @@ type SheetState =
   | { type: "report"; itemId: string; reservationId: string | null }
   | { type: "group"; itemId: string }
   | { type: "cashVoucher"; itemId: string }
-  | { type: "contact"; itemId: string }
-  /** Carries the hold so the name typed here can be attached to it. */
-  | { type: "blessing"; reservationId: string | null }
-  | { type: "confirmed" }
+  /** The amount the guest is about to send, carried to the write behind "שלחתי". */
+  | { type: "contact"; itemId: string; amountAgorot: number }
+  /** Carries the gift, so the name typed here can be attached to it. */
+  | ({ type: "blessing" } & Gift)
+  | { type: "confirmed"; purchased: boolean }
   /** `raceLost` separates "taken while you decided" from "taken before you arrived". */
   | { type: "taken"; itemId: string; raceLost: boolean }
   | null;
@@ -116,7 +126,11 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
   const [sheet, setSheet] = useState<SheetState>(null);
   const [toast, setToast] = useState<string | null>(null);
   const [reporting, setReporting] = useState(false);
+  const [sending, setSending] = useState(false);
   const [giverName, setGiverName] = useState("");
+  // Fetched when the contact sheet opens and never held longer than the page
+  // (D13). Null while in flight, which the sheet renders as a placeholder.
+  const [handle, setHandle] = useState<PaymentHandle | null>(null);
 
   // Patches are tagged with the server payload they were made against, so fresh
   // server data supersedes them by simply not matching. A patch stands in for
@@ -264,17 +278,66 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
     setSheet(purchased ? { type: "blessing", reservationId } : null);
   };
 
-  /**
-   * The blessing text itself lands with the money surface in C4. What can be
-   * recorded now is the name, and since reporting is idempotent, attaching it
-   * is simply the same report again.
-   */
-  const finishGift = async (reservationId: string | null) => {
-    setSheet({ type: "confirmed" });
-    if (!reservationId || !giverName.trim()) return;
+  /* ---------- the money writes ---------- */
 
-    const result = await reportPurchase(registry.slug, reservationId, true, giverName);
-    if (result.ok) patchItem(result.data.item);
+  /**
+   * Open the D13 reveal, and only then ask the API for the handle.
+   *
+   * The couple's Bit number is not in the page payload, so seeing it takes this
+   * deliberate second request. If the couple never set one there is nothing to
+   * show and nowhere to send money, so the sheet closes rather than sitting
+   * there empty.
+   */
+  const revealHandle = async (item: PublicItem, amountAgorot: number) => {
+    setHandle(null);
+    setSheet({ type: "contact", itemId: item.id, amountAgorot });
+
+    const result = await fetchPaymentHandle(registry.slug);
+    if (result.ok) {
+      setHandle(result.data);
+    } else {
+      setSheet(null);
+      showToast(errorCopy(result.code));
+    }
+  };
+
+  /**
+   * "שלחתי" - the money already left the guest's phone, so this write is the
+   * only record it ever happened (D11, D12).
+   *
+   * A failure therefore cannot be swallowed: the sheet stays open with the
+   * error so the guest can tap again, because the alternative is a gift the
+   * couple never sees.
+   */
+  const recordContribution = async (itemId: string, amountAgorot: number) => {
+    setSending(true);
+    const result = await contribute(registry.slug, itemId, amountAgorot);
+    setSending(false);
+
+    if (!result.ok) {
+      showToast(errorCopy(result.code));
+      return;
+    }
+
+    patchItem(result.data.item);
+    router.refresh();
+    setSheet({ type: "blessing", contributionId: result.data.contributionId });
+  };
+
+  /**
+   * The blessing, and with it the name (D36). Both are optional, so an empty
+   * form skips the write entirely rather than storing a blank row.
+   *
+   * The confirmation does not wait for the response. The gift is already
+   * recorded by this point; a blessing that fails to send is not something to
+   * hold a thank-you screen hostage over.
+   */
+  const finishGift = async (gift: Gift, message: string) => {
+    setSheet({ type: "confirmed", purchased: Boolean(gift.reservationId) });
+    if (!giverName.trim() && !message.trim()) return;
+
+    await sendBlessing(registry.slug, gift, giverName, message);
+    router.refresh();
   };
 
   /* ---------- empty and single-item grids ---------- */
@@ -418,7 +481,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
             <GroupGiftSheet
               item={item}
               onClose={closeSheet}
-              onContribute={() => setSheet({ type: "contact", itemId: item.id })}
+              onContribute={(agorot) => void revealHandle(item, agorot)}
             />
           );
         })()}
@@ -431,45 +494,64 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
             <CashVoucherSheet
               item={item}
               onClose={closeSheet}
-              // The amount goes nowhere until contributions land in C4.
-              onSend={() =>
-                item.kind === "voucher"
-                  ? setSheet({ type: "blessing", reservationId: null })
-                  : setSheet({ type: "contact", itemId: item.id })
-              }
+              onSend={(agorot) => {
+                // A voucher is bought at the chain, so there is no amount for us
+                // to record - only the thank-you on the way back.
+                if (item.kind === "voucher") {
+                  if (item.canonicalUrl) {
+                    window.open(item.canonicalUrl, "_blank", "noopener,noreferrer");
+                  }
+                  setSheet({ type: "blessing" });
+                  return;
+                }
+                if (agorot !== null) void revealHandle(item, agorot);
+              }}
             />
           );
         })()}
 
-      {sheet?.type === "contact" && (
-        <ContactRevealSheet
-          coupleNames={registry.coupleNames}
-          handle={DEMO_PAYMENT_HANDLE}
-          onClose={closeSheet}
-          onSent={() => setSheet({ type: "blessing", reservationId: null })}
-          onCopy={() => {
-            void navigator.clipboard?.writeText(DEMO_PAYMENT_HANDLE.handle);
-            showToast(copy.contact.copied);
-          }}
-        />
-      )}
+      {sheet?.type === "contact" &&
+        (() => {
+          const { itemId, amountAgorot } = sheet;
+          return (
+            <ContactRevealSheet
+              coupleNames={registry.coupleNames}
+              handle={handle}
+              amountAgorot={amountAgorot}
+              pending={sending}
+              onClose={closeSheet}
+              onSent={() => void recordContribution(itemId, amountAgorot)}
+              onCopy={() => {
+                if (!handle) return;
+                void navigator.clipboard?.writeText(handle.handle);
+                showToast(copy.contact.copied);
+              }}
+            />
+          );
+        })()}
 
       {sheet?.type === "blessing" &&
         (() => {
-          const { reservationId } = sheet;
+          const { reservationId, contributionId } = sheet;
           return (
             <BlessingSheet
               coupleNames={registry.coupleNames}
               giverName={giverName}
               onGiverNameChange={setGiverName}
               onClose={closeSheet}
-              onSubmit={() => void finishGift(reservationId)}
+              onSubmit={(message) =>
+                void finishGift({ reservationId, contributionId }, message)
+              }
             />
           );
         })()}
 
       {sheet?.type === "confirmed" && (
-        <ConfirmedSheet coupleNames={registry.coupleNames} onClose={closeSheet} />
+        <ConfirmedSheet
+          coupleNames={registry.coupleNames}
+          purchased={sheet.purchased}
+          onClose={closeSheet}
+        />
       )}
 
       {sheet?.type === "taken" && (

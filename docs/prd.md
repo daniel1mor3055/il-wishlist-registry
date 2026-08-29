@@ -88,12 +88,12 @@ Sample data for every mock: couple **נועה ואיתי** (Noa and Itai), baby 
 | G1 | Hero / land | Couple photo, names, one-line story, progress, reassurance strip, "how this works" in three lines | `לראות את הרשימה` (see the list) |
 | G2 | Item grid + filters | Chips: `הכול` / `מה שעוד חסר` / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` / `מעטפה ושוברים`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
 | G3 | Item detail sheet | Image, full name, price, chain chip, quantity line, couple note, price disclaimer | `אני קונה את זה` (I'm buying this) |
-| G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Optional first name, framed `למי להגיד תודה?`. Leaving this sheet without continuing hands the unit back (D33) | `להמשיך לאתר שילב` (continue to Shilav) |
+| G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Leaving this sheet without continuing hands the unit back (D33). No name is asked here - that happens once, at G9 (D36) | `להמשיך לאתר שילב` (continue to Shilav) |
 | G5 | Return self-report modal | The D12 moment. `האם רכשת את הפריט?` with `כן, רכשתי` and `לא רכשתי, לשחרר את הפריט`. Dismissing the question is the third answer and keeps the hold (D35) | `כן, רכשתי` (yes, I bought it) |
-| G6 | Group gift sheet | Funding meter, `נותרו ₪550 מתוך ₪1,290`, `6 אורחים כבר השתתפו`, amount chips, then the contact reveal | `להשתתף במתנה` (join this gift) |
-| G7 | Envelope / gift card sheet | One plain cash envelope with no target and no meter (D28), and voucher types. Amount chips, then contact reveal or outbound merchant | `לשלוח מתנה` (send a gift) |
-| G8 | Contact reveal | The D13 component. `צריכים את הפרטים של נועה ואיתי?` with the Bit or PayBox handle and a copy button, plus `שלחתי` (I sent it) | `העתקה` (copy) |
-| G9 | Private blessing + confirmation | Optional name and message straight to the couple, D17 private. Then `תודה, רשמנו את המתנה שלך` | `לצרף ברכה` (attach a blessing) |
+| G6 | Group gift sheet | Funding meter, `נותרו ₪550 מתוך ₪1,290`, `6 אורחים כבר השתתפו`, amount chips with a free-amount field behind `סכום אחר`, then the contact reveal | `להשתתף במתנה` (join this gift) |
+| G7 | Envelope / gift card sheet | One plain cash envelope with no target and no meter (D28), titled `חיבוק בביט / פייבוקס 💛` (D37), and voucher types. Amount chips, then contact reveal or outbound merchant | `לשלוח מתנה` (send a gift) |
+| G8 | Contact reveal | The D13 component. `צריכים את הפרטים של נועה ואיתי?` with the Bit or PayBox handle and a copy button, the chosen amount restated, plus `שלחתי` (I sent it), which is the write that records the gift (D38) | `העתקה` (copy) |
+| G9 | Private blessing + confirmation | Optional name and message straight to the couple, D17 private. The only place a guest is asked who they are (D36), and the write that attaches the name to the gift (D40). Then `תודה, רשמנו את המתנה שלך`, worded for a purchase or for money depending on which happened | `לצרף ברכה` (attach a blessing) |
 | G10 | Error and edge shell | Not found, closed, offline | `לנסות שוב` (try again) |
 
 Emotional register: guest surfaces read like a message from friends. First person plural, no marketing superlatives, no urgency, no scarcity timers, no discount language. Photography over illustration. The only tonal shift is at G8, where the UI turns plain and explicit because the person is about to send money somewhere.

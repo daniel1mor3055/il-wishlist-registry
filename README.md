@@ -25,7 +25,7 @@ A B2B2C platform that Israeli retailers can embed or integrate, giving their cus
 
 ## Current phase
 
-Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton and guest registry), C2 (Postgres, seed, API read path) and C3 (the double-buy core: reserve, self-report, release) are in.
+Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton and guest registry), C2 (Postgres, seed, API read path), C3 (the double-buy core: reserve, self-report, release) and C4 (the money surface: contributions, contact reveal, private blessings) are in.
 
 | Document                                                 | What it is                                                           |
 | -------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -70,9 +70,12 @@ The web app has no data of its own: every page is server-rendered from `GET /api
 Guest writes go the same way round, through route handlers under `/bff` — the browser never learns the API origin, and the guest cookie is set on the web origin, `HttpOnly`, one per registry:
 
 ```
-POST   /bff/registries/{slug}/items/{itemId}/reservations   take one unit
-POST   /bff/registries/{slug}/reservations/{id}/report       "כן, רכשתי" or "עוד לא" (D12)
-DELETE /bff/registries/{slug}/reservations/{id}             hand the unit back
+POST   /bff/registries/{slug}/items/{itemId}/reservations    take one unit
+POST   /bff/registries/{slug}/reservations/{id}/report       "כן, רכשתי" or "לא רכשתי" (D12, D35)
+DELETE /bff/registries/{slug}/reservations/{id}              hand the unit back
+POST   /bff/registries/{slug}/items/{itemId}/contributions   record money the guest says they sent
+POST   /bff/registries/{slug}/blessings                      private message plus the guest's name
+GET    /bff/registries/{slug}/payment-handle                 the D13 reveal, on interaction only
 ```
 
 `npm run seed` is also the reset: demo registry items are replaced wholesale, which drops every hold placed against them.
@@ -99,9 +102,11 @@ npm run seed             # load both into Postgres
 
 ## Status
 
-C3 done: the double-buy core. Taking an item is one conditional `UPDATE ... WHERE quantity_claimed < quantity_wanted RETURNING`, so two guests on the last unit get one `201` and one `409` rather than an oversold gift; the hold is optimistic in the client and reverts to the taken sheet when the race is lost. Self-reporting (D12), handing a unit back, the per-registry guest cookie and idempotent re-POSTs are in, with the concurrency, replay and counter-reconciliation tests that guard them.
+C4 done: the money surface, which completes the guest side. Every guest flow now writes — a group-gift or envelope contribution recorded at "שלחתי" (D38), the couple's Bit handle revealed by its own request and never in the page payload (D13), and a private blessing that carries the guest's name to the gift it came with (D17, D40). The reserve path from C3 is unchanged: one conditional `UPDATE ... WHERE quantity_claimed < quantity_wanted RETURNING`, so two guests on the last unit get one `201` and one `409` rather than an oversold gift.
 
-Next is C4, the money surface: group-gift and envelope contributions, the D13 contact reveal, and the private blessing (D17) — the flows that currently look finished in the UI and write nothing.
+Both counters are guarded by concurrency tests that were checked by regression rather than by inspection: a read-then-write reserve oversold a two-unit item to five guests, and a read-then-write contribution lost ₪410 of ₪940, while in both cases every sequential test still passed.
+
+Next is C5, the couple's editor: magic-link identity, the create wizard, adding items from the harvested catalog, and item settings — the first surface where the couple, rather than a guest, writes.
 
 ## License
 

@@ -151,19 +151,60 @@ const SCENES = {
     { shot: "sheet-fund-other-amount" },
     // Disabled targets throw, so reaching the next screen proves ₪360 took.
     { text: "לשלוח בביט" },
-    { wait: 800 },
-    { require: "הכסף נשלח ישירות אליהם" },
+    { wait: 1200 },
+    { require: "הסכום שבחרתם:" },
+    { require: "₪360" },
   ],
-  // The CTA stays disabled until an amount is chosen, so pick a chip first.
+  /**
+   * The envelope, end to end: amount, reveal, "שלחתי", blessing, thank-you.
+   *
+   * The handle on the reveal sheet arrives from its own request (D13) rather
+   * than from the page, so `require` here is also the test that the reveal
+   * endpoint answered - a blank placeholder would fail the step.
+   */
   "fund-contact": [
     { goto: MAIN },
     { click: "[data-testid='item-card'][data-kind='fund']", nth: 0 },
     { wait: 400 },
-      { text: "₪100" },
+    { text: "₪100" },
     { wait: 200 },
     { text: "לשלוח בביט" },
-    { wait: 800 },
+    { wait: 1200 },
+    { require: "050-123-4567" },
     { shot: "sheet-contact-reveal" },
+    { text: "שלחתי" },
+    { wait: 1200 },
+    { require: "למי להגיד תודה?" },
+    { type: "יעל ורון", into: "#giver-name" },
+    { type: "מחכים לפגוש אותה 💛", into: "textarea" },
+    { wait: 200 },
+    { text: "לצרף ברכה" },
+    { wait: 1200 },
+    { require: "תודה, רשמנו את המתנה שלך" },
+    { shot: "sheet-envelope-done" },
+  ],
+  /**
+   * Group gifting, which shares the reveal with the envelope and differs in
+   * where the money lands: an item's meter rather than a plain total.
+   */
+  "group-contact": [
+    { goto: MAIN },
+    { click: "[data-testid='item-card'][data-kind='group']", nth: 0 },
+    { wait: 400 },
+    { text: "סכום אחר" },
+    { wait: 200 },
+    { type: "180", into: "[role='dialog'] input[inputmode='numeric']" },
+    { wait: 200 },
+    { text: "להשתתף במתנה" },
+    { wait: 1200 },
+    { require: "₪180" },
+    { shot: "sheet-group-contact" },
+    { text: "שלחתי" },
+    { wait: 1200 },
+    { require: "למי להגיד תודה?" },
+    { text: "לדלג" },
+    { wait: 1000 },
+    { require: "תודה, רשמנו את המתנה שלך" },
   ],
   taken: [
     { goto: MAIN },
@@ -323,9 +364,13 @@ async function type(ws, { into, text }) {
     `(() => {
        const node = document.querySelector(${JSON.stringify(into)});
        if (!node) return 'no field: ' + ${JSON.stringify(into)};
-       const setter = Object.getOwnPropertyDescriptor(
-         HTMLInputElement.prototype, 'value').set;
-       setter.call(node, ${JSON.stringify(text)});
+       // The setter lives on the element's own prototype; calling an input's
+       // setter on a textarea throws.
+       const proto = node.tagName === 'TEXTAREA'
+         ? HTMLTextAreaElement.prototype
+         : HTMLInputElement.prototype;
+       Object.getOwnPropertyDescriptor(proto, 'value')
+         .set.call(node, ${JSON.stringify(text)});
        node.dispatchEvent(new Event('input', { bubbles: true }));
        return 'ok';
      })()`,

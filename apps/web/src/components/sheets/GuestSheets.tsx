@@ -369,16 +369,27 @@ export function CashVoucherSheet({
   );
 }
 
-/** G8. The D13 contact reveal. Deliberately the plainest surface in the app. */
+/**
+ * G8. The D13 contact reveal. Deliberately the plainest surface in the app.
+ *
+ * `handle` is null while the reveal request is in flight: it is not in the page
+ * payload, so it arrives a moment after the sheet does. "שלחתי" is the guest's
+ * self-report that the transfer happened, and it is disabled until there is
+ * something to have sent money to.
+ */
 export function ContactRevealSheet({
   coupleNames,
   handle,
+  amountAgorot,
+  pending,
   onClose,
   onSent,
   onCopy,
 }: {
   coupleNames: string;
-  handle: PaymentHandle;
+  handle: PaymentHandle | null;
+  amountAgorot: number;
+  pending: boolean;
   onClose: () => void;
   onSent: () => void;
   onCopy: () => void;
@@ -389,7 +400,9 @@ export function ContactRevealSheet({
       labelledBy="contact-title"
       cta={
         <div className="flex flex-col items-center gap-2">
-          <PrimaryButton onClick={onSent}>{copy.contact.sent}</PrimaryButton>
+          <PrimaryButton onClick={onSent} disabled={!handle || pending}>
+            {copy.contact.sent}
+          </PrimaryButton>
           <TextButton onClick={onClose}>{copy.contact.notSent}</TextButton>
         </div>
       }
@@ -403,19 +416,30 @@ export function ContactRevealSheet({
 
         <div className="flex flex-col gap-1.5">
           <div className="flex items-center justify-between rounded-btn border border-border bg-panel px-4 py-3.5">
-            <span className="ltr-token text-h3 font-bold text-ink">{handle.handle}</span>
+            <span className="ltr-token text-h3 font-bold text-ink">
+              {handle ? handle.handle : copy.contact.loading}
+            </span>
             <button
               type="button"
               onClick={onCopy}
-              className="shrink-0 rounded-[10px] bg-primary px-3 py-1.5 text-small font-medium text-white transition-opacity active:opacity-80"
+              disabled={!handle}
+              className="shrink-0 rounded-[10px] bg-primary px-3 py-1.5 text-small font-medium text-white transition-opacity active:opacity-80 disabled:opacity-40"
             >
               {copy.contact.copy}
             </button>
           </div>
-          <p className="text-small text-ink-muted">
-            {copy.contact.handleLabel(handle.displayName)}
-          </p>
+          {handle && (
+            <p className="text-small text-ink-muted">
+              {copy.contact.handleLabel(handle.displayName)}
+            </p>
+          )}
         </div>
+
+        {/* Restates the number the guest chose two sheets ago, because they are
+            about to type it into a different app from memory. */}
+        <p className="text-small text-ink">
+          {copy.contact.amountReminder} <InlineAmount agorot={amountAgorot} />
+        </p>
       </div>
     </Sheet>
   );
@@ -430,15 +454,12 @@ export function BlessingSheet({
   onSubmit,
 }: {
   coupleNames: string;
-  /* Shared with the handoff sheet: a guest who already answered "למי להגיד
-     תודה?" on the way out should not be asked again on the way back. */
+  /** The one time a guest is asked who they are (D36). */
   giverName: string;
   onGiverNameChange: (value: string) => void;
   onClose: () => void;
-  onSubmit: () => void;
+  onSubmit: (message: string) => void;
 }) {
-  // The blessing text itself goes nowhere until the write lands in C4, so it
-  // stays local rather than pretending to be part of a flow.
   const [message, setMessage] = useState("");
 
   return (
@@ -447,8 +468,12 @@ export function BlessingSheet({
       labelledBy="blessing-title"
       cta={
         <div className="flex flex-col items-center gap-2">
-          <PrimaryButton onClick={onSubmit}>{copy.blessing.submit}</PrimaryButton>
-          <TextButton onClick={onSubmit}>{copy.blessing.skip}</TextButton>
+          <PrimaryButton onClick={() => onSubmit(message)}>
+            {copy.blessing.submit}
+          </PrimaryButton>
+          {/* Skipping still carries the name: it is the couple's thank-you list,
+              and a guest who typed it meant for them to have it. */}
+          <TextButton onClick={() => onSubmit("")}>{copy.blessing.skip}</TextButton>
         </div>
       }
     >
@@ -476,12 +501,14 @@ export function BlessingSheet({
   );
 }
 
-/** G9b. Confirmation. */
+/** G9b. Confirmation. Says a different true thing for money than for a purchase. */
 export function ConfirmedSheet({
   coupleNames,
+  purchased,
   onClose,
 }: {
   coupleNames: string;
+  purchased: boolean;
   onClose: () => void;
 }) {
   return (
@@ -497,7 +524,11 @@ export function ConfirmedSheet({
         <h2 id="confirmed-title" className="text-h2 font-bold text-ink">
           {copy.confirmed.title}
         </h2>
-        <p className="text-small text-ink">{copy.confirmed.body(coupleNames)}</p>
+        <p className="text-small text-ink">
+          {purchased
+            ? copy.confirmed.body(coupleNames)
+            : copy.confirmed.giftBody(coupleNames)}
+        </p>
       </div>
     </Sheet>
   );
