@@ -4,6 +4,8 @@ Paste **only** the fenced block into Figma Make as the first prompt. Do not past
 
 This replaces the short P1 in [prompts.md](prompts.md). After the first render, go back to that file for P2 onward (states), then the couple editor, then the widget.
 
+Kept as sent, because it is the prompt that produced the render we reviewed. Two parts of it are now superseded and should not be re-pasted as written: the priority badges (`חובה` / `רצוי` / `נחמד שיהיה`) are gone per D27, and card G is a plain cash envelope with no target and no meter rather than `קופה לעגלה` per D28. [p3-missing-states.md](p3-missing-states.md) opens with the two prompts that undo them.
+
 What this prompt is for: one populated, published registry, mobile 390px, Hebrew RTL, guest-only. It is not the couple editor and not the retailer widget.
 
 What to check before iterating: people-first hero (couple above any product logo); no checkout or card fields anywhere; funding meter fills from the **right**; back chevron points **right**; "נותרו ₪550" reads as remaining, not collected; product cards look richer than money tiles; every string is Hebrew.

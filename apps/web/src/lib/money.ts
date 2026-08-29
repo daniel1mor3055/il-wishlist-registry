@@ -65,3 +65,9 @@ export function suggestedAmounts(remaining: number): number[] {
   const usable = candidates.filter((c) => c <= Math.max(remaining, 5_000));
   return usable.length > 0 ? usable.slice(0, 3) : [5_000, 10_000, 20_000];
 }
+
+/**
+ * The envelope's chips are fixed, because an envelope has no target to derive
+ * them from (D28). ₪50 / ₪100 / ₪200, plus "סכום אחר" at the call site.
+ */
+export const ENVELOPE_AMOUNTS = [5_000, 10_000, 20_000];

@@ -7,8 +7,6 @@ const DESCRIPTIONS: Record<string, string> = {
   "empty-registry-demo": "רשימה ריקה",
   "single-item-demo": "פריט אחד בלבד",
   "fully-claimed-demo": "כל הפריטים נתפסו",
-  "draft-demo": "טיוטה — עוד לא פורסמה",
-  "post-birth-demo": "אחרי הלידה",
   "closed-demo": "נסגרה",
 };
 

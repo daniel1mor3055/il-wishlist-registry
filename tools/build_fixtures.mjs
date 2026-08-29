@@ -6,8 +6,8 @@
  * the real API contract (`PublicRegistry`, `PublicItem`), so C2 replaces a
  * loader rather than a data model.
  *
- * The seed needs seven registries, not one: seven of the nineteen PRD section 7
- * states are registry-level and cannot coexist in a single registry.
+ * The seed needs five registries, not one: five of the PRD section 7 states are
+ * registry-level and cannot coexist in a single registry.
  *
  * Usage: node tools/build_fixtures.mjs
  */
@@ -54,17 +54,10 @@ function productItem(source, overrides = {}) {
     note: null,
     category: source.category,
     imageUrl: source.image_url,
-    priority:
-      source.priority_hint === "must"
-        ? "must"
-        : source.priority_hint === "want"
-          ? "want"
-          : "nice",
     chainSlug: source.chain_slug,
     chainNameHe: source.chain_name_he,
     canonicalUrl: source.canonical_url,
     priceAgorot: source.price_agorot,
-    inStock: source.in_stock,
     quantityWanted: 1,
     quantityClaimed: 0,
     claimState: "available",
@@ -78,29 +71,32 @@ function productItem(source, overrides = {}) {
   };
 }
 
-function fundItem(overrides = {}) {
+/**
+ * The cash envelope (D28). No target, no meter, and nothing in its name that
+ * implies a specific purchase - collecting toward one item is what group
+ * gifting on a real product does.
+ */
+function envelopeItem(overrides = {}) {
   return {
     id: nextId(),
     kind: "fund",
-    title: "קופה לעגלה",
+    title: `מעטפה ל${COUPLE}`,
     sourceTitle: null,
     note: null,
-    category: "mobility",
+    category: null,
     imageUrl: null,
-    priority: null,
     chainSlug: null,
     chainNameHe: null,
     canonicalUrl: null,
     priceAgorot: null,
-    inStock: true,
     quantityWanted: 1,
     quantityClaimed: 0,
     claimState: "available",
-    groupGiftEnabled: true,
-    targetAgorot: 300_000,
+    groupGiftEnabled: false,
+    targetAgorot: null,
     contributedAgorot: 180_000,
     contributorCount: 9,
-    subtitle: "מעטפה דיגיטלית — נשלח אלינו בביט",
+    subtitle: "כל סכום, ישירות אלינו בביט או בפייבוקס",
     caption: null,
     ...overrides,
   };
@@ -113,14 +109,12 @@ function voucherItem(overrides = {}) {
     title: "שובר שילב",
     sourceTitle: null,
     note: null,
-    category: "clothing",
+    category: null,
     imageUrl: null,
-    priority: null,
     chainSlug: "shilav",
     chainNameHe: "שילב",
     canonicalUrl: "https://www.shilav.co.il/products/gift-card",
     priceAgorot: null,
-    inStock: true,
     quantityWanted: 1,
     quantityClaimed: 0,
     claimState: "available",
@@ -134,6 +128,7 @@ function voucherItem(overrides = {}) {
   };
 }
 
+const COUPLE = "נועה ואיתי";
 const COVER =
   "https://images.unsplash.com/photo-1763713512973-ed285caa8ba1?w=780&h=488&fit=crop&auto=format";
 
@@ -158,7 +153,6 @@ const breastPump = pick(titleMatches(/משאבת חלב/), "breast pump");
 const changingMat = pick(titleMatches(/משטח החתלה/), "changing mat");
 const mobile = pick(titleMatches(/מובייל|קוביות/), "mobile or blocks");
 const bodysuits = pick(titleMatches(/בגדי גוף|אוברול/), "bodysuits");
-const outOfStock = pick((i) => !i.in_stock, "an out-of-stock item");
 // The longest real retailer title available, to exercise the two-line clamp.
 // Strollers are excluded so the grid does not show two near-identical Priams.
 const longName = catalog
@@ -169,46 +163,40 @@ if (longName) used.add(longName.external_id);
 const mainItems = [
   // The group gift: partially funded, which is the PRD's headline state.
   productItem(stroller, {
-    priority: "must",
     groupGiftEnabled: true,
     targetAgorot: stroller.price_agorot,
     contributedAgorot: Math.round(stroller.price_agorot * 0.57),
     contributorCount: 6,
     caption: "נשלח אחרי הלידה",
   }),
-  productItem(carSeat, { priority: "must" }),
+  productItem(carSeat),
   // Already taken by another guest (D8): state is public, identity is not.
-  productItem(crib, { priority: "want", quantityClaimed: 1, claimState: "purchased" }),
+  productItem(crib, { quantityClaimed: 1, claimState: "purchased" }),
   // Quantity partly fulfilled.
   productItem(bottles, {
-    priority: "nice",
     quantityWanted: 4,
     quantityClaimed: 2,
     claimState: "available",
   }),
   // Carries a couple note.
   productItem(nursingPillow, {
-    priority: "must",
     note: "זה אחד הדברים שבאמת יעזרו לנו בלילות הראשונים",
   }),
-  productItem(breastPump, { priority: "want" }),
+  productItem(breastPump),
   // Reserved, not yet confirmed bought (D12). To a guest this reads the same as
   // bought — which is exactly the point of keeping claim state public (D8).
   productItem(changingMat, {
-    priority: "want",
     quantityClaimed: 1,
     claimState: "reserved",
   }),
-  productItem(mobile, { priority: "nice" }),
-  productItem(bodysuits, { priority: "nice" }),
-  // Out of stock at the chain: price stays, CTA swaps to alternatives.
-  productItem(outOfStock, { priority: "want" }),
-  fundItem(),
+  productItem(mobile),
+  productItem(bodysuits),
+  envelopeItem(),
   voucherItem(),
 ];
 
 if (longName) {
-  mainItems.splice(6, 0, productItem(longName, { priority: "want" }));
+  mainItems.splice(6, 0, productItem(longName));
 }
 
 const claimedCount = (items) =>
@@ -216,14 +204,13 @@ const claimedCount = (items) =>
 
 const main = {
   slug: "noa-itai-k4m2xq8vp3wt",
-  coupleNames: "נועה ואיתי",
+  coupleNames: COUPLE,
   story:
     "יעל בדרך, ואנחנו מתרגשים לקבל אתכם לתוך הסיפור הזה. כל מתנה עוזרת לנו להתכונן. באהבה, נועה ואיתי",
   coverImageUrl: COVER,
   city: "תל אביב",
   dueDate: "2026-02-12",
   babyName: "יעל",
-  bornOn: null,
   lifecycle: "published",
   itemsTotal: mainItems.filter((i) => i.kind === "product").length,
   itemsClaimed: claimedCount(mainItems),
@@ -243,9 +230,6 @@ const empty = {
 const singleItemList = [
   productItem(
     pick(and(byCategory("mobility"), priceBetween(50_000, 900_000)), "single hero item"),
-    {
-      priority: "must",
-    },
   ),
 ];
 const single = {
@@ -256,7 +240,7 @@ const single = {
   itemsClaimed: 0,
 };
 
-// Every product taken, funds still open: the celebratory band promotes the fund.
+// Every product taken, the envelope still open: the celebratory band promotes it.
 const fullyClaimedItems = mainItems.map((item) =>
   item.kind === "product"
     ? { ...item, quantityClaimed: item.quantityWanted, claimState: "purchased" }
@@ -270,20 +254,11 @@ const fullyClaimed = {
   itemsClaimed: fullyClaimedItems.filter((i) => i.kind === "product").length,
 };
 
-const draft = { ...main, slug: "draft-demo", lifecycle: "draft" };
-
-const postBirth = {
-  ...main,
-  slug: "post-birth-demo",
-  lifecycle: "post_birth",
-  bornOn: "2026-02-09",
-};
-
 const closed = { ...main, slug: "closed-demo", lifecycle: "closed" };
 
 /* ---------- emit ---------- */
 
-const registries = { main, empty, single, fullyClaimed, draft, postBirth, closed };
+const registries = { main, empty, single, fullyClaimed, closed };
 
 const banner = `/**
  * GENERATED FILE - do not edit by hand.

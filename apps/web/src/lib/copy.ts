@@ -8,13 +8,7 @@
  * Keys are grouped by the PRD screen or state they belong to.
  */
 
-import type { Category, Priority } from "./types";
-
-export const PRIORITY_LABELS: Record<Priority, string> = {
-  must: "חובה",
-  want: "רצוי",
-  nice: "נחמד שיהיה",
-};
+import type { Category } from "./types";
 
 export const CATEGORY_LABELS: Record<Category, string> = {
   linens: "לינה",
@@ -33,7 +27,7 @@ export const FILTERS = [
   { id: "100to300", label: "₪100–₪300" },
   { id: "over300", label: "מעל ₪300" },
   { id: "group", label: "מתנות משותפות" },
-  { id: "cash", label: "כספיות ושוברים" },
+  { id: "cash", label: "מעטפה ושוברים" },
 ] as const;
 
 export type FilterId = (typeof FILTERS)[number]["id"];
@@ -51,7 +45,6 @@ export const copy = {
       "קונים באתר החנות, או שולחים כסף ישירות אלינו בביט",
       "מסמנים שרכשתם — כדי שאף אחד לא יקנה את אותו דבר פעמיים",
     ],
-    postBirth: (babyName: string) => `${babyName} נולדה! אלה הדברים שעוזרים לנו עכשיו`,
     shipsAfterBirth: "נשלח אחרי הלידה",
   },
 
@@ -59,7 +52,7 @@ export const copy = {
   grid: {
     empty: (names: string) => `${names} עוד מכינים את הרשימה`,
     singleItem: "בינתיים יש פריט אחד ברשימה",
-    fullyClaimed: "כל הפריטים ברשימה נתפסו. אפשר עוד להשתתף בקופה",
+    fullyClaimed: "כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה",
     noneInFilter: "אין פריטים בסינון הזה",
     offline: "משהו נתקע. לנסות שוב?",
     retry: "לנסות שוב",
@@ -72,9 +65,9 @@ export const copy = {
     quantityRemaining: (remaining: number, wanted: number) =>
       `נשארו ${remaining} מתוך ${wanted}`,
     quantityLabel: "כמות",
+    /* Carries the whole "reality lives at the chain" message on its own now
+       that there is no stock state to carry part of it (D26). */
     priceMayDiffer: "המחיר מתעדכן באתר החנות",
-    outOfStock: (chain: string) => `אזל מהמלאי ב${chain}`,
-    findElsewhere: "לחפש בחנות אחרת",
     fullName: "השם המלא בחנות",
     detailCta: "אני קונה את זה",
     contributeCta: "להשתתף במתנה",
@@ -111,9 +104,11 @@ export const copy = {
     complete: "המתנה הושלמה. תודה לכל מי שהשתתף",
   },
 
-  /** G7 funds and vouchers. */
+  /** G7 the cash envelope and vouchers. */
   fund: {
-    envelopeSubtitle: "מעטפה דיגיטלית — נשלח אלינו בביט",
+    /* No target and no meter, so the subtitle carries "any amount" instead of
+       a remaining sum (D28). */
+    envelopeSubtitle: "כל סכום, ישירות אלינו בביט או בפייבוקס",
     sendViaBit: "לשלוח בביט",
     voucherBody: (chain: string) => `הקנייה מתבצעת באתר ${chain}, לא כאן`,
     voucherContinue: (chain: string) => `להמשיך לאתר ${chain}`,
@@ -153,14 +148,14 @@ export const copy = {
   taken: {
     title: "אורח אחר כבר לקח את זה",
     body: (names: string) =>
-      `הפריט הזה כבר נתפס. אפשר לבחור מתנה אחרת מהרשימה, או להשתתף בקופה המשותפת של ${names}.`,
-    fundInstead: "להשתתף בקופה במקום",
+      `הפריט הזה כבר נתפס. אפשר לבחור מתנה אחרת מהרשימה, או לשלוח מעטפה ל${names}.`,
+    fundInstead: "לשלוח מעטפה במקום",
   },
 
-  /** G10 lifecycle and error shells. */
+  /** G10 lifecycle and error shells. An unpublished registry has no shell of
+      its own: it answers exactly like a wrong slug (D30). */
   shell: {
     notFound: "הרשימה לא נמצאה. אולי הקישור לא הועתק במלואו",
-    notPublished: "הרשימה עדיין לא פורסמה",
     closed: "הרשימה נסגרה. תודה לכל מי שהשתתף",
     genericError: "משהו נתקע. לנסות שוב?",
     rateLimited: "רגע, ננסה שוב עוד מעט",
@@ -176,7 +171,6 @@ export const copy = {
 /** API error code to Hebrew. Unknown codes fall through to the generic row. */
 export const ERROR_COPY: Record<string, string> = {
   registry_not_found: copy.shell.notFound,
-  registry_not_published: copy.shell.notPublished,
   registry_closed: copy.shell.closed,
   item_already_reserved: copy.handoff.raceLost,
   fund_complete: copy.group.complete,

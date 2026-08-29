@@ -2,10 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Hero, HowItWorks } from "@/components/registry/Hero";
 import { RegistryClient } from "@/components/registry/RegistryClient";
-import {
-  ClosedRegistrySummary,
-  RegistryShell,
-} from "@/components/registry/RegistryShell";
+import { ClosedRegistrySummary } from "@/components/registry/RegistryShell";
 import { getPublicRegistry } from "@/lib/api";
 import { copy } from "@/lib/copy";
 import { OG_HEIGHT, OG_WIDTH, ogImageUrl } from "@/lib/og";
@@ -17,8 +14,9 @@ type Props = { params: Promise<{ slug: string }> };
  * highest-traffic surface in the product. This is the entire reason the web app
  * is server-rendered.
  *
- * A draft or closed registry must still return valid, non-error metadata, or
- * the preview dies and the link degrades to a bare URL.
+ * A closed registry must still return valid, non-error metadata, or the preview
+ * dies and the link degrades to a bare URL. An unpublished one is not a case
+ * here at all: it never resolves (D30).
  */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -30,11 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const title = copy.hero.titleFor(registry.coupleNames);
   const description =
-    registry.lifecycle === "draft"
-      ? copy.shell.notPublished
-      : registry.lifecycle === "closed"
-        ? copy.shell.closed
-        : registry.story;
+    registry.lifecycle === "closed" ? copy.shell.closed : registry.story;
 
   return {
     title,
@@ -62,10 +56,6 @@ export default async function RegistryPage({ params }: Props) {
   const registry = await getPublicRegistry(slug);
 
   if (!registry) notFound();
-
-  if (registry.lifecycle === "draft") {
-    return <RegistryShell message={copy.shell.notPublished} />;
-  }
 
   if (registry.lifecycle === "closed") {
     return <ClosedRegistrySummary registry={registry} />;

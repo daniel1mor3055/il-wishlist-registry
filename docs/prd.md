@@ -61,20 +61,21 @@ Consequences the design must honor:
 
 ```mermaid
 stateDiagram-v2
-  [*] --> Draft
-  Draft --> Published: couple publishes at the announcement
-  Published --> PostBirth: couple announces the birth
-  PostBirth --> Closed: couple closes, or auto-archive
-  Published --> Closed
+  [*] --> Unpublished
+  Unpublished --> Published: couple publishes at the announcement
+  Published --> Closed: couple closes, or auto-archive
   Closed --> [*]
 ```
 
+Two states are guest-facing, and they are two timestamps rather than a state machine (D30).
+
 | State | Guest sees | Notes |
 |---|---|---|
-| Draft (`טיוטה`) | Nothing. The link is not live | The couple builds here during pregnancy |
-| Published (`פורסמה`) | Full registry, items framed `נשלח אחרי הלידה` | Published with the birth announcement |
-| Post-birth (`נולד/ה`) | Announcement hero, list re-sorted toward what helps in months 0-3, nice-to-haves folded | Couple flips this manually |
+| Unpublished | Not found, identical to a wrong slug (D30) | Editor-only. The couple builds here during pregnancy; `published_at` is null |
+| Published (`פורסמה`) | Full registry, items framed `נשלח אחרי הלידה` | Published with the birth announcement, which per D14 *is* the birth announcement |
 | Closed (`נסגרה`) | Read-only thank-you summary, no giving | A stale open registry full of taken items is a trust event for a late guest |
+
+There is no post-birth variant (D29). The list published at the announcement is the list, start to finish.
 
 ## 6. Surfaces and screens
 
@@ -85,15 +86,15 @@ Sample data for every mock: couple **נועה ואיתי** (Noa and Itai), baby 
 | ID | Screen | Job | Primary CTA |
 |---|---|---|---|
 | G1 | Hero / land | Couple photo, names, one-line story, progress, reassurance strip, "how this works" in three lines | `לראות את הרשימה` (see the list) |
-| G2 | Item grid + filters | Chips: `הכול` / `מה שעוד חסר` / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` / `כספיות ושוברים`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
-| G3 | Item detail sheet | Image, full name, price, chain chip, priority badge (`חובה` / `רצוי` / `נחמד שיהיה`), quantity line, couple note, price disclaimer | `אני קונה את זה` (I'm buying this) |
+| G2 | Item grid + filters | Chips: `הכול` / `מה שעוד חסר` / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` / `מעטפה ושוברים`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
+| G3 | Item detail sheet | Image, full name, price, chain chip, quantity line, couple note, price disclaimer | `אני קונה את זה` (I'm buying this) |
 | G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Optional first name, framed `למי להגיד תודה?` | `להמשיך לאתר שילב` (continue to Shilav) |
 | G5 | Return self-report modal | The D12 moment. `האם רכשת את הפריט?` with `כן, רכשתי` and `עוד לא` | `כן, רכשתי` (yes, I bought it) |
 | G6 | Group gift sheet | Funding meter, `נותרו ₪550 מתוך ₪1,290`, `6 אורחים כבר השתתפו`, amount chips, then the contact reveal | `להשתתף במתנה` (join this gift) |
-| G7 | Cash fund / gift card sheet | Named funds (`קופה לעגלה`) and voucher types, amount chips, then contact reveal or outbound merchant | `לשלוח מתנה` (send a gift) |
+| G7 | Envelope / gift card sheet | One plain cash envelope with no target and no meter (D28), and voucher types. Amount chips, then contact reveal or outbound merchant | `לשלוח מתנה` (send a gift) |
 | G8 | Contact reveal | The D13 component. `צריכים את הפרטים של נועה ואיתי?` with the Bit or PayBox handle and a copy button, plus `שלחתי` (I sent it) | `העתקה` (copy) |
 | G9 | Private blessing + confirmation | Optional name and message straight to the couple, D17 private. Then `תודה, רשמנו את המתנה שלך` | `לצרף ברכה` (attach a blessing) |
-| G10 | Error and edge shell | Not found, closed, draft, offline | `לנסות שוב` (try again) |
+| G10 | Error and edge shell | Not found, closed, offline | `לנסות שוב` (try again) |
 
 Emotional register: guest surfaces read like a message from friends. First person plural, no marketing superlatives, no urgency, no scarcity timers, no discount language. Photography over illustration. The only tonal shift is at G8, where the UI turns plain and explicit because the person is about to send money somewhere.
 
@@ -102,15 +103,15 @@ Emotional register: guest surfaces read like a message from friends. First perso
 | ID | Screen | Job | Primary CTA |
 |---|---|---|---|
 | C1 | Create wizard, 3 steps | `מי אתם` → `התאריך המשוער ללידה` → `מאיפה נתחיל` (starter template or blank) | `נתחיל את הרשימה` |
-| C2 | Editor home | Sectioned list, drag to reorder, progress ring, draft banner with `לפרסם את הרשימה` | `הוספת פריט` |
+| C2 | Editor home | Sectioned list, drag to reorder, progress ring, and while `published_at` is null an unpublished banner with `לפרסם את הרשימה`. This banner is the only place unpublished is ever surfaced (D30) | `הוספת פריט` |
 | C3 | Add item | Tabs: `לחפש בחנויות` (mock cross-chain catalog), `להדביק קישור` (paste with parsed preview), `להוסיף ידנית` | `להוסיף לרשימה` |
-| C4 | Item settings | Priority, `כמה נשמח לקבל` (quantity), couple note, `לאפשר מתנה משותפת` with hint `מומלץ בפריטים מעל ₪400` | `לשמור` |
-| C5 | Funds, vouchers and payment details | Name a fund, optional target, pick voucher types, and enter the Bit or PayBox handle that D13 reveals to guests | `ליצור קופה` |
+| C4 | Item settings | `כמה נשמח לקבל` (quantity), couple note, `לאפשר מתנה משותפת` with hint `מומלץ בפריטים מעל ₪400` | `לשמור` |
+| C5 | Envelope, vouchers and payment details | Turn the cash envelope on or off, pick voucher types, and enter the Bit or PayBox handle that D13 reveals to guests. There is nothing to name and no target to set (D28) | `לשמור` |
 | C6 | Story and cover | Photo, two-line story | `לשמור` |
 | C7 | Preview as guest | Real guest render in a device frame, banner `זו התצוגה שהאורחים רואים` | `חזרה לעריכה` |
 | C8 | Publish and share | The D14 announcement moment. WhatsApp-first, designed link-preview card, editable Hebrew message, QR for the ברית | `לשתף בוואטסאפ` |
 | C9 | Gift tracker | Table: פריט / מי / מתי / סטטוס / תודה. Chips `נתפס`, `נרכש`, `התקבל`. Per-guest amounts appear here and nowhere else (D15). Release and correct controls (D16) | `לומר תודה` |
-| C10 | Settings and lifecycle | `לעדכן שהתינוק נולד`, `לסגור את הרשימה`, visibility, delete | `לשמור` |
+| C10 | Settings and lifecycle | `לסגור את הרשימה`, visibility, delete | `לשמור` |
 
 ### 6.3 Surface 3: retailer widget (prototype only, D18)
 
@@ -128,24 +129,21 @@ Figma Make defaults to the happy path and to full lists, so every state below ne
 
 | State | Where | Treatment | Hebrew string |
 |---|---|---|---|
-| Draft, not published | G10 | Link is live but registry is not | `הרשימה עדיין לא פורסמה` |
 | Empty registry | G2 | No grid. Warm card, no illustration | `נועה ואיתי עוד מכינים את הרשימה` |
 | Single item | G2 | One full-width hero card, never a lonely grid cell | `בינתיים יש פריט אחד ברשימה` |
-| Fully claimed | G2 | Celebratory band, funds promoted | `כל הפריטים ברשימה נתפסו. אפשר עוד להשתתף בקופה` |
-| Reserved by someone else | G2, G3 | Muted card, badge, CTA demoted | `כבר נתפס` / `להשתתף בקופה במקום` |
+| Fully claimed | G2 | Celebratory band, the envelope promoted | `כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה` |
+| Reserved by someone else | G2, G3 | Muted card, badge, CTA demoted | `כבר נתפס` / `לשלוח מעטפה במקום` |
 | Group gift partly funded | G3, G6 | RTL meter, remaining amount is the headline, never the percent | `נותרו ₪550 מתוך ₪1,290` |
 | Group gift complete | G6 | Full meter, closed CTA | `המתנה הושלמה. תודה לכל מי שהשתתף` |
 | Quantity partly fulfilled | G2, G3 | Counter chip, CTA stays live | `נשארו 2 מתוך 4` |
 | Handoff pending | G5 | Guest went out and came back without confirming | `עוד לא` keeps the item reserved, not purchased |
 | Gift card sent | G9, C9 | Neutral chip, never an error color | `השובר נשלח לנועה ואיתי` |
-| Out of stock | G3 | Price stays, CTA swaps to alternatives | `אזל מהמלאי בשילב` / `לחפש בחנות אחרת` |
-| Price may differ | G3 | Permanent, quiet, never a warning color | `המחיר מתעדכן באתר החנות` |
+| Price may differ | G3 | Permanent, quiet, never a warning color. Carries the whole "reality lives at the chain" message now that stock is gone (D26) | `המחיר מתעדכן באתר החנות` |
 | Broken image | G2, G3 | Branded 1:1 placeholder with category glyph and product name. Never a gray box with alt text, never a layout shift | none |
 | Long Hebrew name | G2, G3 | Two-line clamp with reserved min-height, badges wrap and never truncate | `עגלת תאומים משולבת עם סלקל…` |
 | Closed registry | G10 | Read-only thank-you summary | `הרשימה נסגרה. תודה לכל מי שהשתתף` |
 | Not found | G10 | Assume a truncated WhatsApp link | `הרשימה לא נמצאה. אולי הקישור לא הועתק במלואו` |
 | Offline while browsing | G2 | Inline retry row, keeps cached items | `משהו נתקע. לנסות שוב?` |
-| Post-birth | G1 | Hero flips to announcement, list re-sorts | `יעל נולדה! אלה הדברים שעוזרים לנו עכשיו` |
 | Reserve race | G4 | Optimistic UI must be reversible | `בזמן שמילאת, אורח אחר לקח את הפריט` |
 
 ## 8. RTL rules
@@ -173,7 +171,7 @@ Concrete values, because abstract style words produce abstract output.
 | Ink | `#1F1D1B` | Headings, body |
 | Ink muted | `#6B6560` | Secondary text, helper copy |
 | Primary | `#2F6F62` | Primary CTA, active chips. Deliberately not pink or baby blue |
-| Accent | `#E5A24B` | Funding meters, progress, priority highlights |
+| Accent | `#E5A24B` | Funding meters, progress, the envelope tile |
 | Success | `#3E7D55` | Confirmed and received states |
 | Muted / taken | `#9A938C` | Claimed items, disabled |
 | Border | `#E8E3DC` | Hairlines, card strokes |
@@ -183,7 +181,10 @@ Radius 16px cards, 12px buttons, 999px pills. Spacing on an 8pt grid. Type scale
 ## 10. Non-goals
 
 - Any checkout, card field, payment sheet, escrow, refund flow, or fund custody (D11).
-- Automatic purchase detection, retailer webhooks, live price or stock sync, price-drop alerts.
+- Automatic purchase detection, retailer webhooks, price-drop alerts.
+- Stock and availability in any form: no sync, no cached flag, no out-of-stock state (D26).
+- Item priority or importance ranking, and sorting by it (D27).
+- Named or targeted cash funds, and a post-birth mode (D28, D29).
 - Guest accounts, guest login, guest history, guest-to-guest visibility.
 - Public blessings wall or guestbook (D17).
 - Real retailer integrations, contracts, feeds, attribution panels, merchant dashboards (D18).

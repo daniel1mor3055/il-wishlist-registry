@@ -6,6 +6,18 @@ Already present in the render, so not listed below: the cash/voucher sheet, the 
 
 ---
 
+## Removals first
+
+D27 and D28 dropped two things the render already has. Send these before adding states, so the new screens are not generated with them baked in.
+
+```
+Remove the priority badges ("חובה", "רצוי", "נחמד שיהיה") from every card and every sheet.
+```
+
+```
+Rename the "קופה לעגלה" card to "מעטפה לנועה ואיתי" and delete its target amount and funding meter, so it is a plain cash envelope with amount chips only.
+```
+
 ## Required states
 
 ```
@@ -14,14 +26,6 @@ Add an empty-registry state: no grid, one warm card reading "נועה ואיתי
 
 ```
 Add a completed group gift state: meter full, button disabled, text "המתנה הושלמה. תודה לכל מי שהשתתף".
-```
-
-```
-Add an out-of-stock item state: price stays, button swaps to "לחפש בחנות אחרת".
-```
-
-```
-Add a post-birth hero variant: "יעל נולדה! אלה הדברים שעוזרים לנו עכשיו".
 ```
 
 ```
@@ -35,7 +39,7 @@ Add a single-item state: one full-width hero card instead of a two-column grid.
 ```
 
 ```
-Add a fully-claimed banner above the grid: "כל הפריטים ברשימה נתפסו. אפשר עוד להשתתף בקופה".
+Add a fully-claimed banner above the grid: "כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה".
 ```
 
 ```

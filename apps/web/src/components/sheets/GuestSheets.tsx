@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Sheet, Modal, CheckMark } from "./SheetShell";
 import { ItemImage } from "@/components/primitives/ItemImage";
 import { Meter } from "@/components/primitives/Meter";
-import { Pill, PriorityBadge, ShopChip } from "@/components/primitives/Badges";
+import { ShopChip } from "@/components/primitives/Badges";
 import { Price, InlineAmount } from "@/components/primitives/Price";
 import { AmountChips } from "@/components/primitives/AmountChips";
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/components/primitives/Buttons";
 import { copy } from "@/lib/copy";
 import {
+  ENVELOPE_AMOUNTS,
   fundedPercent,
   remainingAgorot,
   isFundComplete,
@@ -48,19 +49,12 @@ export function ItemDetailSheet({
   onReserve: () => void;
 }) {
   const remainingQty = item.quantityWanted - item.quantityClaimed;
-  const outOfStock = !item.inStock;
 
   return (
     <Sheet
       onClose={onClose}
       labelledBy="detail-title"
-      cta={
-        outOfStock ? (
-          <SecondaryButton onClick={onClose}>{copy.item.findElsewhere}</SecondaryButton>
-        ) : (
-          <PrimaryButton onClick={onReserve}>{copy.item.detailCta}</PrimaryButton>
-        )
-      }
+      cta={<PrimaryButton onClick={onReserve}>{copy.item.detailCta}</PrimaryButton>}
     >
       <div className="flex flex-col gap-4">
         <div className="relative aspect-square w-full overflow-hidden rounded-card bg-image-bg">
@@ -76,7 +70,6 @@ export function ItemDetailSheet({
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-wrap justify-start gap-1.5">
             {item.chainNameHe && <ShopChip name={item.chainNameHe} />}
-            {item.priority && <PriorityBadge priority={item.priority} />}
           </div>
           {item.priceAgorot !== null && <Price agorot={item.priceAgorot} size="h3" />}
         </div>
@@ -107,10 +100,6 @@ export function ItemDetailSheet({
           <div className="rounded-btn bg-panel p-4">
             <p className="text-small text-ink">”{item.note}”</p>
           </div>
-        )}
-
-        {outOfStock && item.chainNameHe && (
-          <Pill>{copy.item.outOfStock(item.chainNameHe)}</Pill>
         )}
 
         {/* Permanent and quiet, never a warning colour (PRD section 7). */}
@@ -271,7 +260,7 @@ export function GroupGiftSheet({
   );
 }
 
-/** G7. A cash fund or a voucher. */
+/** G7. The cash envelope, or a voucher. */
 export function CashVoucherSheet({
   item,
   onClose,
@@ -283,8 +272,6 @@ export function CashVoucherSheet({
 }) {
   const [amount, setAmount] = useState<number | "other" | null>(null);
   const isVoucher = item.kind === "voucher";
-  const remaining = remainingAgorot(item.contributedAgorot, item.targetAgorot);
-  const complete = isFundComplete(item.contributedAgorot, item.targetAgorot);
 
   if (isVoucher) {
     return (
@@ -317,13 +304,9 @@ export function CashVoucherSheet({
       onClose={onClose}
       labelledBy="fund-title"
       cta={
-        complete ? (
-          <SecondaryButton onClick={onClose}>{copy.confirmed.back}</SecondaryButton>
-        ) : (
-          <PrimaryButton onClick={() => onSend(amount)} disabled={amount === null}>
-            {copy.fund.sendViaBit}
-          </PrimaryButton>
-        )
+        <PrimaryButton onClick={() => onSend(amount)} disabled={amount === null}>
+          {copy.fund.sendViaBit}
+        </PrimaryButton>
       }
     >
       <div className="flex flex-col gap-4 pt-1">
@@ -332,31 +315,13 @@ export function CashVoucherSheet({
         </h2>
         {item.subtitle && <p className="text-small text-ink-muted">{item.subtitle}</p>}
 
-        {item.targetAgorot !== null && (
-          <div className="flex flex-col gap-2">
-            <Meter
-              percent={fundedPercent(item.contributedAgorot, item.targetAgorot)}
-              tone={complete ? "success" : "accent"}
-            />
-            {complete ? (
-              <p className="text-body font-medium text-success">{copy.group.complete}</p>
-            ) : (
-              <p className="text-body font-medium text-ink">
-                נותרו <InlineAmount agorot={remaining} /> מתוך{" "}
-                <InlineAmount agorot={item.targetAgorot} />
-              </p>
-            )}
-          </div>
-        )}
-
-        {!complete && (
-          <AmountChips
-            values={suggestedAmounts(remaining || 50_000)}
-            selected={amount}
-            onSelect={setAmount}
-            includeOther
-          />
-        )}
+        <AmountChips
+          values={ENVELOPE_AMOUNTS}
+          selected={amount}
+          onSelect={setAmount}
+          includeOther
+        />
+        <p className="text-small text-ink-muted">{copy.group.anyAmountHelps}</p>
       </div>
     </Sheet>
   );

@@ -8,7 +8,6 @@ import type { PublicRegistry } from "@/lib/types";
  * WhatsApp link, so nothing here waits on the client.
  */
 export function Hero({ registry }: { registry: PublicRegistry }) {
-  const postBirth = registry.lifecycle === "post_birth";
   const percent =
     registry.itemsTotal > 0 ? (registry.itemsClaimed / registry.itemsTotal) * 100 : 0;
 
@@ -30,9 +29,7 @@ export function Hero({ registry }: { registry: PublicRegistry }) {
       <div className="flex flex-col gap-4 px-5 pt-5">
         <div className="flex flex-col gap-2">
           <h1 className="text-h1 font-bold text-ink">
-            {postBirth && registry.babyName
-              ? copy.hero.postBirth(registry.babyName)
-              : copy.hero.titleFor(registry.coupleNames)}
+            {copy.hero.titleFor(registry.coupleNames)}
           </h1>
           <p className="text-body text-ink">{registry.story}</p>
           {registry.city && (

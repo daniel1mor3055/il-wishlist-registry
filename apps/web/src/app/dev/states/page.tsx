@@ -7,7 +7,7 @@ import type { PublicItem } from "@/lib/types";
 /**
  * The state gallery.
  *
- * PRD section 7 lists nineteen states, and Figma Make defaults to the happy
+ * PRD section 7 lists sixteen states, and Figma Make defaults to the happy
  * path, so every one needs its own frame. This page is the review checklist:
  * a missing state shows up as a hole rather than as an omission nobody noticed.
  *
@@ -58,23 +58,9 @@ const FRAME_STATES: FrameState[] = [
   {
     id: "fully-claimed",
     prd: "G2 — fully claimed",
-    hebrew: "כל הפריטים ברשימה נתפסו. אפשר עוד להשתתף בקופה",
+    hebrew: "כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה",
     status: "c1",
     slug: "fully-claimed-demo",
-  },
-  {
-    id: "post-birth",
-    prd: "G1 — post-birth",
-    hebrew: "יעל נולדה! אלה הדברים שעוזרים לנו עכשיו",
-    status: "c1",
-    slug: "post-birth-demo",
-  },
-  {
-    id: "draft",
-    prd: "G10 — draft, not published",
-    hebrew: "הרשימה עדיין לא פורסמה",
-    status: "c1",
-    slug: "draft-demo",
   },
   {
     id: "closed",
@@ -85,6 +71,7 @@ const FRAME_STATES: FrameState[] = [
   },
   {
     id: "not-found",
+    // Also what an unpublished registry looks like, deliberately (D30).
     prd: "G10 — not found",
     hebrew: "הרשימה לא נמצאה. אולי הקישור לא הועתק במלואו",
     status: "c1",
@@ -110,8 +97,7 @@ const find = (predicate: (item: PublicItem) => boolean, label: string): PublicIt
 const groupGift = find((i) => i.groupGiftEnabled && i.kind === "product", "group gift");
 const takenItem = find((i) => i.claimState !== "available", "taken item");
 const partialQty = find((i) => i.quantityWanted > 1, "partial quantity");
-const outOfStock = find((i) => !i.inStock && i.kind === "product", "out of stock");
-const fund = find((i) => i.kind === "fund", "fund");
+const envelope = find((i) => i.kind === "fund", "cash envelope");
 const voucher = find((i) => i.kind === "voucher", "voucher");
 const longName = items
   .filter((i) => i.kind === "product")
@@ -134,7 +120,11 @@ const CARD_STATES: CardState[] = [
     prd: "G6 — group gift complete",
     hebrew: "המתנה הושלמה. תודה לכל מי שהשתתף",
     status: "c1",
-    item: { ...fund, contributedAgorot: fund.targetAgorot ?? 0, contributorCount: 14 },
+    item: {
+      ...groupGift,
+      contributedAgorot: groupGift.targetAgorot ?? 0,
+      contributorCount: 14,
+    },
   },
   {
     id: "taken",
@@ -151,13 +141,6 @@ const CARD_STATES: CardState[] = [
     item: partialQty,
   },
   {
-    id: "out-of-stock",
-    prd: "G3 — out of stock",
-    hebrew: "אזל מהמלאי בשילב",
-    status: "c1",
-    item: outOfStock,
-  },
-  {
     id: "long-name",
     prd: "G2, G3 — long Hebrew name",
     hebrew: "two-line clamp with reserved height",
@@ -170,6 +153,13 @@ const CARD_STATES: CardState[] = [
     hebrew: "branded 1:1 placeholder, category glyph, no layout shift",
     status: "c1",
     item: { ...groupGift, imageUrl: "https://cdn.shopify.com/does-not-exist.jpg" },
+  },
+  {
+    id: "envelope",
+    prd: "G7 — cash envelope tile",
+    hebrew: "כל סכום, ישירות אלינו בביט או בפייבוקס. בלי יעד ובלי מדחום",
+    status: "c1",
+    item: envelope,
   },
   {
     id: "voucher",

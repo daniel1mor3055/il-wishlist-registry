@@ -52,6 +52,20 @@ Resolved from [council/impl-consolidation.md](council/impl-consolidation.md) and
 
 Resolved open questions: **O1** is closed by D22.
 
+## Locked, round four (scope reductions)
+
+Taken with the human after C1, before the C2 schema was written. Every one of these is a removal, and they land now precisely because a field that never becomes a column costs nothing, while a column removed later costs a migration.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D26 | No stock state, anywhere | We cannot know a chain's stock without an integration we do not have, and a wrong "אזל מהמלאי" is the same trust event as a wrong price. There is no `in_stock` field on the catalog or the item, and no out-of-stock item state. The price disclaimer `המחיר מתעדכן באתר החנות` carries the whole "reality lives at the chain" message on its own. | LOCKED |
+| D27 | No item priority | `חובה` / `רצוי` / `נחמד שיהיה` is removed from the item, the card, the detail sheet, the editor and the sort options. Curation is the couple's act of putting something on the list at all; a three-level ranking asks them for more work whose only guest-visible effect is mild pressure. List order already expresses emphasis. | LOCKED |
+| D28 | One cash envelope, never a named fund | A fund named after an item (`קופה לעגלה`) duplicates group gifting, which already collects money toward a specific item, and it implies we are holding that money toward that purchase — which D11 says we never do. A registry has at most one cash gift: a plain envelope, no target, no meter, no item in its name. Group gifting stays on real items, where the target is the item's real price. | LOCKED |
+| D29 | No post-birth state | The lifecycle is `published -> closed`. The pre-birth framing `נשלח אחרי הלידה` already carries D14's shipping promise, and per D14 publishing *is* the birth announcement, so a second hero and a re-sorted list were a second design of the same page with no new gifting capability behind it. `born_on` and the announcement hero are gone. | LOCKED |
+| D30 | Not-yet-published is not a guest-facing state | An unpublished registry answers exactly like a wrong slug: not found. Publishing survives as the couple's action (D14) and as a nullable `published_at` on the row, but `הרשימה עדיין לא פורסמה` is deleted. A guest only holds the link because the couple sent it, which happens at the announcement; and a leaked pre-birth link that confirms "נועה ואיתי have a registry" leaks more than a 404 does. This also removes the lifecycle enum and its transition validation: two timestamps, `published_at` and `closed_at`, say everything the four-state machine said. | LOCKED |
+
+Consequence for the C2 schema: `registry_items` has no `priority`, no `out_of_stock`; `catalog_items` has no `in_stock`; `registries` has no `lifecycle` enum and no `born_on`. The council's [domain brief](council/impl-domain.md) still lists all of those, and is superseded here.
+
 ## Target retailers
 
 Design content should look like these chains. None of them is integrated in this phase; all catalog data is mock.

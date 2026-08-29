@@ -29,7 +29,7 @@ The couple is נועה ואיתי, expecting a girl named יעל, due 12 בפב�
 
 Build these screens in this order:
 1. Hero landing: couple photo, "רשימת הלידה של נועה ואיתי", one-line personal story, a progress line showing how much of the list is claimed, and a reassurance strip reading "בלי הרשמה · בלי פרטי אשראי · המתנה נשלחת אחרי הלידה". Below it, "איך זה עובד" in three short lines. Primary button: "לראות את הרשימה".
-2. Item grid: two-column cards. Sticky filter chips: "הכול", "מה שעוד חסר", "עד ₪100", "₪100–₪300", "מעל ₪300", "מתנות משותפות", "כספיות ושוברים". Each card shows image, two-line product name, price, a small shop-name chip, and a priority badge ("חובה", "רצוי", "נחמד שיהיה").
+2. Item grid: two-column cards. Sticky filter chips: "הכול", "מה שעוד חסר", "עד ₪100", "₪100–₪300", "מעל ₪300", "מתנות משותפות", "מעטפה ושוברים". Each card shows image, two-line product name, price, and a small shop-name chip.
 3. Item detail bottom sheet: large image, full product name, price, shop chip, quantity line, a short note from the couple, a quiet grey line "המחיר מתעדכן באתר החנות", and a primary button "אני קונה את זה".
 4. Reserve and handoff sheet: explains the item is now held for this guest, an optional first-name field labelled "למי להגיד תודה?", and a primary button "להמשיך לאתר שילב" that sends the guest to the shop's own site.
 5. Return confirmation modal: asks "האם רכשת את הפריט?" with two buttons, "כן, רכשתי" and "עוד לא".
@@ -59,10 +59,10 @@ Hebrew does not hyphenate: clamp product names to two lines with reserved height
 
 ## P2 to P8. The funds sheet, then the states, one change each
 
-Send this one first. It completes the hybrid gifting model, since the master prompt covers products and group gifts but not cash funds or gift cards.
+Send this one first. It completes the hybrid gifting model, since the master prompt covers products and group gifts but not cash or gift cards.
 
 ```
-Add a "כספיות ושוברים" sheet: named funds like "קופה לעגלה" with amount chips, and gift-card options from שילב and מוצצים. Cash funds open the contact reveal; gift cards send the guest to the shop's own site.
+Add a "מעטפה ושוברים" sheet: one plain cash envelope with amount chips and no target or meter, plus gift-card options from שילב and מוצצים. The envelope opens the contact reveal; gift cards send the guest to the shop's own site.
 ```
 
 The rest are states. Figma Make defaults to the happy path and to full lists, so each must become its own view.
@@ -84,14 +84,6 @@ Add a partial quantity chip on cards reading "נשארו 2 מתוך 4".
 ```
 
 ```
-Add an out-of-stock item state: price stays, button swaps to "לחפש בחנות אחרת".
-```
-
-```
-Add a post-birth hero variant: "יעל נולדה! אלה הדברים שעוזרים לנו עכשיו".
-```
-
-```
 Add an error screen: "הרשימה לא נמצאה. אולי הקישור לא הועתק במלואו".
 ```
 
@@ -102,7 +94,7 @@ Add a single-item state: one full-width hero card instead of a two-column grid.
 ```
 
 ```
-Add a fully-claimed banner above the grid: "כל הפריטים ברשימה נתפסו. אפשר עוד להשתתף בקופה".
+Add a fully-claimed banner above the grid: "כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה".
 ```
 
 ```
@@ -122,8 +114,8 @@ Screens in this order:
 1. Create wizard, three steps, step 1 at the far right: "מי אתם", then "התאריך המשוער ללידה", then "מאיפה נתחיל" offering a starter template or a blank list. Button "נתחיל את הרשימה".
 2. Editor home: the list grouped by category with drag handles, a progress ring, and a prominent draft banner reading "הרשימה עדיין לא פורסמה" with a button "לפרסם את הרשימה". Primary action "הוספת פריט".
 3. Add item, three tabs: "לחפש בחנויות" showing a mock cross-shop catalog, "להדביק קישור" showing a pasted link resolving into a preview card, and "להוסיף ידנית".
-4. Item settings: priority selector, a quantity field "כמה נשמח לקבל", a note field, and a toggle "לאפשר מתנה משותפת" with the hint "מומלץ בפריטים מעל ₪400".
-5. Funds and payment details: create a named fund such as "קופה לעגלה", choose gift-card types, and enter the Bit or PayBox phone number that guests will see. Explain that money goes directly to the couple and never through the app.
+4. Item settings: a quantity field "כמה נשמח לקבל", a note field, and a toggle "לאפשר מתנה משותפת" with the hint "מומלץ בפריטים מעל ₪400".
+5. Envelope and payment details: a single toggle for accepting a cash envelope, with nothing to name and no target to set, plus gift-card types and the Bit or PayBox phone number that guests will see. Explain that money goes directly to the couple and never through the app.
 6. Preview as guest: the guest view rendered inside a phone frame with a banner "זו התצוגה שהאורחים רואים".
 7. Publish and share: the moment the couple publishes with their birth announcement. Show a WhatsApp-style link preview card with the couple photo, names and one line; an editable Hebrew message; a copy-link button; and a QR code option. Primary button "לשתף בוואטסאפ".
 8. Gift tracker: a table with columns פריט, מי, מתי, סטטוס, תודה. Status chips "נתפס", "נרכש", "התקבל". A filter "ממתין לתודה". Each row has a "לומר תודה" action, and a control to release an item that was reserved but never bought.
@@ -150,7 +142,7 @@ Add a thank-you composer: editable Hebrew text "תודה רבה על {פריט} 
 ```
 
 ```
-Add a settings screen with "לעדכן שהתינוק נולד" and "לסגור את הרשימה".
+Add a settings screen with "לסגור את הרשימה" and a delete option.
 ```
 
 ---

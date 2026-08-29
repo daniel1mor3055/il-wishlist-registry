@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "harvested_at": "2026-08-28T21:16:56+00:00",
   "source": "public Shopify products.json per chain, no auth",
   "note": "Real product data, harvested once per D22. The application seeds from this file and never calls a chain at runtime. Re-run tools/harvest_catalog.py to refresh.",
@@ -109,12 +109,10 @@
       "category_label_he": "לינה",
       "price_agorot": 449000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/9c74e11fe818c219cffd7c9d3dc6b01f.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -130,12 +128,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 148900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-7300182-A.webp",
       "image_width": 900,
-      "image_height": 900,
-      "priority_hint": "must"
+      "image_height": 900
     },
     {
       "chain_slug": "shilav",
@@ -151,12 +147,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 769000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/CYB_26_INT_y225_Priam_FoldCot_ROGO_COBI_Style_print_large_411a7655-856d-4cf8-9d3e-220be1f03097.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -172,12 +166,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3900043",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-3900043-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -193,12 +185,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 31990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "1260445176454",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/BWSJK21X-451_new_f4cbdb1f-e25d-48b3-9e7f-fb43858cdaf6.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -214,12 +204,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 99990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "7502746",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/7502746-_2.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -235,12 +223,10 @@
       "category_label_he": "לינה",
       "price_agorot": 79900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3801286",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/3801285A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -256,12 +242,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 59900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "5019340",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-5019340-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -277,12 +261,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 90000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "4090175",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-4090175-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -298,12 +280,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "6268022",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-6268022-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -319,12 +299,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 27990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "1260345176454",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/BWSJK20X-451_new_255cc190-7ea8-4518-bc3d-06011eaf5412.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -340,12 +318,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 29990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "9502402",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-9502402-D.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -361,12 +337,10 @@
       "category_label_he": "לינה",
       "price_agorot": 29990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "6264036",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-6264036-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -382,12 +356,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "7300234",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-7300234-A_91c4e330-a5c1-44b5-937d-6f1cfae9b995.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -403,12 +375,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 8990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "6267186",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/6267186-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -424,12 +394,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3900042",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-3900042-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -445,12 +413,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3270072455406",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-32700724554-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -466,12 +432,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "7508049",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-7508049-D.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -487,12 +451,10 @@
       "category_label_he": "לינה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "6265354",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/6265354-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -508,12 +470,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3801270",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-3801270-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -529,12 +489,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 769000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/CYB_26_INT_y225_Priam_FoldCot_ROGO_PCPI_Style_print_large_497ce67e-700a-4e67-8701-1ca29d8a9b7f.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -550,12 +508,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "6268026",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/6268026-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -571,12 +527,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 31990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "1260332951554",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/12603329A_new.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -592,12 +546,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 89990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "9520491",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-9520491-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -613,12 +565,10 @@
       "category_label_he": "לינה",
       "price_agorot": 179000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3801085",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-3801085-C_c6480257-67c6-40bd-a87b-22c7be771955.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -634,12 +584,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 129000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3801108",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-3801108-A.webp",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -655,12 +603,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 89900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "5910280",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-5910280-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -676,12 +622,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3900041",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-3900041-B.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -697,12 +641,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 21990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "1260345597452",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/BWSJK09J-455.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -718,12 +660,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "7512046",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/7512046-_1.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -739,12 +679,10 @@
       "category_label_he": "לינה",
       "price_agorot": 79900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3801285",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/3801285A_2.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -760,12 +698,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 49900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "5910293",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-5910293-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -781,12 +717,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 8990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "6267181",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/6267181-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -802,12 +736,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "6268024",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/6268024-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -823,12 +755,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3270030660003",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-32700306600-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -844,12 +774,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "7610639",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-7610639-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -865,12 +793,10 @@
       "category_label_he": "לינה",
       "price_agorot": 29990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "6264115",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/6264115-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -886,12 +812,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 24900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3801722",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-3801722-G.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -907,12 +831,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 769000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/CYB_26_INT_y225_Priam_FoldCot_ROGO_CNBR_Style_print_large_665598e8-9cb3-4f3a-b6b9-952d36e1197b.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "must"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -928,12 +850,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3900040",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-3900040-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -949,12 +869,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 19990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "1260346697452",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/12603466A_new.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -970,12 +888,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 89900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "5910294",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-5910294-G.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -991,12 +907,10 @@
       "category_label_he": "לינה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "6265348",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/6265348-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -1012,12 +926,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "3980188",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-3980188-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "nice"
+      "image_height": 1920
     },
     {
       "chain_slug": "shilav",
@@ -1033,12 +945,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 89900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "5910279",
       "image_url": "https://cdn.shopify.com/s/files/1/0666/5532/2281/files/XL-5910279-A.jpg",
       "image_width": 1920,
-      "image_height": 1920,
-      "priority_hint": "want"
+      "image_height": 1920
     },
     {
       "chain_slug": "motsetsim",
@@ -1054,12 +964,10 @@
       "category_label_he": "לינה",
       "price_agorot": 449000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "14005502",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/StokkeSleepiMiniCribBundlewithMattressV3-WarmBrown22.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1075,12 +983,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 119000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "45005",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/46af00aa8bf8fbd4c214ec641711e44e.jpg",
       "image_width": 480,
-      "image_height": 380,
-      "priority_hint": "must"
+      "image_height": 380
     },
     {
       "chain_slug": "motsetsim",
@@ -1096,12 +1002,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 739900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "15419804",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/Nuna_TRIVlx_TRIVlx_Cot_AllSeasons_Cosmopolitan_Profile_PA_GL_2400.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1117,12 +1021,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 35990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "140763",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/140763.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1138,12 +1040,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 13900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "154336",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/154336337.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1159,12 +1059,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 261750,
       "compare_at_agorot": 349000,
-      "in_stock": true,
       "sku": "154257",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/11_781d52ba-e138-4a0f-95c2-2e979d941b3e.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1180,12 +1078,10 @@
       "category_label_he": "לינה",
       "price_agorot": 99900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "140212",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/output_dd2a45b1-891f-4042-8950-239b1a6131a9.png",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1201,12 +1097,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 99900,
       "compare_at_agorot": 119000,
-      "in_stock": true,
       "sku": "158624",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/1_b8dd6019-b395-4895-940b-e0d3363a43fc.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1222,12 +1116,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 99900,
       "compare_at_agorot": 149000,
-      "in_stock": true,
       "sku": "154604",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/output_b070934b-cd37-486e-bd99-c2fccc4bf759.png",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1243,12 +1135,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "14431101",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/2_a1a06e41-c236-4acf-8d5b-cc92fcd976d7.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1264,12 +1154,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 7990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "148964",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/148965.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1285,12 +1173,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 39900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "154562",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/42.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1306,12 +1192,10 @@
       "category_label_he": "לינה",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "7406603",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/bbebf0cc20c8269d3939f27079092dbd.png",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1327,12 +1211,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "159356",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/159356.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1348,12 +1230,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "158675",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/6_0b5ccadb-e304-4a5c-a117-98230e1ae946.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1369,12 +1249,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "64377",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/1e67da36c02db9a39b1b2cbad9d2b5a1.png",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1390,12 +1268,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 13900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "154334",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/154334335.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1411,12 +1287,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "154561",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/output_0dc9ab9e-0194-43e4-894d-00742905f8bb.png",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1432,12 +1306,10 @@
       "category_label_he": "לינה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "140630",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/34324016_14_1.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1453,12 +1325,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "162879",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/724133100498.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1474,12 +1344,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "162914",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/162914.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1495,12 +1363,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 27900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "158719",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/158719.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1516,12 +1382,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 7990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "148961",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/148961_1.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1537,12 +1401,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "162841",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/1628411.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1558,12 +1420,10 @@
       "category_label_he": "לינה",
       "price_agorot": 246420,
       "compare_at_agorot": 289900,
-      "in_stock": true,
       "sku": "144436",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/c794dc0badb709cf419c81859866295c.png",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1579,12 +1439,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 119000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "4500515",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/45005015.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1600,12 +1458,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 679000,
       "compare_at_agorot": 759000,
-      "in_stock": true,
       "sku": "154347",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/swiv_bmwumber.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1621,12 +1477,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 8990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "149032",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/149032.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1642,12 +1496,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 13900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "154332",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/154332333_98adff43-1a97-4ab2-9213-5404ff8ef97a.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1663,12 +1515,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 36900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "154560",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/BWY0850-2_1.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1684,12 +1534,10 @@
       "category_label_he": "לינה",
       "price_agorot": 99900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "140210",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/output_92c6438c-51b7-4900-a6cf-ab651facd628.png",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1705,12 +1553,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 99900,
       "compare_at_agorot": 119000,
-      "in_stock": true,
       "sku": "158625",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/1_cff119e8-2591-4e06-bcf0-3cc2f6551a7c.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1726,12 +1572,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 99900,
       "compare_at_agorot": 139900,
-      "in_stock": true,
       "sku": "154249",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/output_0c472389-564f-4bc9-8557-f859b3af7bde.png",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1747,12 +1591,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 27900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "158718",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/158718.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1768,12 +1610,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 7990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "147931",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/147903.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1789,12 +1629,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "150170",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/TX1573B-1.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1810,12 +1648,10 @@
       "category_label_he": "לינה",
       "price_agorot": 28990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "154948",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/154954.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1831,12 +1667,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "159355",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/159355.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1852,12 +1686,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 29900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "158674",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/2B53E369-2DED-4747-A3A7-D622232FF6DF.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "want"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1873,12 +1705,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 8990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "149036",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/149036.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1894,12 +1724,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 11990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "148958",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/148958.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1915,12 +1743,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "162842",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/7241331001083.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1936,12 +1762,10 @@
       "category_label_he": "לינה",
       "price_agorot": 9900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "154345",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/output_55aab52c-3048-4aa8-8c59-3ba8431d04f9.png",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1957,12 +1781,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 9900,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "158733",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/158732.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "motsetsim",
@@ -1978,12 +1800,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 9990,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": "162881",
       "image_url": "https://cdn.shopify.com/s/files/1/0925/2516/6880/files/7241331005111.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "nice"
+      "image_height": 760
     },
     {
       "chain_slug": "agalis",
@@ -1999,12 +1819,10 @@
       "category_label_he": "לינה",
       "price_agorot": 179900,
       "compare_at_agorot": 219800,
-      "in_stock": true,
       "sku": "13745",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/13745.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "must"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2020,12 +1838,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 49900,
       "compare_at_agorot": 49900,
-      "in_stock": true,
       "sku": "13705",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/141665.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2041,12 +1857,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 769000,
       "compare_at_agorot": 769000,
-      "in_stock": true,
       "sku": "92094",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/92094.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "must"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2062,12 +1876,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 24900,
       "compare_at_agorot": 24900,
-      "in_stock": true,
       "sku": "13670",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/68170.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2083,12 +1895,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 9990,
       "compare_at_agorot": 9990,
-      "in_stock": false,
       "sku": "89496",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/89496.jpg",
       "image_width": 1000,
-      "image_height": 1000,
-      "priority_hint": "nice"
+      "image_height": 1000
     },
     {
       "chain_slug": "agalis",
@@ -2104,12 +1914,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 35920,
       "compare_at_agorot": 44900,
-      "in_stock": true,
       "sku": "13762",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/141519.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2125,12 +1933,10 @@
       "category_label_he": "לינה",
       "price_agorot": 99900,
       "compare_at_agorot": 99900,
-      "in_stock": true,
       "sku": "13737",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/91029_f8b89724-c4a8-4688-9e71-90f66aaf731b.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "must"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2146,12 +1952,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 23992,
       "compare_at_agorot": 29990,
-      "in_stock": true,
       "sku": "91404",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/6628-c.jpg",
       "image_width": 1702,
-      "image_height": 1937,
-      "priority_hint": "nice"
+      "image_height": 1937
     },
     {
       "chain_slug": "agalis",
@@ -2167,12 +1971,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 99900,
       "compare_at_agorot": 99900,
-      "in_stock": true,
       "sku": "13736",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/50201_29fb5710-cca1-45e4-b4f8-baada4a90656.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2188,12 +1990,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 9990,
       "compare_at_agorot": 11760,
-      "in_stock": true,
       "sku": "11798",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/11798.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2209,12 +2009,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 6990,
       "compare_at_agorot": 6990,
-      "in_stock": false,
       "sku": "89504",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/89504.jpg",
       "image_width": 1000,
-      "image_height": 1000,
-      "priority_hint": "nice"
+      "image_height": 1000
     },
     {
       "chain_slug": "agalis",
@@ -2230,12 +2028,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 26320,
       "compare_at_agorot": 32900,
-      "in_stock": true,
       "sku": "89828",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/110410.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2251,12 +2047,10 @@
       "category_label_he": "לינה",
       "price_agorot": 28990,
       "compare_at_agorot": 28990,
-      "in_stock": true,
       "sku": "90453",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/90453.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2272,12 +2066,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 7990,
       "compare_at_agorot": 7990,
-      "in_stock": true,
       "sku": "92073",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/92073.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2293,12 +2085,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 29990,
       "compare_at_agorot": 29990,
-      "in_stock": true,
       "sku": "91680",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/91680.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2314,12 +2104,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 23990,
       "compare_at_agorot": 23990,
-      "in_stock": true,
       "sku": "91613",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/91613.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2335,12 +2123,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 44900,
       "compare_at_agorot": 54900,
-      "in_stock": false,
       "sku": "12004",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/7656.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2356,12 +2142,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 8990,
       "compare_at_agorot": 8990,
-      "in_stock": true,
       "sku": "89079",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/89079_2dc2336f-cec1-4224-8e90-23e061bfa137.jpg",
       "image_width": 1000,
-      "image_height": 1000,
-      "priority_hint": "must"
+      "image_height": 1000
     },
     {
       "chain_slug": "agalis",
@@ -2377,12 +2161,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 9743,
       "compare_at_agorot": 12990,
-      "in_stock": true,
       "sku": "13176",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/141341.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2398,12 +2180,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 9990,
       "compare_at_agorot": 9990,
-      "in_stock": true,
       "sku": "12464",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/21015.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2419,12 +2199,10 @@
       "category_label_he": "לינה",
       "price_agorot": 9990,
       "compare_at_agorot": 9990,
-      "in_stock": true,
       "sku": "91595",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/91595.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2440,12 +2218,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 23992,
       "compare_at_agorot": 29990,
-      "in_stock": true,
       "sku": "91406",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/6630.jpg",
       "image_width": 1702,
-      "image_height": 1937,
-      "priority_hint": "nice"
+      "image_height": 1937
     },
     {
       "chain_slug": "agalis",
@@ -2461,12 +2237,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 719000,
       "compare_at_agorot": 719000,
-      "in_stock": true,
       "sku": "92093",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/92093.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "must"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2482,12 +2256,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 23990,
       "compare_at_agorot": 23990,
-      "in_stock": true,
       "sku": "91614",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/91614.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2503,12 +2275,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 35920,
       "compare_at_agorot": 44900,
-      "in_stock": true,
       "sku": "13761",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/DSC02047.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2524,12 +2294,10 @@
       "category_label_he": "לינה",
       "price_agorot": 149900,
       "compare_at_agorot": 189800,
-      "in_stock": true,
       "sku": "13742",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/13742.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "must"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2545,12 +2313,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 7990,
       "compare_at_agorot": 7990,
-      "in_stock": true,
       "sku": "92072",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/92072.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2566,12 +2332,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 89990,
       "compare_at_agorot": 89990,
-      "in_stock": true,
       "sku": "91720",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/2_2_a39f3d93-7e93-4093-b86a-ab43886d2340.jpg",
       "image_width": 1702,
-      "image_height": 1702,
-      "priority_hint": "want"
+      "image_height": 1702
     },
     {
       "chain_slug": "agalis",
@@ -2587,12 +2351,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 9743,
       "compare_at_agorot": 12990,
-      "in_stock": true,
       "sku": "13181",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/141346.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2608,12 +2370,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 19992,
       "compare_at_agorot": 24990,
-      "in_stock": true,
       "sku": "13698",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/121640_8518f41e-7a28-4e96-a3c6-e324ff59411a.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2629,12 +2389,10 @@
       "category_label_he": "לינה",
       "price_agorot": 97425,
       "compare_at_agorot": 129900,
-      "in_stock": true,
       "sku": "13775",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/8715784.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "must"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2650,12 +2408,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 23992,
       "compare_at_agorot": 29990,
-      "in_stock": true,
       "sku": "91405",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/6629-1.jpg",
       "image_width": 1702,
-      "image_height": 1937,
-      "priority_hint": "nice"
+      "image_height": 1937
     },
     {
       "chain_slug": "agalis",
@@ -2671,12 +2427,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 29990,
       "compare_at_agorot": 29990,
-      "in_stock": true,
       "sku": "91682",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/3_27369421-c0f5-4e9f-951e-a34bcb587338.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2692,12 +2446,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 23990,
       "compare_at_agorot": 23990,
-      "in_stock": true,
       "sku": "91615",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/91615.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2713,12 +2465,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 9990,
       "compare_at_agorot": 9990,
-      "in_stock": true,
       "sku": "13635",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/17715.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2734,12 +2484,10 @@
       "category_label_he": "לינה",
       "price_agorot": 27900,
       "compare_at_agorot": 27900,
-      "in_stock": true,
       "sku": "83456",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/834302_8a1ace92-a681-4640-b8c0-74c7806c292a.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "must"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2755,12 +2503,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 7990,
       "compare_at_agorot": 7990,
-      "in_stock": true,
       "sku": "92071",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/92071.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2776,12 +2522,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 8990,
       "compare_at_agorot": 8990,
-      "in_stock": true,
       "sku": "89080",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/89080.jpg",
       "image_width": 1000,
-      "image_height": 1000,
-      "priority_hint": "must"
+      "image_height": 1000
     },
     {
       "chain_slug": "agalis",
@@ -2797,12 +2541,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 9743,
       "compare_at_agorot": 12990,
-      "in_stock": true,
       "sku": "13180",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/141345.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2818,12 +2560,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 35920,
       "compare_at_agorot": 44900,
-      "in_stock": true,
       "sku": "13760",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/141517.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "want"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2839,12 +2579,10 @@
       "category_label_he": "לינה",
       "price_agorot": 9990,
       "compare_at_agorot": 9990,
-      "in_stock": true,
       "sku": "91596",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/91596.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2860,12 +2598,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 23920,
       "compare_at_agorot": 29900,
-      "in_stock": true,
       "sku": "13808",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/3051016.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2881,12 +2617,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 719000,
       "compare_at_agorot": 719000,
-      "in_stock": true,
       "sku": "92092",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/92092.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "must"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2902,12 +2636,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 23990,
       "compare_at_agorot": 23990,
-      "in_stock": true,
       "sku": "91616",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/91616.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "agalis",
@@ -2923,12 +2655,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 19990,
       "compare_at_agorot": 19990,
-      "in_stock": true,
       "sku": "91843",
       "image_url": "https://cdn.shopify.com/s/files/1/0721/4517/4617/files/91843.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "baby-star",
@@ -2944,12 +2674,10 @@
       "category_label_he": "לינה",
       "price_agorot": 493000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/2026-06-24134408.png",
       "image_width": 791,
-      "image_height": 795,
-      "priority_hint": "must"
+      "image_height": 795
     },
     {
       "chain_slug": "baby-star",
@@ -2965,12 +2693,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 119000,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "59589",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/TrippTrapp_WarmBrown_2-8-scaled-e1760867358589.webp",
       "image_width": 2048,
-      "image_height": 2048,
-      "priority_hint": "must"
+      "image_height": 2048
     },
     {
       "chain_slug": "baby-star",
@@ -2986,12 +2712,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 769000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/CYB_26_INT_y270_Priam_FoldCot_ROGO_OFWH_Style_screen_standard.webp",
       "image_width": 1000,
-      "image_height": 1000,
-      "priority_hint": "must"
+      "image_height": 1000
     },
     {
       "chain_slug": "baby-star",
@@ -3007,12 +2731,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 369000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/img_3701ab-copy_optimized_83c2b03d-9297-4cc1-8f19-0b28d446af3c.webp",
       "image_width": 2048,
-      "image_height": 2048,
-      "priority_hint": "must"
+      "image_height": 2048
     },
     {
       "chain_slug": "baby-star",
@@ -3028,12 +2750,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 14990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40168455",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/Gemini_Generated_Image_fai7c0fai7c0fai7.jpg",
       "image_width": 1024,
-      "image_height": 1024,
-      "priority_hint": "nice"
+      "image_height": 1024
     },
     {
       "chain_slug": "baby-star",
@@ -3049,12 +2769,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 261750,
       "compare_at_agorot": 349000,
-      "in_stock": true,
       "sku": "40168068",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/img_3553a-copy_optimized.jpg",
       "image_width": 4480,
-      "image_height": 4480,
-      "priority_hint": "nice"
+      "image_height": 4480
     },
     {
       "chain_slug": "baby-star",
@@ -3070,12 +2788,10 @@
       "category_label_he": "לינה",
       "price_agorot": 97430,
       "compare_at_agorot": 129900,
-      "in_stock": true,
       "sku": "40141318",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/1Z5A5478-800x800.jpg",
       "image_width": 800,
-      "image_height": 800,
-      "priority_hint": "must"
+      "image_height": 800
     },
     {
       "chain_slug": "baby-star",
@@ -3091,12 +2807,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 82990,
       "compare_at_agorot": 139990,
-      "in_stock": true,
       "sku": "90968",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/Screenshot_12_c900b6e7-bab5-40ee-a44e-bd8197105e37.webp",
       "image_width": 872,
-      "image_height": 872,
-      "priority_hint": "must"
+      "image_height": 872
     },
     {
       "chain_slug": "baby-star",
@@ -3112,12 +2826,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 99900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "65043",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/car-seat-cosmo-1-_1.webp",
       "image_width": 2048,
-      "image_height": 2048,
-      "priority_hint": "want"
+      "image_height": 2048
     },
     {
       "chain_slug": "baby-star",
@@ -3133,12 +2845,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 81000,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "58341",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/D7_A9_D7_99_D7_93_D7_94-_D7_90_D7_99_D7_99_D7_9C_D7_AA-80-_D7_9C_D7_91_D7_9F-_D7_90_D7_99_D7_98_D7_9C_D7_99_D7_94-1060800010-600x564.jpg",
       "image_width": 600,
-      "image_height": 564,
-      "priority_hint": "want"
+      "image_height": 564
     },
     {
       "chain_slug": "baby-star",
@@ -3154,12 +2864,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 4540,
       "compare_at_agorot": 6490,
-      "in_stock": true,
       "sku": "40167328",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/91043.webp",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "baby-star",
@@ -3175,12 +2883,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 56900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40164475",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/1f3c4470ff0b839b92ff9da382373603.jpg",
       "image_width": 864,
-      "image_height": 1080,
-      "priority_hint": "want"
+      "image_height": 1080
     },
     {
       "chain_slug": "baby-star",
@@ -3196,12 +2902,10 @@
       "category_label_he": "לינה",
       "price_agorot": 29900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "63652",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/0608614325146.jpg",
       "image_width": 700,
-      "image_height": 470,
-      "priority_hint": "must"
+      "image_height": 470
     },
     {
       "chain_slug": "baby-star",
@@ -3217,12 +2921,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 29900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "59583",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/TrippTrappBS_HeatherMauve_CLOSE_1-5_eCom-scaled.webp",
       "image_width": 2048,
-      "image_height": 2048,
-      "priority_hint": "want"
+      "image_height": 2048
     },
     {
       "chain_slug": "baby-star",
@@ -3238,12 +2940,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 29990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40167132",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/cyb_23_eu_y000_inlay_sironag_plus_black_18abc7cc428d2170.jpg",
       "image_width": 698,
-      "image_height": 698,
-      "priority_hint": "want"
+      "image_height": 698
     },
     {
       "chain_slug": "baby-star",
@@ -3259,12 +2959,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 22320,
       "compare_at_agorot": 27900,
-      "in_stock": true,
       "sku": "40168664",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/69e934a373bd3fa0d2867881d689a65a.jpg",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "baby-star",
@@ -3280,12 +2978,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 14990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40168454",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/Gemini_Generated_Image_fcapykfcapykfcap.png",
       "image_width": 928,
-      "image_height": 928,
-      "priority_hint": "nice"
+      "image_height": 928
     },
     {
       "chain_slug": "baby-star",
@@ -3301,12 +2997,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 27990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40144102",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/b_1_a084e093-d019-4adc-9d55-7b8f9e9dd969.jpg",
       "image_width": 503,
-      "image_height": 550,
-      "priority_hint": "must"
+      "image_height": 550
     },
     {
       "chain_slug": "baby-star",
@@ -3322,12 +3016,10 @@
       "category_label_he": "לינה",
       "price_agorot": 8990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40170603",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/52glvg-f-cp1750x1580x50px50p--324e035126990858801dd8dc95e70bf3.jpg",
       "image_width": 1750,
-      "image_height": 1580,
-      "priority_hint": "nice"
+      "image_height": 1580
     },
     {
       "chain_slug": "baby-star",
@@ -3343,12 +3035,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 9990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "770730004",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/retail_bottles_150ml_3pieces-768x539.jpg",
       "image_width": 768,
-      "image_height": 539,
-      "priority_hint": "nice"
+      "image_height": 539
     },
     {
       "chain_slug": "baby-star",
@@ -3364,12 +3054,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 8990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40159229",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/89072.webp",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "baby-star",
@@ -3385,12 +3073,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 9990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40149950",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/l_1_ce1deb0c-e34b-4b4e-b270-da997e73ef7f.jpg",
       "image_width": 432,
-      "image_height": 1076,
-      "priority_hint": "nice"
+      "image_height": 1076
     },
     {
       "chain_slug": "baby-star",
@@ -3406,12 +3092,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 4190,
       "compare_at_agorot": 5990,
-      "in_stock": true,
       "sku": "40167370",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/91067.webp",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "baby-star",
@@ -3427,12 +3111,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 8900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40170762",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/done-by-deer-round-rattle.jpg",
       "image_width": 458,
-      "image_height": 458,
-      "priority_hint": "nice"
+      "image_height": 458
     },
     {
       "chain_slug": "baby-star",
@@ -3448,12 +3130,10 @@
       "category_label_he": "לינה",
       "price_agorot": 453000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/1z5a0787_optimized-500x500_df336557-32fe-4746-9e63-187fa88460c4.jpg",
       "image_width": 500,
-      "image_height": 500,
-      "priority_hint": "must"
+      "image_height": 500
     },
     {
       "chain_slug": "baby-star",
@@ -3469,12 +3149,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 101150,
       "compare_at_agorot": 119000,
-      "in_stock": false,
       "sku": "65473",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/7290020442413.jpg",
       "image_width": 351,
-      "image_height": 241,
-      "priority_hint": "must"
+      "image_height": 241
     },
     {
       "chain_slug": "baby-star",
@@ -3490,12 +3168,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 769000,
       "compare_at_agorot": null,
-      "in_stock": true,
       "sku": null,
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/CYB_26_INT_y270_Priam_FoldCot_ROGO_PCPI_Style_screen_standard.webp",
       "image_width": 1000,
-      "image_height": 1000,
-      "priority_hint": "must"
+      "image_height": 1000
     },
     {
       "chain_slug": "baby-star",
@@ -3511,12 +3187,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 257000,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "91925",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/11_603721dd-67a4-4db8-b426-c148b1e1f011.webp",
       "image_width": 904,
-      "image_height": 904,
-      "priority_hint": "must"
+      "image_height": 904
     },
     {
       "chain_slug": "baby-star",
@@ -3532,12 +3206,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 12900,
       "compare_at_agorot": 0,
-      "in_stock": false,
       "sku": "40166763",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/2800-277M_003_1-17520669381536986.webp",
       "image_width": 1400,
-      "image_height": 1400,
-      "priority_hint": "nice"
+      "image_height": 1400
     },
     {
       "chain_slug": "baby-star",
@@ -3553,12 +3225,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 159000,
       "compare_at_agorot": 0,
-      "in_stock": false,
       "sku": "40152975",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/78af22327268c549a1d74768b7b960c7.webp",
       "image_width": 500,
-      "image_height": 500,
-      "priority_hint": "must"
+      "image_height": 500
     },
     {
       "chain_slug": "baby-star",
@@ -3574,12 +3244,10 @@
       "category_label_he": "לינה",
       "price_agorot": 90000,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40165077",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/972659b034c3a7533cd2b75065f67ae0-_1.webp",
       "image_width": 1080,
-      "image_height": 1080,
-      "priority_hint": "want"
+      "image_height": 1080
     },
     {
       "chain_slug": "baby-star",
@@ -3595,12 +3263,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 62000,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "65312",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/medium-anex_rocker_fluff_4.jpg",
       "image_width": 768,
-      "image_height": 768,
-      "priority_hint": "want"
+      "image_height": 768
     },
     {
       "chain_slug": "baby-star",
@@ -3616,12 +3282,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 99900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "65385",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/ocdxpu-f-cp1044x696x50px50p--c02a38fae838cc7bc52420567df2e5ea.jpg",
       "image_width": 1044,
-      "image_height": 696,
-      "priority_hint": "want"
+      "image_height": 696
     },
     {
       "chain_slug": "baby-star",
@@ -3637,12 +3301,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 49990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40170725",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/5712643054245.webp",
       "image_width": 800,
-      "image_height": 800,
-      "priority_hint": "want"
+      "image_height": 800
     },
     {
       "chain_slug": "baby-star",
@@ -3658,12 +3320,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 4190,
       "compare_at_agorot": 5990,
-      "in_stock": true,
       "sku": "40167379",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/91076.webp",
       "image_width": 1200,
-      "image_height": 1200,
-      "priority_hint": "nice"
+      "image_height": 1200
     },
     {
       "chain_slug": "baby-star",
@@ -3679,12 +3339,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 55900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40170735",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/done-by-deer-activity-gym-tiny-farm-5712643060642.webp",
       "image_width": 1024,
-      "image_height": 1160,
-      "priority_hint": "want"
+      "image_height": 1160
     },
     {
       "chain_slug": "baby-star",
@@ -3700,12 +3358,10 @@
       "category_label_he": "לינה",
       "price_agorot": 28720,
       "compare_at_agorot": 35900,
-      "in_stock": true,
       "sku": "40170132",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/154781.webp",
       "image_width": 960,
-      "image_height": 760,
-      "priority_hint": "must"
+      "image_height": 760
     },
     {
       "chain_slug": "baby-star",
@@ -3721,12 +3377,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 26900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "64942",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/20dc4b095a058542ae02173976b18934.jpg",
       "image_width": 559,
-      "image_height": 940,
-      "priority_hint": "want"
+      "image_height": 940
     },
     {
       "chain_slug": "baby-star",
@@ -3742,12 +3396,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 29900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40168253",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/ANP_0766_web_aa40f657-1ab9-4457-a6d2-65fe8ab63f26.webp",
       "image_width": 1750,
-      "image_height": 1750,
-      "priority_hint": "must"
+      "image_height": 1750
     },
     {
       "chain_slug": "baby-star",
@@ -3763,12 +3415,10 @@
       "category_label_he": "רחצה והחתלה",
       "price_agorot": 19900,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "65107",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/2075-1.png",
       "image_width": 2573,
-      "image_height": 3009,
-      "priority_hint": "nice"
+      "image_height": 3009
     },
     {
       "chain_slug": "baby-star",
@@ -3784,12 +3434,10 @@
       "category_label_he": "ביגוד",
       "price_agorot": 11900,
       "compare_at_agorot": 0,
-      "in_stock": false,
       "sku": "40166399",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/2801-066.webp",
       "image_width": 1400,
-      "image_height": 1400,
-      "priority_hint": "nice"
+      "image_height": 1400
     },
     {
       "chain_slug": "baby-star",
@@ -3805,12 +3453,10 @@
       "category_label_he": "צעצועים",
       "price_agorot": 27990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "69712",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/2026-06-28_091039.png",
       "image_width": 1016,
-      "image_height": 956,
-      "priority_hint": "want"
+      "image_height": 956
     },
     {
       "chain_slug": "baby-star",
@@ -3826,12 +3472,10 @@
       "category_label_he": "לינה",
       "price_agorot": 7490,
       "compare_at_agorot": 9990,
-      "in_stock": true,
       "sku": "40165183",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/74ca41225538c36e5e71119b788897c0.png",
       "image_width": 865,
-      "image_height": 897,
-      "priority_hint": "nice"
+      "image_height": 897
     },
     {
       "chain_slug": "baby-star",
@@ -3847,12 +3491,10 @@
       "category_label_he": "האכלה",
       "price_agorot": 8990,
       "compare_at_agorot": 12490,
-      "in_stock": true,
       "sku": "87877",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/Screenshot_25.webp",
       "image_width": 462,
-      "image_height": 462,
-      "priority_hint": "nice"
+      "image_height": 462
     },
     {
       "chain_slug": "baby-star",
@@ -3868,12 +3510,10 @@
       "category_label_he": "ניידות",
       "price_agorot": 8990,
       "compare_at_agorot": 0,
-      "in_stock": true,
       "sku": "40170602",
       "image_url": "https://cdn.shopify.com/s/files/1/0645/2759/7615/files/ofedax-f-cp1750x1580x50px50p--053bf0f857e3f6b1e05aedd876da2b4a.jpg",
       "image_width": 1750,
-      "image_height": 1580,
-      "priority_hint": "must"
+      "image_height": 1580
     }
   ]
 }

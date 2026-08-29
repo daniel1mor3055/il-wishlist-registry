@@ -11,12 +11,13 @@
  * source, so anything present here is readable by anyone holding the link.
  */
 
-export type Lifecycle = "draft" | "published" | "post_birth" | "closed";
+/**
+ * Only two states are guest-facing (D29, D30). Unpublished is not one of them:
+ * it answers like a wrong slug, so it never reaches this type.
+ */
+export type Lifecycle = "published" | "closed";
 
 export type ItemKind = "product" | "fund" | "voucher";
-
-/** PRD G3: חובה / רצוי / נחמד שיהיה */
-export type Priority = "must" | "want" | "nice";
 
 export type Category = "linens" | "feeding" | "mobility" | "bath" | "clothing" | "toys";
 
@@ -32,23 +33,24 @@ export interface PublicItem {
   sourceTitle: string | null;
   /** The couple's own note about the item. */
   note: string | null;
-  category: Category;
+  /** Null for the envelope and vouchers, and for a manually added item. */
+  category: Category | null;
   imageUrl: string | null;
-
-  priority: Priority | null;
 
   /** Product fields. Null for funds and vouchers. */
   chainSlug: string | null;
   chainNameHe: string | null;
   canonicalUrl: string | null;
   priceAgorot: number | null;
-  inStock: boolean;
 
   quantityWanted: number;
   quantityClaimed: number;
   claimState: ClaimState;
 
-  /** Group gift and fund fields. */
+  /**
+   * Group gifting, which only ever applies to a product: the target is that
+   * product's real price. The cash envelope has no target at all (D28).
+   */
   groupGiftEnabled: boolean;
   targetAgorot: number | null;
   contributedAgorot: number;
@@ -69,8 +71,6 @@ export interface PublicRegistry {
   /** ISO date. The expected birth date. */
   dueDate: string | null;
   babyName: string | null;
-  /** ISO date, set once the couple flips to post-birth. */
-  bornOn: string | null;
   lifecycle: Lifecycle;
 
   itemsTotal: number;

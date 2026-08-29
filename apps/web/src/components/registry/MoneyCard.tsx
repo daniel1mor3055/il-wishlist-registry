@@ -1,9 +1,5 @@
 "use client";
 
-import { Meter } from "@/components/primitives/Meter";
-import { InlineAmount } from "@/components/primitives/Price";
-import { fundedPercent, remainingAgorot, isFundComplete } from "@/lib/money";
-import { copy } from "@/lib/copy";
 import type { PublicItem } from "@/lib/types";
 
 /**
@@ -42,11 +38,15 @@ export function EnvelopeArt() {
 }
 
 /**
- * A cash fund or a voucher tile.
+ * The cash envelope, or a voucher tile.
  *
  * Dashed border so the money tile reads as a different kind of object from a
  * product, and deliberately quieter: PRD risk 3 is that cash cannibalises
  * products, so the product tile has to be the more attractive object.
+ *
+ * No meter and no remaining amount. An envelope is not a fund with a target
+ * (D28) - collecting toward a specific thing is what group gifting on a real
+ * product is for, and that lives on `ProductCard`.
  */
 export function MoneyCard({
   item,
@@ -56,9 +56,6 @@ export function MoneyCard({
   /** Optional so the card can be rendered statically from a server component. */
   onClick?: () => void;
 }) {
-  const hasTarget = item.targetAgorot !== null;
-  const complete = isFundComplete(item.contributedAgorot, item.targetAgorot);
-
   return (
     <button
       type="button"
@@ -70,27 +67,6 @@ export function MoneyCard({
       <EnvelopeArt />
       <p className="text-body font-bold text-ink">{item.title}</p>
       {item.subtitle && <p className="text-tiny text-ink-muted">{item.subtitle}</p>}
-
-      {hasTarget && (
-        <div className="flex flex-col gap-1.5">
-          <Meter
-            percent={fundedPercent(item.contributedAgorot, item.targetAgorot)}
-            tone={complete ? "success" : "accent"}
-          />
-          {complete ? (
-            <p className="text-tiny font-medium text-success">{copy.group.complete}</p>
-          ) : (
-            <p className="text-tiny font-medium text-ink">
-              נותרו{" "}
-              <InlineAmount
-                agorot={remainingAgorot(item.contributedAgorot, item.targetAgorot)}
-              />{" "}
-              מתוך <InlineAmount agorot={item.targetAgorot!} />
-            </p>
-          )}
-        </div>
-      )}
-
       {item.caption && <p className="text-tiny text-ink-muted">{item.caption}</p>}
     </button>
   );

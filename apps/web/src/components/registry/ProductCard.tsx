@@ -2,7 +2,7 @@
 
 import { ItemImage } from "@/components/primitives/ItemImage";
 import { Meter } from "@/components/primitives/Meter";
-import { Pill, PriorityBadge, ShopChip } from "@/components/primitives/Badges";
+import { Pill, ShopChip } from "@/components/primitives/Badges";
 import { Price, InlineAmount } from "@/components/primitives/Price";
 import { copy } from "@/lib/copy";
 import { fundedPercent, remainingAgorot } from "@/lib/money";
@@ -82,10 +82,6 @@ export function ProductCard({
           <Pill>{copy.item.quantityRemaining(remainingQty, item.quantityWanted)}</Pill>
         )}
 
-        {!item.inStock && !taken && item.chainNameHe && (
-          <Pill>{copy.item.outOfStock(item.chainNameHe)}</Pill>
-        )}
-
         {isGroup && (
           <div className="flex flex-col gap-1.5">
             <Meter percent={fundedPercent(item.contributedAgorot, item.targetAgorot)} />
@@ -105,7 +101,6 @@ export function ProductCard({
         <div className="mt-auto flex items-end justify-between gap-2 pt-1">
           <div className="flex flex-wrap justify-start gap-1.5">
             {item.chainNameHe && <ShopChip name={item.chainNameHe} />}
-            {item.priority && <PriorityBadge priority={item.priority} />}
           </div>
           {item.priceAgorot !== null && <Price agorot={item.priceAgorot} muted={taken} />}
         </div>

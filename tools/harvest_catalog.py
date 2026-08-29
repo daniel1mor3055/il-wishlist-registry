@@ -112,12 +112,6 @@ CATEGORY_KEYWORDS: list[tuple[str, tuple[str, ...]]] = [
     ),
 ]
 
-PRIORITY_HINTS: tuple[tuple[str, tuple[str, ...]], ...] = (
-    # Big-ticket essentials read as "must have" on a registry.
-    ("must", ("עגל", "מושב בטיחות", "כיסא בטיחות", "כיסאות בטיחות", "סלקל", "מיטת", "עריסה", "מוניטור", "משאבת")),
-    ("nice", ("צעצוע", "בובה", "פאזל", "ספר", "רעשן", "נשכן")),
-)
-
 MIN_AGOROT = 2_000        # 20 ILS. Below this it is an accessory, not a gift.
 MAX_AGOROT = 800_000      # 8000 ILS.
 MIN_TITLE_LEN = 8
@@ -178,20 +172,6 @@ def classify(product_type: str, title: str, tags: list[str]) -> str | None:
             if kw in haystack:
                 return category
     return None
-
-
-def guess_priority(title: str, agorot: int) -> str:
-    haystack = title or ""
-    for priority, keywords in PRIORITY_HINTS:
-        for kw in keywords:
-            if kw in haystack:
-                return priority
-    # Fall back on price: expensive things read as more essential on a registry.
-    if agorot >= 100_000:
-        return "must"
-    if agorot >= 25_000:
-        return "want"
-    return "nice"
 
 
 def clean_title(raw: str) -> str:
@@ -264,8 +244,10 @@ def normalise(product: dict[str, Any], chain: dict[str, str]) -> dict[str, Any] 
         return None
 
     handle = product.get("handle") or ""
-    in_stock = any(bool(v.get("available")) for v in variants)
 
+    # Shopify reports variant availability, and we deliberately drop it (D26).
+    # A stock flag captured once is stale within the hour, and a wrong
+    # "אזל מהמלאי" costs the same trust as a wrong price.
     return {
         "chain_slug": chain["slug"],
         "chain_name_he": chain["name_he"],
@@ -280,12 +262,10 @@ def normalise(product: dict[str, Any], chain: dict[str, str]) -> dict[str, Any] 
         "category_label_he": CATEGORY_LABELS_HE[category],
         "price_agorot": agorot,
         "compare_at_agorot": to_agorot(variant.get("compare_at_price")),
-        "in_stock": in_stock,
         "sku": (variant.get("sku") or "").strip() or None,
         "image_url": image_url,
         "image_width": image.get("width"),
         "image_height": image.get("height"),
-        "priority_hint": guess_priority(source_title, agorot),
     }
 
 
@@ -358,7 +338,7 @@ def curate(items: list[dict[str, Any]], per_chain: int) -> list[dict[str, Any]]:
             in_band = [i for i in bucket if low <= i["price_agorot"] < high]
             # Most expensive first within each band: on a registry the
             # substantial version of a thing is the more interesting gift.
-            in_band.sort(key=lambda i: (not i["in_stock"], -i["price_agorot"]))
+            in_band.sort(key=lambda i: -i["price_agorot"])
             bands.append(in_band)
 
         interleaved: list[dict[str, Any]] = []
@@ -428,7 +408,8 @@ def main() -> int:
         return 1
 
     snapshot = {
-        "schema_version": 1,
+        # 2 dropped in_stock and priority_hint from every item (D26, D27).
+        "schema_version": 2,
         "harvested_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "source": "public Shopify products.json per chain, no auth",
         "note": (
@@ -445,9 +426,8 @@ def main() -> int:
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(json.dumps(snapshot, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
-    in_stock = sum(1 for i in all_items if i["in_stock"])
     log(f"Wrote {OUT_PATH.relative_to(REPO_ROOT)}")
-    log(f"  {len(all_items)} items across {len(chains_out)} chains, {in_stock} in stock")
+    log(f"  {len(all_items)} items across {len(chains_out)} chains")
     return 0
 
 

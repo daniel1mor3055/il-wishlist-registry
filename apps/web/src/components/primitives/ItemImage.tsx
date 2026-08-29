@@ -58,23 +58,27 @@ const GLYPHS: Record<Category, React.ReactNode> = {
   ),
 };
 
-function Placeholder({ category, title }: { category: Category; title: string }) {
+/** An item with no category still gets the branded placeholder, just no glyph:
+    a manually added item may have nothing to classify it by. */
+function Placeholder({ category, title }: { category: Category | null; title: string }) {
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-image-bg p-4">
-      <svg
-        width="52"
-        height="52"
-        viewBox="0 0 64 64"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="text-muted"
-        aria-hidden="true"
-      >
-        {GLYPHS[category]}
-      </svg>
+      {category && (
+        <svg
+          width="52"
+          height="52"
+          viewBox="0 0 64 64"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="text-muted"
+          aria-hidden="true"
+        >
+          {GLYPHS[category]}
+        </svg>
+      )}
       <p className="line-clamp-2 text-center text-micro font-medium text-ink-muted">
         {title}
       </p>
@@ -93,7 +97,7 @@ export function ItemImage({
 }: {
   src: string | null;
   alt: string;
-  category: Category;
+  category: Category | null;
   title: string;
   sizes?: string;
   priority?: boolean;

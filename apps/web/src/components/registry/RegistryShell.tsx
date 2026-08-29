@@ -4,10 +4,11 @@ import type { PublicRegistry } from "@/lib/types";
 /**
  * G10. The lifecycle and error shells.
  *
- * A draft registry has a live link but no contents, a closed one is a read-only
- * thank-you, and a missing one assumes a WhatsApp link that got truncated.
- * These are separate from an exception: they are legitimate states with their
- * own copy, and they must still render valid Open Graph metadata.
+ * A closed registry is a read-only thank-you, and a missing one assumes a
+ * WhatsApp link that got truncated - which is also what an unpublished registry
+ * looks like, deliberately (D30). These are separate from an exception: they
+ * are legitimate states with their own copy, and they must still render valid
+ * Open Graph metadata.
  */
 export function RegistryShell({
   message,
