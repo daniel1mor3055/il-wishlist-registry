@@ -34,7 +34,7 @@ def test_the_address_is_revealed_only_by_its_own_request(
         "postalCode": "6433228",
         "notes": "קוד לבניין 4580",
         "copyText": (
-            "נועה ואיתי\nדיזנגוף 99\nכניסה ב\nקומה 3\nדירה 12\nתל אביב\n6433228\nקוד לבניין 4580"
+            "נועה ואיתי\nדיזנגוף 99\nכניסה ב\nקומה 3\nדירה 12\nתל אביב\nמיקוד 6433228\nקוד לבניין 4580"
         ),
     }
     assert page.json()["hasShippingAddress"] is True

@@ -498,7 +498,7 @@ def reveal_shipping_address(session: Session, *, slug: str) -> ShippingAddressVi
     if city:
         lines.append(city)
     if postal:
-        lines.append(postal)
+        lines.append(f"מיקוד {postal}")
     if notes:
         lines.append(notes)
 

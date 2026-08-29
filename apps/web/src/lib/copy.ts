@@ -104,6 +104,7 @@ export const copy = {
     entranceLine: (value: string) => `כניסה ${value}`,
     floorLine: (value: string) => `קומה ${value}`,
     apartmentLine: (value: string) => `דירה ${value}`,
+    postalLine: (value: string) => `מיקוד ${value}`,
   },
 
   /** G5 the D12 self-report moment. */

@@ -238,9 +238,7 @@ function ShippingAddressReveal({
           )}
           {address.city && <span>{address.city}</span>}
           {address.postalCode && (
-            <span className="ltr-token" dir="ltr">
-              {address.postalCode}
-            </span>
+            <span>{copy.handoff.postalLine(address.postalCode)}</span>
           )}
           {address.notes && <span className="text-ink-muted">{address.notes}</span>}
         </div>
