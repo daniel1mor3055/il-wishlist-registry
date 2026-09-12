@@ -31,6 +31,7 @@ Baby registry is the wedge; other occasions are parked. Design discovery is done
 | -------------------------------------------------------- | -------------------------------------------------------------------- |
 | [docs/decisions.md](docs/decisions.md)                   | Decision log. Authoritative — everything else defers to it           |
 | [docs/prd.md](docs/prd.md)                               | PRD and UX spec: surfaces, screens, states, RTL rules, design tokens |
+| [docs/testing.md](docs/testing.md)                       | Test layers and how to add a spec as a checkpoint lands              |
 | [docs/figma-make/prompts.md](docs/figma-make/prompts.md) | Paste-ready Figma Make prompt pack                                   |
 | [docs/council/](docs/council/)                           | Adversarial discovery and implementation briefs, with consolidations |
 
@@ -106,7 +107,7 @@ To sign in to the seeded demo list, ask for a link as `noa.itai@example.com` and
 | http://localhost:8000/docs                    | API docs, guest and owner endpoints alike     |
 | http://localhost:8025                         | Mailpit — where the magic links arrive        |
 
-Checks: `npm run typecheck`, `npm run lint`, `npm run format`. API tests: `docker compose exec api pytest`. `npm run shoot` drives headless Chrome through both surfaces and writes a PNG per state, including a real lost race staged against a live page and a login that goes through an actual mail in Mailpit.
+Checks: `npm run test` (types + API). Guest screens: `npm run test:e2e` (Playwright, needs the running app). The map of what belongs in which layer, and how to add a spec as a checkpoint lands, is [docs/testing.md](docs/testing.md). `npm run shoot` is still the screenshot driver — looking, not asserting.
 
 Regenerating seed data (rarely needed — both files are committed):
 

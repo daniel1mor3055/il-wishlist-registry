@@ -23,9 +23,15 @@
     "demo-data": "node tools/build_demo_registries.mjs",
     "migrate": "docker compose exec api alembic upgrade head",
     "seed": "docker compose exec api python -m app.seed",
-    "shoot": "node tools/shoot.mjs"
+    "shoot": "node tools/shoot.mjs",
+    "test": "npm run typecheck && npm run test:api",
+    "test:api": "docker compose exec -T api pytest",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium",
+    "test:all": "npm run test && npm run test:e2e"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "prettier": "^3.4.2"
   },
   "engines": {
