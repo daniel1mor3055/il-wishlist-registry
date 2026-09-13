@@ -55,6 +55,7 @@ cannot make a spec pass by accident.
 | `c1-guest-read.spec.mjs` | C1 / C2 | Published page, empty, fully claimed, not-found (D30) |
 | `c3-guest-hold.spec.mjs` | C3 | Handoff X releases (D33). Report ESC keeps the hold and shows `שמור לך`, not `כבר נתפס` (D35) |
 | `c4-guest-money.spec.mjs` | C4 | Envelope opens; Bit reveal is a second request (D13) |
+| `c6-editor.spec.mjs` | C6 | Payment/story/share screens. Preview is display-only. Unpublished `/r/{slug}` stays 404 (D30). Bit with no number is Hebrew, not `משהו נתקע` |
 
 First time on a machine:
 
@@ -69,9 +70,9 @@ npm run dev          # or leave it, Playwright will start it
 npm run test:e2e
 ```
 
-Specs that write (the C3 file) use `single-item-demo` so they cannot pass against
-the wrong card. They are serial: the seed is shared, and two browsers holding
-the same unit is the bug we are testing, not the harness.
+Specs that write (C3 holds, C6 new couples) are serial. C3 uses
+`single-item-demo` so it cannot pass against the wrong card. C6 editor specs
+need Mailpit: they sign in through a real magic link.
 
 ## Adding a test as you implement
 
@@ -91,9 +92,9 @@ the same unit is the bug we are testing, not the harness.
    that documents a lie. Add the spec in the same change that ships the
    behaviour.
 
-C6, when it lands, wants `e2e/c6-share.spec.mjs` (WhatsApp copy, preview) and
-whatever owner tests belong next to `test_owner_registry.py` for the payment
-handle and story fields.
+C6 owner API (handle not in the public payload, cover/story published,
+vouchers) belongs in `test_owner_registry.py` next to the other couple
+writes. The Playwright file is the screens.
 
 ## What this is not
 

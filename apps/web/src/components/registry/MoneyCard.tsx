@@ -56,24 +56,30 @@ export function EnvelopeArt() {
  */
 export function MoneyCard({
   item,
+  hasBit = false,
+  hasPaybox = false,
   onClick,
 }: {
   item: PublicItem;
+  hasBit?: boolean;
+  hasPaybox?: boolean;
   /** Optional so the card can be rendered statically from a server component. */
   onClick?: () => void;
 }) {
   const collected = item.kind === "fund" && item.contributorCount > 0;
+  const title =
+    item.kind === "fund" ? copy.fund.tile(hasBit, hasPaybox) : item.title;
 
   return (
     <button
       type="button"
       onClick={onClick}
       data-testid="item-card"
-      data-kind={item.kind === "voucher" ? "voucher" : "fund"}
+      data-kind={item.kind === "voucher" ? "voucher" : "envelope"}
       className="flex flex-col gap-2.5 rounded-card border border-dashed border-border bg-surface p-3 text-right transition-transform active:scale-[0.98]"
     >
       <EnvelopeArt />
-      <p className="text-body font-bold text-ink">{item.title}</p>
+      <p className="text-body font-bold text-ink">{title}</p>
       {item.subtitle && <p className="text-tiny text-ink-muted">{item.subtitle}</p>}
       {item.caption && <p className="text-tiny text-ink-muted">{item.caption}</p>}
 

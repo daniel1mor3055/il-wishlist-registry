@@ -43,17 +43,10 @@ from app.db import Base
 
 ITEM_KINDS = ("product", "fund", "voucher")
 CLAIM_STATES = ("available", "reserved", "purchased")
-PAYMENT_METHODS = ("bit", "paybox")
 
 
 class Registry(Base):
     __tablename__ = "registries"
-    __table_args__ = (
-        CheckConstraint(
-            f"payment_method IS NULL OR payment_method IN {PAYMENT_METHODS}",
-            name="ck_registry_payment_method",
-        ),
-    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     #: Unique: one registry per couple, which is why the editor's routes are
@@ -87,9 +80,9 @@ class Registry(Base):
     closed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)
 
     #: Revealed to a guest only on explicit interaction (D13). Never part of the
-    #: public registry payload, which is what the golden-key test enforces.
-    payment_method: Mapped[str | None] = mapped_column(String(10), default=None)
-    payment_handle: Mapped[str | None] = mapped_column(String(40), default=None)
+    #: public registry payload. A filled handle is that rail; empty is off.
+    bit_handle: Mapped[str | None] = mapped_column(String(40), default=None)
+    paybox_handle: Mapped[str | None] = mapped_column(String(40), default=None)
     payment_display_name: Mapped[str | None] = mapped_column(String(80), default=None)
 
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

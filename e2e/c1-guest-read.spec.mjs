@@ -14,7 +14,6 @@ test.describe("C1/C2 guest read", () => {
   }) => {
     await page.goto(MAIN);
     await expect(page.getByText("רשימת הלידה של נועה ואיתי")).toBeVisible();
-    await expect(page.getByText("בלי הרשמה")).toBeVisible();
     await expect(page.locator(availableProduct).first()).toBeVisible();
   });
 
@@ -26,7 +25,7 @@ test.describe("C1/C2 guest read", () => {
   test("a fully claimed list says so and still offers the envelope", async ({ page }) => {
     await page.goto(CLAIMED);
     await expect(
-      page.getByText("כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה"),
+      page.getByText("כל הפריטים ברשימה נתפסו. אפשר עוד לתת שי"),
     ).toBeVisible();
   });
 

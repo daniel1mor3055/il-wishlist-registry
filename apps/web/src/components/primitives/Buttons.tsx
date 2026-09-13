@@ -1,5 +1,9 @@
 "use client";
 
+/** Filled primary control. Charcoal on the pink fill — white on it fails WCAG. */
+export const fillPrimary =
+  "bg-primary text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active disabled:opacity-45";
+
 export function PrimaryButton({
   children,
   onClick,
@@ -18,8 +22,10 @@ export function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-full rounded-btn py-3.5 text-body font-medium text-white transition-opacity active:opacity-80 disabled:opacity-50 ${
-        tone === "success" ? "bg-success" : "bg-primary"
+      className={`w-full rounded-btn py-3.5 text-body font-medium ${
+        tone === "success"
+          ? "bg-success text-on-success transition-opacity active:opacity-80 disabled:opacity-45"
+          : fillPrimary
       }`}
     >
       {children}

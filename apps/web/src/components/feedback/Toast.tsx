@@ -12,9 +12,11 @@
 export function Toast({
   message,
   onDismiss,
+  action,
 }: {
   message: string;
   onDismiss: () => void;
+  action?: { label: string; onClick: () => void };
 }) {
   return (
     <div className="fixed inset-x-0 bottom-24 z-[60] flex justify-center px-6">
@@ -24,6 +26,15 @@ export function Toast({
         className="animate-toast flex items-center gap-3 rounded-btn bg-ink px-4 py-3 text-small font-medium text-white shadow-lg"
       >
         <span>{message}</span>
+        {action && (
+          <button
+            type="button"
+            onClick={action.onClick}
+            className="shrink-0 transition-opacity active:opacity-70"
+          >
+            {action.label}
+          </button>
+        )}
         <button
           type="button"
           onClick={onDismiss}
@@ -33,7 +44,7 @@ export function Toast({
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path
               d="M6 6l12 12M18 6L6 18"
-              stroke="#fff"
+              stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
             />

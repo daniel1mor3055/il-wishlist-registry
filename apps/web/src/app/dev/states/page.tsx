@@ -62,7 +62,7 @@ const FRAME_STATES: FrameState[] = [
   {
     id: "fully-claimed",
     prd: "G2 — fully claimed",
-    hebrew: "כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה",
+    hebrew: "כל הפריטים ברשימה נתפסו. אפשר עוד לתת שי",
     status: "c1",
     slug: "fully-claimed-demo",
   },
@@ -206,7 +206,7 @@ const PENDING_STATES: Array<{ prd: string; hebrew: string; status: Status }> = [
 
 function StatusChip({ status }: { status: Status }) {
   const tone =
-    status === "c1" ? "bg-primary text-white" : "bg-neutral-tint text-ink-muted";
+    status === "c1" ? "bg-primary text-on-primary" : "bg-neutral-tint text-ink-muted";
   return (
     <span className={`ltr-token rounded-full px-2 py-0.5 text-micro font-bold ${tone}`}>
       {STATUS_LABELS[status]}

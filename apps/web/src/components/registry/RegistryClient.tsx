@@ -159,7 +159,13 @@ function writeCachedHolds(slug: string, holds: Holds) {
   }
 }
 
-export function RegistryClient({ registry }: { registry: PublicRegistry }) {
+export function RegistryClient({
+  registry,
+  preview = false,
+}: {
+  registry: PublicRegistry;
+  preview?: boolean;
+}) {
   const router = useRouter();
   const [filter, setFilter] = useState<FilterId>("all");
   const [sheet, setSheet] = useState<SheetState>(null);
@@ -175,6 +181,9 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
   // look like someone else took the item.
   const [holds, setHolds] = useState<Holds>({});
   const [holdsCacheReady, setHoldsCacheReady] = useState(false);
+  /* Item ids whose in-flight reserve should be thrown away. Only for closing
+     G4 before the hold id exists. A finished release must not leave a flag
+     here, or the next tap "succeeds" and then immediately hands the unit back. */
   const pendingRelease = useRef(new Set<string>());
 
   const rememberHold = (itemId: string, reservationId: string) => {
@@ -187,7 +196,6 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
     });
   };
   const forgetHold = (itemId: string) => {
-    pendingRelease.current.add(itemId);
     setHolds((current) => {
       if (!(itemId in current)) return current;
       const next = { ...current };
@@ -235,14 +243,15 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
   }, [router]);
 
   useEffect(() => {
+    if (preview) return;
     setHolds(readCachedHolds(registry.slug));
     setHoldsCacheReady(true);
-  }, [registry.slug]);
+  }, [registry.slug, preview]);
 
   useEffect(() => {
-    if (!holdsCacheReady) return;
+    if (preview || !holdsCacheReady) return;
     writeCachedHolds(registry.slug, holds);
-  }, [registry.slug, holds, holdsCacheReady]);
+  }, [registry.slug, holds, holdsCacheReady, preview]);
 
   /**
    * The cookie is HttpOnly, so a returning guest cannot know their holds from
@@ -250,6 +259,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
    * second request that identifies this guest only.
    */
   useEffect(() => {
+    if (preview) return;
     let cancelled = false;
     void fetchMyHolds(registry.slug).then((result) => {
       if (cancelled || !result.ok) return;
@@ -271,7 +281,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
     return () => {
       cancelled = true;
     };
-  }, [registry.slug, registry]);
+  }, [registry.slug, registry, preview]);
 
   const shown = useMemo(
     () => items.filter((item) => matchesFilter(item, filter, Boolean(holds[item.id]))),
@@ -292,6 +302,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
   };
 
   const openItem = (item: PublicItem) => {
+    if (preview) return;
     const mine = holds[item.id];
     if (mine && item.claimState !== "purchased") {
       // Dismissing G5 kept the hold. Tapping the card asks the question again.
@@ -370,10 +381,15 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
    */
   const abandonHold = async (itemId: string, reservationId: string | null) => {
     setSheet(null);
-    forgetHold(itemId);
     dropPatch(itemId);
-    if (!reservationId) return;
+    if (!reservationId) {
+      // The POST is still in flight. Tell reserve() to throw the unit back
+      // when it lands, instead of keeping a hold nobody asked to keep.
+      pendingRelease.current.add(itemId);
+      return;
+    }
 
+    forgetHold(itemId);
     await releaseReservation(registry.slug, reservationId);
     router.refresh();
   };
@@ -412,10 +428,10 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
   /**
    * Open the D13 reveal, and only then ask the API for the handle.
    *
-   * The couple's Bit number is not in the page payload, so seeing it takes this
-   * deliberate second request. If the couple never set one there is nothing to
-   * show and nowhere to send money, so the sheet closes rather than sitting
-   * there empty.
+   * The couple's payment numbers are not in the page payload, so seeing them
+   * takes this deliberate second request. If the couple never set one there
+   * is nothing to show and nowhere to send money, so the sheet closes rather
+   * than sitting there empty.
    */
   const revealHandle = async (item: PublicItem, amountAgorot: number) => {
     setHandle(null);
@@ -486,7 +502,11 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
   return (
     <>
       <div className="mt-6">
-        <div className="sticky top-0 z-20 flex flex-col gap-2 border-b border-border bg-bg px-5 pb-3 pt-3">
+        <div
+          className={`sticky z-20 flex flex-col gap-2 border-b border-border bg-bg/80 px-5 pb-3 pt-3 backdrop-blur-sm ${
+            preview ? "top-12" : "top-0"
+          }`}
+        >
           <p className="text-small font-medium text-ink-muted">{registry.coupleNames}</p>
           {/* Carousels and chip rows start at the rightmost item (PRD section 8),
               which is what the inline start gives us in RTL. */}
@@ -501,7 +521,7 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
                   aria-pressed={active}
                   className={`shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-small font-medium transition-colors ${
                     active
-                      ? "border border-primary bg-primary text-white"
+                      ? "border border-accent bg-accent text-on-accent"
                       : "border border-border bg-surface text-ink"
                   }`}
                 >
@@ -513,8 +533,8 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
         </div>
 
         {allProductsClaimed && (
-          <div className="mx-4 mt-4 rounded-card bg-primary-tint p-4 text-center">
-            <p className="text-small font-medium text-primary">
+          <div className="mx-4 mt-4 rounded-card bg-accent-tint p-4 text-center">
+            <p className="text-small font-medium text-accent-ink">
               {copy.grid.fullyClaimed}
             </p>
           </div>
@@ -532,7 +552,12 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
                   featured
                 />
               ) : (
-                <MoneyCard item={singleItem} onClick={() => openItem(singleItem)} />
+                <MoneyCard
+                  item={singleItem}
+                  hasBit={registry.hasBit}
+                  hasPaybox={registry.hasPaybox}
+                  onClick={() => openItem(singleItem)}
+                />
               )}
             </div>
           </div>
@@ -551,7 +576,13 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
                   onClick={() => openItem(item)}
                 />
               ) : (
-                <MoneyCard key={item.id} item={item} onClick={() => openItem(item)} />
+                <MoneyCard
+                  key={item.id}
+                  item={item}
+                  hasBit={registry.hasBit}
+                  hasPaybox={registry.hasPaybox}
+                  onClick={() => openItem(item)}
+                />
               ),
             )}
           </div>
@@ -631,6 +662,8 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
           return (
             <CashVoucherSheet
               item={item}
+              hasBit={registry.hasBit}
+              hasPaybox={registry.hasPaybox}
               onClose={closeSheet}
               onSend={(agorot) => {
                 // A voucher is bought at the chain, so there is no amount for us
@@ -659,9 +692,8 @@ export function RegistryClient({ registry }: { registry: PublicRegistry }) {
               pending={sending}
               onClose={closeSheet}
               onSent={() => void recordContribution(itemId, amountAgorot)}
-              onCopy={() => {
-                if (!handle) return;
-                void navigator.clipboard?.writeText(handle.handle);
+              onCopy={(digits) => {
+                void navigator.clipboard?.writeText(digits);
                 showToast(copy.contact.copied);
               }}
             />

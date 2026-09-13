@@ -3,27 +3,39 @@
 /* Design tokens: PRD section 9. This block is the only place a colour, radius
    or type size is defined. A hex literal anywhere under src/components is a bug. */
 @theme {
-  --color-bg: #fdfcfa;
-  --color-surface: #ffffff;
-  --color-ink: #1f1d1b;
-  --color-ink-muted: #6b6560;
-  --color-primary: #2f6f62;
-  --color-accent: #e5a24b;
+  --color-bg: #fbf6f4;
+  --color-surface: #fffcfb;
+  --color-ink: #2a2528;
+  --color-ink-muted: #6a6366;
+  --color-primary: #ffb6c1;
+  --color-primary-hover: #dfa0aa;
+  --color-primary-active: #d0969f;
+  --color-on-primary: #2a2528;
+  /* Dark rose for primary *text* on paper. The fill itself is too light. */
+  --color-primary-ink: #7a3f54;
+  --color-accent: #a2cffe;
+  --color-accent-hover: #90b6de;
+  --color-accent-active: #88aacf;
+  --color-on-accent: #2a2528;
+  --color-accent-ink: #2e4a66;
   --color-success: #3e7d55;
+  --color-on-success: #ffffff;
   /* Only the couple ever sees this: a refused save, or the remove action. The
      guest surface states problems in words, never in red. */
   --color-danger: #a8443b;
-  --color-muted: #9a938c;
-  --color-border: #e8e3dc;
+  --color-muted: #8a8588;
+  --color-border: #e8dde0;
 
   /* Tints derived from the palette, used for badge and panel fills. */
-  --color-primary-tint: #eaf1ef;
-  --color-accent-tint: #fbf1e2;
-  --color-accent-ink: #b47420;
-  --color-neutral-tint: #f4f1ec;
-  --color-panel: #f6f4f0;
-  --color-image-bg: #f1ece4;
-  --color-meter-track: #f1ece4;
+  --color-primary-tint: #fff0f3;
+  --color-accent-tint: #eef5fc;
+  --color-neutral-tint: #f4eef0;
+  --color-panel: #f7f1f2;
+  --color-image-bg: #f3eaec;
+  --color-meter-track: #e4eaf3;
+
+  --color-wash-blush: #ffb6c1;
+  --color-wash-sky: #a2cffe;
 
   --radius-card: 16px;
   --radius-btn: 12px;
@@ -61,12 +73,42 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+input[type="checkbox"],
+input[type="radio"] {
+  accent-color: var(--color-primary-ink);
+}
+
 /* Prices, phone numbers and Latin brand tokens are LTR runs inside RTL text
    and must never break across lines (PRD section 8). */
 .ltr-token {
   direction: ltr;
   unicode-bidi: isolate;
   white-space: nowrap;
+}
+
+/* Dual unisex wash. Blush at the inline start (visual right in RTL), sky
+   opposite, so neither pastel owns the page. Guest paper is full strength;
+   the editor uses the quieter recipe so the guest surface stays the pretty one. */
+.paper-wash {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse 90% 50% at 100% -8%, color-mix(in srgb, var(--color-wash-blush) 52%, transparent), transparent 60%),
+    radial-gradient(ellipse 80% 48% at -8% 108%, color-mix(in srgb, var(--color-wash-sky) 52%, transparent), transparent 58%);
+}
+
+.paper-wash-quiet {
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse 90% 45% at 100% -8%, color-mix(in srgb, var(--color-wash-blush) 28%, transparent), transparent 58%),
+    radial-gradient(ellipse 70% 40% at -10% 108%, color-mix(in srgb, var(--color-wash-sky) 28%, transparent), transparent 55%);
+}
+
+.editor-wash {
+  /* Alias while screens move to paper-wash-quiet. */
+  background-color: var(--color-bg);
+  background-image:
+    radial-gradient(ellipse 90% 45% at 100% -8%, color-mix(in srgb, var(--color-wash-blush) 28%, transparent), transparent 58%),
+    radial-gradient(ellipse 70% 40% at -10% 108%, color-mix(in srgb, var(--color-wash-sky) 28%, transparent), transparent 55%);
 }
 
 .hide-scroll {

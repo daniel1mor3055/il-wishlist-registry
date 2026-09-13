@@ -94,14 +94,22 @@ class BlessingRequest(BaseModel):
         return self
 
 
-class PaymentHandleView(BaseModel):
-    """The D13 reveal. Never part of `PublicRegistry`, only ever this endpoint."""
+class PaymentRailView(BaseModel):
+    """One live rail on the D13 reveal. Never part of `PublicRegistry`."""
 
     model_config = WireModel
 
     method: Literal["bit", "paybox"]
     handle: str
     display_name: str
+
+
+class PaymentHandleView(BaseModel):
+    """The D13 reveal. Never part of `PublicRegistry`, only ever this endpoint."""
+
+    model_config = WireModel
+
+    rails: list[PaymentRailView]
 
 
 class ShippingAddressView(BaseModel):

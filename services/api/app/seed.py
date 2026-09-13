@@ -167,8 +167,8 @@ def seed_demo_registries(session: Session) -> int:
             baby_name=row["baby_name"],
             published_at=now if row["published"] else None,
             closed_at=now if row["closed"] else None,
-            payment_method=row["payment_method"],
-            payment_handle=row["payment_handle"],
+            bit_handle=row.get("bit_handle"),
+            paybox_handle=row.get("paybox_handle"),
             payment_display_name=row["payment_display_name"],
         )
         session.add(registry)

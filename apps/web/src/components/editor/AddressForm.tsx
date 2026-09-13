@@ -65,7 +65,11 @@ export function AddressForm({
       <AddressFields value={value} onChange={setValue} showIntro={false} />
       <div className="mt-auto flex flex-col gap-2 pt-4">
         <FormError message={error} />
-        {saved && <p className="text-small text-success">{copy.editor.address.saved}</p>}
+        {saved && (
+          <p role="status" className="text-small text-success">
+            {copy.editor.address.saved}
+          </p>
+        )}
         <PrimaryButton onClick={save} disabled={pending}>
           {pending ? copy.editor.address.saving : copy.editor.address.save}
         </PrimaryButton>

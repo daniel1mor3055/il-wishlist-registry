@@ -20,7 +20,7 @@ export function RegistryShell({
   children?: React.ReactNode;
 }) {
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col items-center justify-center gap-4 bg-bg px-6 text-center">
+    <main className="paper-wash mx-auto flex min-h-dvh w-full max-w-[430px] flex-col items-center justify-center gap-4 px-6 text-center">
       <div className="flex flex-col gap-3 rounded-card border border-border bg-surface p-6">
         <p className="text-h3 font-bold text-ink">{message}</p>
         {detail && <p className="text-small text-ink-muted">{detail}</p>}

@@ -62,7 +62,7 @@ export default async function RegistryPage({ params }: Props) {
   }
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-bg">
+    <main className="paper-wash mx-auto flex min-h-dvh w-full max-w-[430px] flex-col">
       <Hero registry={registry} />
       <HowItWorks />
 
@@ -72,7 +72,7 @@ export default async function RegistryPage({ params }: Props) {
               costs no client JavaScript. */}
           <a
             href="#list"
-            className="block w-full rounded-btn bg-primary py-3.5 text-center text-body font-medium text-white transition-opacity active:opacity-80"
+            className="block w-full rounded-btn bg-primary py-3.5 text-center text-body font-medium text-on-primary hover:bg-primary-hover active:bg-primary-active"
           >
             {copy.hero.cta}
           </a>

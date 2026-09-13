@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { patchItem, removeItem } from "@/app/editor/actions";
-import { Field, FormError, inputClass } from "@/components/editor/EditorShell";
+import { Field, FormError, inputClass, ViewOnSiteLink } from "@/components/editor/EditorShell";
 import { PrimaryButton } from "@/components/primitives/Buttons";
 import { GROUP_GIFT_HINT_AGOROT, copy } from "@/lib/copy";
 import { formatAgorot } from "@/lib/money";
@@ -28,10 +28,12 @@ export function ItemSettings({ item }: { item: OwnerItem }) {
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
   const [removing, startRemoving] = useTransition();
+  const [confirming, setConfirming] = useState(false);
 
   const isProduct = item.kind === "product";
   const hasMoney = item.contributedAgorot > 0;
   const claimed = item.quantityClaimed;
+  const hasHistory = claimed > 0 || hasMoney;
   const expensive =
     item.priceAgorot !== null && item.priceAgorot >= GROUP_GIFT_HINT_AGOROT;
 
@@ -59,6 +61,14 @@ export function ItemSettings({ item }: { item: OwnerItem }) {
           className={inputClass}
         />
       </Field>
+
+      {isProduct && item.canonicalUrl && (
+        <ViewOnSiteLink
+          href={item.canonicalUrl}
+          chain={item.chainNameHe}
+          size="small"
+        />
+      )}
 
       <Field
         label={copy.editor.itemSettings.noteLabel}
@@ -133,25 +143,67 @@ export function ItemSettings({ item }: { item: OwnerItem }) {
           {pending ? copy.editor.itemSettings.saving : copy.editor.itemSettings.save}
         </PrimaryButton>
 
-        <button
-          type="button"
-          disabled={removing}
-          onClick={() => {
-            if (!window.confirm(copy.editor.itemSettings.removeConfirm)) return;
-            startRemoving(async () => {
-              const result = await removeItem(item.id);
-              if (result.ok) router.push("/editor");
-              else setError(result.error);
-            });
-          }}
-          className="py-2 text-center text-small font-medium text-danger transition-opacity active:opacity-70 disabled:opacity-50"
-        >
-          {copy.editor.itemSettings.remove}
-        </button>
-        {claimed > 0 && (
-          <p className="text-tiny text-ink-muted">
-            {copy.editor.itemSettings.removeTaken}
-          </p>
+        {isProduct && !confirming && (
+          <>
+            <button
+              type="button"
+              disabled={removing}
+              onClick={() => setConfirming(true)}
+              className="py-2 text-center text-small font-medium text-danger transition-opacity active:opacity-70 disabled:opacity-50"
+            >
+              {copy.editor.itemSettings.remove}
+            </button>
+            {claimed > 0 && (
+              <p className="text-tiny text-ink-muted">
+                {copy.editor.itemSettings.removeTaken}
+              </p>
+            )}
+            {claimed === 0 && hasMoney && (
+              <p className="text-tiny text-ink-muted">
+                {copy.editor.itemSettings.removeContributed}
+              </p>
+            )}
+          </>
+        )}
+
+        {isProduct && confirming && (
+          <div className="flex flex-col gap-2">
+            <p className="text-small text-ink">
+              {claimed > 0
+                ? copy.editor.itemSettings.removeTaken
+                : hasMoney
+                  ? copy.editor.itemSettings.removeContributed
+                  : copy.editor.itemSettings.removeConfirm}
+            </p>
+            <button
+              type="button"
+              disabled={removing}
+              onClick={() =>
+                startRemoving(async () => {
+                  setError(null);
+                  const result = await removeItem(item.id);
+                  if (result.ok) router.push("/editor");
+                  else {
+                    setError(result.error);
+                    setConfirming(false);
+                  }
+                })
+              }
+              className="py-2 text-center text-small font-medium text-danger transition-opacity active:opacity-70 disabled:opacity-50"
+            >
+              {hasHistory
+                ? copy.editor.itemSettings.removeConfirmTaken
+                : copy.editor.itemSettings.remove}
+            </button>
+            <button
+              type="button"
+              disabled={removing}
+              onClick={() => setConfirming(false)}
+              className="py-2 text-center text-small font-medium text-ink-muted transition-opacity active:opacity-70 disabled:opacity-50"
+            >
+              {copy.editor.itemSettings.removeCancel}
+            </button>
+          </div>
         )}
       </div>
     </div>

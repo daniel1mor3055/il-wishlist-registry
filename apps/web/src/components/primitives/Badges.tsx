@@ -9,8 +9,8 @@ export function Pill({
   const tones = {
     neutral: "bg-neutral-tint text-ink-muted",
     bordered: "bg-neutral-tint text-ink-muted border border-border",
-    muted: "bg-muted text-white",
-    primary: "bg-primary text-white",
+    muted: "bg-neutral-tint text-ink-muted",
+    primary: "bg-primary text-on-primary",
   } as const;
   return (
     <span

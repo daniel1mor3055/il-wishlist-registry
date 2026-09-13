@@ -78,7 +78,7 @@ Taken while implementing C3. These are implementation decisions, small enough th
 | D34 | A closed registry refuses new holds and still accepts reports | A guest holding a unit must always be able to say what happened to it, or a couple who closes their list freezes the ledger mid-truth. Closing stops new holds only. | LOCKED |
 | D35 | An explicit "לא רכשתי" releases the hold; dismissing the question keeps it | Taken with the human after using C3. The report modal's second option used to read `עוד לא` and keep the item locked, which is indefensible without a timer: a guest who decided not to buy could strand the best item on the list until the couple noticed. The button now says what it does — `לא רכשתי, לשחרר את הפריט` — and the guest who is genuinely mid-purchase does not answer this question at all, they dismiss it, which is stated on the modal. The holder then sees `שמור לך` and can tap the card to reopen the question; every other guest sees `כבר נתפס`. Supersedes the PRD's original `עוד לא keeps the item reserved`. | LOCKED |
 | D36 | "למי להגיד תודה?" is asked once, at the end | It was on the handoff sheet *and* the blessing sheet, so a guest who typed their name on the way out was asked again on the way back. It stays on the blessing sheet only: on the way out the guest is trying to leave for the shop, and on the way back they have a reason to be typing. | LOCKED |
-| D37 | The cash envelope is titled `חיבוק בביט / פייבוקס 💛` | A Hebrew `מעטפה` is a physical thing you hand over at a wedding, and `מעטפה לנועה ואיתי` read as an object addressed to someone. The title now names the two apps the money actually travels through, and the subtitle drops to `כל סכום, ישירות אלינו`. `מעטפה` survives as the verb phrase elsewhere (`לשלוח מעטפה במקום`), which is the ordinary Hebrew idiom for giving cash. | LOCKED |
+| D37 | The cash gift is titled as a `חיבוק`, never a `מעטפה` | A Hebrew `מעטפה` is the paper wrapper you hand over at a wedding, not the gift. The gift itself is a `שי` — the cash people give at a brit. The tile names whichever apps currently have a number (`חיבוק בביט 💛`, `חיבוק בפייבוקס 💛`, `חיבוק בביט / פייבוקס 💛`, or `חיבוק 💛` when neither) (D50); the subtitle is `כל סכום, ישירות אלינו`. Everywhere else the couple and guest talk about this option, the word is `שי` (`לתת שי`, `להוסיף שי`), never `מעטפה`. | LOCKED |
 
 One thing C3 measured rather than assumed: regressing the reserve path to a read-then-write and re-running the concurrency tests, the two-guest race still passed - the threads did not overlap - while six guests on two units produced five winners. A small race is a timing coincidence; the crowd is the test that detects an oversell. Noted in `tests/test_reserve_race.py` so nobody trims it.
 
@@ -130,6 +130,15 @@ not already know where to send the box.
 | # | Decision | Detail | Status |
 |---|---|---|---|
 | D49 | Shipping address is a D13-style reveal, not a shipping product | Guests still buy at the chain. The couple may optionally store a street, entrance, floor, apartment, postal code and a free-text note so a guest on the product handoff can copy them. City stays the public caption it already is (`תל אביב · נשלח אחרי הלידה`). כניסה, קומה and דירה are three fields; `הערות נוספות` is for the building that does not fit those three. The street is absent from the public payload and is fetched only when the guest taps `צריכים את כתובת המשלוח של…`, and the sheet says the address does not transfer into the shop. Presence is a boolean (`hasShippingAddress`) so a list with no street does not offer a dead link. We still never ship, track, or collect a guest address. | LOCKED |
+
+## Locked, round nine (independent money rails)
+
+Taken while the couple was testing C6. Bit and PayBox are two ways of sending
+a שי, not a choice of one app.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D50 | Bit and PayBox are two rails from one Israeli mobile | Guests may send in Bit, PayBox, or either. The schema keeps `bit_handle` and `paybox_handle` so a reveal can list live rails; the public payload carries only `hasBit` / `hasPaybox`. The D13 reveal is still one GET `/payment-handle` (D41) and answers `{ rails: [{ method, handle, displayName }] }`. The editor does not XOR the apps and does not treat an empty field as an off switch: one phone and a display name, the שי checkbox enables the cash tile, and save writes that number to both columns. Contributions do not record which app was used. | LOCKED |
 
 ## Target retailers
 

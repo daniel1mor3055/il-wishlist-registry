@@ -3,7 +3,7 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { addCatalogItem, addManualItem } from "@/app/editor/actions";
-import { Field, FormError, inputClass } from "@/components/editor/EditorShell";
+import { Field, FormError, inputClass, ViewOnSiteLink } from "@/components/editor/EditorShell";
 import { PrimaryButton } from "@/components/primitives/Buttons";
 import { ItemImage } from "@/components/primitives/ItemImage";
 import { Price } from "@/components/primitives/Price";
@@ -89,7 +89,7 @@ function Tab({
       aria-pressed={active}
       onClick={onClick}
       className={`flex-1 rounded-btn py-2 text-small font-medium transition-colors ${
-        active ? "bg-primary text-white" : "bg-neutral-tint text-ink-muted"
+        active ? "bg-accent text-on-accent" : "bg-neutral-tint text-ink-muted"
       }`}
     >
       {children}
@@ -129,7 +129,7 @@ function SearchTab({
         />
         <button
           type="submit"
-          className="shrink-0 rounded-btn bg-primary px-4 text-small font-medium text-white"
+          className="shrink-0 rounded-btn bg-primary px-4 text-small font-medium text-on-primary hover:bg-primary-hover active:bg-primary-active"
         >
           {copy.editor.add.search}
         </button>
@@ -144,8 +144,8 @@ function SearchTab({
               type="button"
               aria-pressed={on}
               onClick={() => onCategory(on ? null : one)}
-              className={`shrink-0 rounded-full px-3.5 py-1.5 text-tiny font-medium transition-colors ${
-                on ? "bg-primary text-white" : "border border-border bg-surface text-ink"
+              className={`h-9 shrink-0 whitespace-nowrap rounded-btn px-3.5 text-small font-medium transition-colors ${
+                on ? "bg-accent text-on-accent" : "bg-neutral-tint text-ink"
               }`}
             >
               {CATEGORY_LABELS[one]}
@@ -180,7 +180,7 @@ function ResultRow({ result }: { result: CatalogResult }) {
   const [pending, startTransition] = useTransition();
 
   return (
-    <li className="flex items-center gap-3 rounded-card border border-border bg-surface p-2.5">
+    <li className="flex items-start gap-3 rounded-card border border-border bg-surface p-2.5">
       <span className="relative h-14 w-14 shrink-0 overflow-hidden rounded-btn bg-image-bg">
         <ItemImage
           src={result.imageUrl}
@@ -199,6 +199,7 @@ function ResultRow({ result }: { result: CatalogResult }) {
           <Price agorot={result.priceAgorot} />
           <span className="text-tiny text-ink-muted">{result.chainNameHe}</span>
         </span>
+        <ViewOnSiteLink href={result.canonicalUrl} chain={result.chainNameHe} />
         <FormError message={error} />
       </span>
 
@@ -214,7 +215,7 @@ function ResultRow({ result }: { result: CatalogResult }) {
           })
         }
         className={`shrink-0 rounded-full px-3.5 py-1.5 text-tiny font-medium transition-colors disabled:opacity-60 ${
-          added ? "bg-success text-white" : "bg-primary text-white"
+          added ? "bg-success text-on-success" : "bg-primary text-on-primary"
         }`}
       >
         {added ? copy.editor.add.added : copy.editor.add.addThis}
@@ -285,10 +286,8 @@ function ManualTab() {
                 type="button"
                 aria-pressed={on}
                 onClick={() => setCategory(on ? null : one)}
-                className={`rounded-full px-3.5 py-1.5 text-tiny font-medium transition-colors ${
-                  on
-                    ? "bg-primary text-white"
-                    : "border border-border bg-surface text-ink"
+                className={`h-9 rounded-btn px-3.5 text-small font-medium transition-colors ${
+                  on ? "bg-accent text-on-accent" : "bg-neutral-tint text-ink"
                 }`}
               >
                 {CATEGORY_LABELS[one]}

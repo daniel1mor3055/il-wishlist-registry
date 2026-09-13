@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { copy } from "@/lib/copy";
 
 /**
  * The frame every editor screen sits in.
@@ -20,8 +21,8 @@ export function EditorShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col bg-bg">
-      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-surface px-4 py-3">
+    <main className="paper-wash-quiet mx-auto flex min-h-dvh w-full max-w-[430px] flex-col">
+      <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-border bg-surface/90 px-4 py-3 backdrop-blur-sm">
         {back && (
           <Link
             href={back}
@@ -47,7 +48,7 @@ export function EditorShell({
           </Link>
         )}
         <h1 className="flex-1 truncate text-body font-bold text-ink">{title}</h1>
-        {action}
+        {action && <div className="-me-1 flex shrink-0 items-center">{action}</div>}
       </header>
 
       <div className="flex flex-1 flex-col px-4 py-4">{children}</div>
@@ -85,3 +86,48 @@ export function Field({
 
 export const inputClass =
   "w-full rounded-btn border border-border bg-surface px-3 py-2.5 text-body text-ink outline-none transition-colors focus:border-primary";
+
+/** Opens the shop listing in a new tab. Inspect, not the G4 purchase handoff. */
+export function ViewOnSiteLink({
+  href,
+  chain,
+  size = "tiny",
+}: {
+  href: string;
+  chain: string | null;
+  size?: "tiny" | "small";
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`inline-flex min-h-11 items-center font-medium text-primary-ink underline decoration-primary-ink/40 underline-offset-4 transition-opacity active:opacity-70 ${
+        size === "tiny" ? "text-tiny" : "text-small"
+      }`}
+    >
+      {copy.editor.viewOnSite(chain)}
+    </a>
+  );
+}
+
+/** Header END actions. Same hit target as the back chevron. */
+export function EditorIconLink({
+  href,
+  label,
+  children,
+}: {
+  href: string;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <Link
+      href={href}
+      aria-label={label}
+      className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink-muted transition-colors hover:bg-neutral-tint"
+    >
+      {children}
+    </Link>
+  );
+}

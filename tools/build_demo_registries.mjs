@@ -80,12 +80,12 @@ function productItem(source, overrides = {}) {
  *
  * "חיבוק" rather than "מעטפה": a Hebrew envelope is what you hand over at a
  * wedding, and this is neither an object nor addressed to anyone. The title
- * names the two apps the money actually travels through.
+ * stored title is rail-agnostic; the guest tile names whichever apps have a number.
  */
 function envelopeItem(overrides = {}) {
   return {
     kind: "fund",
-    title: "חיבוק בביט / פייבוקס 💛",
+    title: "חיבוק 💛",
     source_title: null,
     note: null,
     category: null,
@@ -220,8 +220,8 @@ const main = {
   baby_name: "יעל",
   published: true,
   closed: false,
-  payment_method: "bit",
-  payment_handle: "050-123-4567",
+  bit_handle: "050-123-4567",
+  paybox_handle: null,
   payment_display_name: "נועה",
   items: mainItems,
 };

@@ -69,7 +69,6 @@ export type CreateInput = {
   shippingApartment: string | null;
   shippingNotes: string | null;
   shippingPostalCode: string | null;
-  starterCategories: string[];
   includeEnvelope: boolean;
 };
 
@@ -94,6 +93,11 @@ export type RegistryPatchInput = {
   shippingApartment?: string | null;
   shippingNotes?: string | null;
   shippingPostalCode?: string | null;
+  story?: string | null;
+  coverImageUrl?: string | null;
+  bitHandle?: string | null;
+  payboxHandle?: string | null;
+  paymentDisplayName?: string | null;
 };
 
 export async function patchRegistry(patch: RegistryPatchInput): Promise<ActionResult> {
@@ -107,6 +111,8 @@ export async function patchRegistry(patch: RegistryPatchInput): Promise<ActionRe
   }
   revalidatePath("/editor");
   revalidatePath("/editor/address");
+  revalidatePath("/editor/payment");
+  revalidatePath("/editor/story");
   return { ok: true, data: undefined };
 }
 
@@ -123,6 +129,21 @@ export async function addEnvelope(): Promise<ActionResult> {
   const result = await ownerFetch<OwnerItem>("/me/registry/envelope", { method: "POST" });
   if (!result.ok) return failed(result.code);
   revalidatePath("/editor");
+  revalidatePath("/editor/payment");
+  return { ok: true, data: undefined };
+}
+
+export async function addVoucher(chainSlug: string): Promise<ActionResult> {
+  const result = await ownerFetch<OwnerItem>("/me/registry/vouchers", {
+    method: "POST",
+    body: JSON.stringify({ chainSlug }),
+  });
+  if (!result.ok) {
+    if (result.status === 401) redirect("/editor/enter");
+    return failed(result.code);
+  }
+  revalidatePath("/editor");
+  revalidatePath("/editor/payment");
   return { ok: true, data: undefined };
 }
 
@@ -183,5 +204,6 @@ export async function removeItem(itemId: string): Promise<ActionResult> {
   });
   if (!result.ok) return failed(result.code);
   revalidatePath("/editor");
+  revalidatePath("/editor/payment");
   return { ok: true, data: undefined };
 }

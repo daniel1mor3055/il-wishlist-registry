@@ -76,12 +76,15 @@ The magic-link session is an `HttpOnly` cookie set by the Next route handler, pe
 
 | PRD token | `@theme` variable | Utility |
 |---|---|---|
-| Background `#FDFCFA` | `--color-bg` | `bg-bg` |
-| Surface `#FFFFFF` | `--color-surface` | `bg-surface` |
-| Ink `#1F1D1B` | `--color-ink` | `text-ink` |
-| Ink muted `#6B6560` | `--color-ink-muted` | `text-ink-muted` |
-| Primary `#2F6F62` | `--color-primary` | `bg-primary` |
-| Accent `#E5A24B` | `--color-accent` | `bg-accent` |
+| Background `#FBF6F4` | `--color-bg` | `bg-bg` |
+| Surface `#FFFCFB` | `--color-surface` | `bg-surface` |
+| Ink `#2A2528` | `--color-ink` | `text-ink` |
+| Ink muted `#6A6366` | `--color-ink-muted` | `text-ink-muted` |
+| Primary `#FFB6C1` | `--color-primary` | `bg-primary` — commitment CTAs |
+| On-primary `#2A2528` | `--color-on-primary` | `text-on-primary` |
+| Primary ink `#7A3F54` | `--color-primary-ink` | `text-primary-ink` |
+| Accent `#A2CFFE` | `--color-accent` | `bg-accent` — selected chips, meters, envelope |
+| On-accent `#2A2528` | `--color-on-accent` | `text-on-accent` |
 | Success `#3E7D55` | `--color-success` | `text-success` |
 | Muted `#9A938C` | `--color-muted` | `text-muted` |
 | Border `#E8E3DC` | `--color-border` | `border-border` |

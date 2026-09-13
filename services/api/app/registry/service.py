@@ -71,5 +71,7 @@ def get_public_registry(session: Session, slug: str) -> PublicRegistry | None:
         items_total=len(products),
         items_claimed=sum(1 for item in products if item.claim_state != "available"),
         has_shipping_address=bool((registry.shipping_street or "").strip()),
+        has_bit=bool((registry.bit_handle or "").strip()),
+        has_paybox=bool((registry.paybox_handle or "").strip()),
         items=[to_public_item(item) for item in items],
     )

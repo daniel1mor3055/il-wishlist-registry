@@ -39,7 +39,7 @@ Add a single-item state: one full-width hero card instead of a two-column grid.
 ```
 
 ```
-Add a fully-claimed banner above the grid: "כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה".
+Add a fully-claimed banner above the grid: "כל הפריטים ברשימה נתפסו. אפשר עוד לתת שי".
 ```
 
 ```

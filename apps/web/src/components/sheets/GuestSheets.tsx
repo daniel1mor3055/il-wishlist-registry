@@ -168,7 +168,7 @@ export function HandoffSheet({
       }
     >
       <div className="flex flex-col gap-4 pt-2">
-        <div className="grid h-12 w-12 place-items-center rounded-full bg-primary-tint">
+        <div className="grid h-12 w-12 place-items-center rounded-full bg-primary-tint text-primary-ink">
           <CheckMark />
         </div>
         <h2 id="handoff-title" className="text-h2 font-bold text-ink">
@@ -217,7 +217,7 @@ function ShippingAddressReveal({
         type="button"
         onClick={() => void reveal()}
         disabled={loading}
-        className="text-right text-small font-medium text-primary underline decoration-primary/40 underline-offset-4 transition-opacity active:opacity-70 disabled:opacity-60"
+        className="text-right text-small font-medium text-primary-ink underline decoration-primary-ink/40 underline-offset-4 transition-opacity active:opacity-70 disabled:opacity-60"
       >
         {loading ? copy.handoff.addressLoading : copy.handoff.needAddress(coupleNames)}
       </button>
@@ -248,7 +248,7 @@ function ShippingAddressReveal({
             void navigator.clipboard?.writeText(address.copyText);
             setCopied(true);
           }}
-          className="shrink-0 rounded-[10px] bg-primary px-3 py-1.5 text-small font-medium text-white transition-opacity active:opacity-80"
+          className="shrink-0 rounded-[10px] bg-primary px-3 py-1.5 text-small font-medium text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active"
         >
           {copied ? copy.handoff.copiedAddress : copy.handoff.copyAddress}
         </button>
@@ -384,10 +384,14 @@ export function GroupGiftSheet({
 /** G7. The cash envelope, or a voucher. */
 export function CashVoucherSheet({
   item,
+  hasBit,
+  hasPaybox,
   onClose,
   onSend,
 }: {
   item: PublicItem;
+  hasBit: boolean;
+  hasPaybox: boolean;
   onClose: () => void;
   /** Agorot for the envelope, null for a voucher, whose amount is set at the chain. */
   onSend: (agorot: number | null) => void;
@@ -427,13 +431,13 @@ export function CashVoucherSheet({
       labelledBy="fund-title"
       cta={
         <PrimaryButton onClick={() => onSend(amount)} disabled={amount === null}>
-          {copy.fund.sendViaBit}
+          {copy.fund.send(hasBit, hasPaybox)}
         </PrimaryButton>
       }
     >
       <div className="flex flex-col gap-4 pt-1">
         <h2 id="fund-title" className="text-h2 font-bold text-ink">
-          {item.title}
+          {copy.fund.tile(hasBit, hasPaybox)}
         </h2>
         {item.subtitle && <p className="text-small text-ink-muted">{item.subtitle}</p>}
 
@@ -485,15 +489,19 @@ export function ContactRevealSheet({
   pending: boolean;
   onClose: () => void;
   onSent: () => void;
-  onCopy: () => void;
+  onCopy: (digits: string) => void;
 }) {
+  const rails = handle?.rails ?? [];
+  const hasBit = rails.some((rail) => rail.method === "bit");
+  const hasPaybox = rails.some((rail) => rail.method === "paybox");
+
   return (
     <Sheet
       onClose={onClose}
       labelledBy="contact-title"
       cta={
         <div className="flex flex-col items-center gap-2">
-          <PrimaryButton onClick={onSent} disabled={!handle || pending}>
+          <PrimaryButton onClick={onSent} disabled={!handle || rails.length === 0 || pending}>
             {copy.contact.sent}
           </PrimaryButton>
           <TextButton onClick={onClose}>{copy.contact.notSent}</TextButton>
@@ -504,32 +512,30 @@ export function ContactRevealSheet({
         <h2 id="contact-title" className="text-h2 font-bold text-ink">
           {copy.contact.title(coupleNames)}
         </h2>
-        {/* The one place the product states plainly that it takes no money. */}
-        <p className="text-small text-ink">{copy.contact.body}</p>
+        <p className="text-small text-ink">{copy.contact.bodyFor(hasBit, hasPaybox)}</p>
 
-        <div className="flex flex-col gap-1.5">
-          <div className="flex items-center justify-between rounded-btn border border-border bg-panel px-4 py-3.5">
-            <span className="ltr-token text-h3 font-bold text-ink">
-              {handle ? handle.handle : copy.contact.loading}
-            </span>
-            <button
-              type="button"
-              onClick={onCopy}
-              disabled={!handle}
-              className="shrink-0 rounded-[10px] bg-primary px-3 py-1.5 text-small font-medium text-white transition-opacity active:opacity-80 disabled:opacity-40"
-            >
-              {copy.contact.copy}
-            </button>
-          </div>
-          {handle && (
-            <p className="text-small text-ink-muted">
-              {copy.contact.handleLabel(handle.displayName)}
-            </p>
-          )}
-        </div>
+        {rails.length === 0 ? (
+          <p className="text-small text-ink-muted">{copy.contact.loading}</p>
+        ) : (
+          rails.map((rail) => (
+            <div key={rail.method} className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between rounded-btn border border-border bg-panel px-4 py-3.5">
+                <span className="ltr-token text-h3 font-bold text-ink">{rail.handle}</span>
+                <button
+                  type="button"
+                  onClick={() => onCopy(rail.handle)}
+                  className="shrink-0 rounded-[10px] bg-primary px-3 py-1.5 text-small font-medium text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active"
+                >
+                  {copy.contact.copy}
+                </button>
+              </div>
+              <p className="text-small text-ink-muted">
+                {copy.contact.handleLabel(rail.method, rail.displayName)}
+              </p>
+            </div>
+          ))
+        )}
 
-        {/* Restates the number the guest chose two sheets ago, because they are
-            about to type it into a different app from memory. */}
         <p className="text-small text-ink">
           {copy.contact.amountReminder} <InlineAmount agorot={amountAgorot} />
         </p>
@@ -611,7 +617,7 @@ export function ConfirmedSheet({
       cta={<SecondaryButton onClick={onClose}>{copy.confirmed.back}</SecondaryButton>}
     >
       <div className="flex flex-col items-center gap-4 py-6 text-center">
-        <div className="grid h-16 w-16 place-items-center rounded-full bg-primary-tint">
+        <div className="grid h-16 w-16 place-items-center rounded-full bg-primary-tint text-primary-ink">
           <CheckMark size={32} />
         </div>
         <h2 id="confirmed-title" className="text-h2 font-bold text-ink">

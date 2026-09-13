@@ -7,6 +7,7 @@
     POST   /me/registry/items/catalog   add from the seeded catalog
     POST   /me/registry/items/manual    add something the catalog lacks
     POST   /me/registry/envelope        add the envelope, if the wizard skipped it
+    POST   /me/registry/vouchers        add a chain gift-card type
     PATCH  /me/registry/items/{id}      item settings
     DELETE /me/registry/items/{id}      remove, or hide if a guest has acted
 
@@ -17,12 +18,13 @@ the only thing that says which registry this is.
 
 from uuid import UUID
 
-from fastapi import APIRouter, status
+from fastapi import APIRouter, Response, status
 
 from app.deps import CurrentCouple, DbSessionDep
 from app.registry.owner_schemas import (
     AddCatalogItemRequest,
     AddManualItemRequest,
+    AddVoucherRequest,
     CreateRegistryRequest,
     ItemPatch,
     OwnerItem,
@@ -33,6 +35,7 @@ from app.registry.owner_service import (
     add_catalog_item,
     add_envelope,
     add_manual_item,
+    add_voucher,
     create_registry,
     get_registry,
     patch_item,
@@ -111,6 +114,27 @@ def add_by_hand(
 )
 def add_the_envelope(couple: CurrentCouple, session: DbSessionDep) -> OwnerItem:
     return add_envelope(session, couple=couple)
+
+
+@router.post(
+    "/registry/vouchers",
+    response_model=OwnerItem,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        200: {"description": "This voucher type is already on the list"},
+        404: {"description": "Unknown voucher type, or no registry yet"},
+    },
+)
+def add_a_voucher(
+    body: AddVoucherRequest,
+    couple: CurrentCouple,
+    session: DbSessionDep,
+    response: Response,
+) -> OwnerItem:
+    item, created = add_voucher(session, couple=couple, body=body)
+    if not created:
+        response.status_code = status.HTTP_200_OK
+    return item
 
 
 @router.patch(

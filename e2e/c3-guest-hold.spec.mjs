@@ -63,4 +63,14 @@ test.describe("C3 guest hold", () => {
     await expect(page.getByText("שמור לך")).toBeVisible();
     await expect(page.getByText("כבר נתפס")).toHaveCount(0);
   });
+
+  test("releasing then holding again still opens the shop", async ({ page }) => {
+    await holdUntilHandoff(page);
+    await continueToReport(page);
+    await page.getByRole("button", { name: "לא רכשתי, לשחרר את הפריט" }).click();
+    await expect(page.locator(availableProduct)).toBeVisible();
+
+    await holdUntilHandoff(page);
+    await expect(page.getByRole("button", { name: /להמשיך לאתר/ })).toBeEnabled();
+  });
 });

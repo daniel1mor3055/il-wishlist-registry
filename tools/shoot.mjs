@@ -257,7 +257,7 @@ const SCENES = {
   /** The money tiles in the grid, where the envelope shows what it has collected. */
   "money-cards": [
     { goto: MAIN },
-    { text: "מעטפה ושוברים" },
+    { text: "שי ושוברים" },
     { wait: 400 },
     { scrollTo: "[data-testid='item-card'][data-kind='fund']" },
     { wait: 300 },
@@ -298,7 +298,7 @@ const SCENES = {
     { shot: "editor-home" },
   ],
   /**
-   * A couple who has never been here: three steps, a starter list, and the
+   * A couple who has never been here: two steps, default שי, and the
    * unpublished banner that is the only place D30's state is ever named.
    */
   "editor-wizard": [
@@ -315,13 +315,6 @@ const SCENES = {
     { wait: 300 },
     { require: "כתובת למשלוח" },
     { shot: "editor-wizard-address" },
-    { text: "הלאה" },
-    { wait: 300 },
-    { require: "מאיפה נתחיל?" },
-    { text: "ניידות" },
-    { text: "רחצה והחתלה" },
-    { wait: 200 },
-    { shot: "editor-wizard-starter" },
     { text: "ליצור את הרשימה" },
     { wait: 2500 },
     { require: "הרשימה עוד לא פורסמה" },

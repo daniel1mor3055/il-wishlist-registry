@@ -114,7 +114,7 @@ function Chip({
       aria-pressed={active}
       className={`rounded-full px-4 py-2 text-small font-medium transition-colors ${
         active
-          ? "border border-primary bg-primary text-white"
+          ? "border border-accent bg-accent text-on-accent"
           : "border border-border bg-surface text-ink"
       }`}
     >

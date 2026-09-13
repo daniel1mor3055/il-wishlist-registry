@@ -19,7 +19,7 @@ Angle: the schema and the invariants. `C1`-`C6` are implementation checkpoints; 
 | `couples` | identity | the account | `id`, `email` (unique, lowercased), `display_name` |
 | `magic_tokens` | identity | login | `token_hash`, `couple_id`, `expires_at`, `consumed_at` (single-use) |
 | `sessions` | identity | the session | `token_hash`, `couple_id`, `expires_at` |
-| `registries` | registry | the list | `id`, `couple_id`, `slug` (unique), `couple_names`, `story`, `cover_image`, `city`, `due_date`, `lifecycle` (`draft`/`published`/`post_birth`/`closed`), `baby_name`, `born_on`, `payment_method`, `payment_handle`, `payment_display_name` |
+| `registries` | registry | the list | `id`, `couple_id`, `slug` (unique), `couple_names`, `story`, `cover_image`, `city`, `due_date`, `lifecycle` (`draft`/`published`/`post_birth`/`closed`), `baby_name`, `born_on`, `bit_handle`, `paybox_handle`, `payment_display_name` |
 | `registry_items` | registry | one row per tile | `id`, `registry_id`, `kind` (`product`/`fund`/`voucher`), `position`, `title`, `note`, `priority`, `quantity_wanted`, `quantity_claimed`, `image_url`, `category`, `group_gift_enabled`, `target_agorot`, `contributed_agorot`, `is_active`, `out_of_stock`, plus catalog snapshot: `chain_slug`, `chain_name`, `external_id`, `canonical_url`, `price_agorot` |
 | `reservations` | gifting | a hold and its self-report | `id`, `item_id`, `registry_id`, `guest_token_hash`, `giver_name`, `status` (`held`/`purchased`/`released`), `created_at`, `reported_at`, `released_by` (`guest`/`couple`), `thanked_at` |
 | `contributions` | gifting | the ledger | `id`, `registry_id`, `item_id`, `guest_token_hash`, `giver_name`, `amount_agorot`, `declared_sent_at`, `created_at`, `thanked_at` |
@@ -83,7 +83,7 @@ Three layers, cheapest first, because the leak is silent and SSR puts the payloa
 2. **Separate response models**, per the architect brief. Contract-level.
 3. **A golden-key test** asserting the exact key set of the public payload, so a new column cannot appear by default.
 
-Layer 1 is one migration and is the only layer that is structural rather than a matter of remembering. `payment_handle` lives on `registries` but is excluded from any public view; it reaches a guest only through the reveal endpoint on explicit interaction (D13).
+Layer 1 is one migration and is the only layer that is structural rather than a matter of remembering. `bit_handle` and `paybox_handle` live on `registries` but are excluded from any public view; they reach a guest only through the reveal endpoint on explicit interaction (D13, D50).
 
 Blessings have no public read path at all — no endpoint, no view, no column. The submitting guest does not get their own blessing echoed back.
 

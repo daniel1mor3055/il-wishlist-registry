@@ -34,6 +34,7 @@ from app.registry.owner_schemas import (
     MAX_ITEMS,
     AddCatalogItemRequest,
     AddManualItemRequest,
+    AddVoucherRequest,
     CreateRegistryRequest,
     ItemPatch,
     OwnerItem,
@@ -42,12 +43,32 @@ from app.registry.owner_schemas import (
 )
 from app.registry.slug import build_slug
 
-#: The envelope the wizard offers, worded as D37 settled it.
-ENVELOPE_TITLE = "חיבוק בביט / פייבוקס 💛"
+#: Stored rail-agnostic. Guests and the editor title the tile from live rails
+#: in copy.ts (D37, D50).
+ENVELOPE_TITLE = "חיבוק 💛"
 ENVELOPE_SUBTITLE = "כל סכום, ישירות אלינו"
 
-#: How many catalog items a chosen starter category contributes.
-STARTER_PER_CATEGORY = 3
+#: Closed set of chain gift cards. Names and homepages from the catalog seed;
+#: shilav's URL is the gift-card path already on the demo registries.
+VOUCHER_CAPTION = "אתם בוחרים את הסכום באתר החנות"
+VOUCHER_TYPES: dict[str, dict[str, str]] = {
+    "shilav": {
+        "chain_name_he": "שילב",
+        "canonical_url": "https://www.shilav.co.il/products/gift-card",
+    },
+    "motsetsim": {
+        "chain_name_he": "מוצצים",
+        "canonical_url": "https://motsesim.co.il",
+    },
+    "agalis": {
+        "chain_name_he": "עגליס",
+        "canonical_url": "https://www.agalease-baby.co.il",
+    },
+    "baby-star": {
+        "chain_name_he": "בייבי סטאר",
+        "canonical_url": "https://www.baby-star.co.il",
+    },
+}
 
 SLUG_ATTEMPTS = 5
 
@@ -107,8 +128,8 @@ def to_owner_registry(registry: Registry) -> OwnerRegistry:
         shipping_postal_code=registry.shipping_postal_code,
         published_at=registry.published_at,
         closed_at=registry.closed_at,
-        payment_method=registry.payment_method,
-        payment_handle=registry.payment_handle,
+        bit_handle=registry.bit_handle,
+        paybox_handle=registry.paybox_handle,
         payment_display_name=registry.payment_display_name,
         items_total=len(active_products),
         items_claimed=sum(1 for item in active_products if item.claim_state != "available"),
@@ -173,14 +194,8 @@ def create_registry(
     session.add(registry)
     session.flush()
 
-    position = 0
     if body.include_envelope:
-        session.add(_envelope(registry.id, position))
-        position += 1
-
-    for item in _starter_items(session, body.starter_categories):
-        session.add(_from_catalog(registry.id, position, item, quantity_wanted=1, note=None))
-        position += 1
+        session.add(_envelope(registry.id, 0))
 
     session.commit()
     session.refresh(registry)
@@ -212,30 +227,6 @@ def _envelope(registry_id: UUID, position: int) -> RegistryItem:
         title=ENVELOPE_TITLE,
         subtitle=ENVELOPE_SUBTITLE,
     )
-
-
-def _starter_items(session: Session, categories: list[str]) -> list[tuple[CatalogItem, str]]:
-    """A few real products per chosen category, spread across the price range.
-
-    Cheapest-first would fill the list with dummies and bibs; a registry needs
-    the pram in it too. So: cheapest, middle, dearest of each category, which
-    also shows the couple that the range exists.
-    """
-    picked: list[tuple[CatalogItem, str]] = []
-    for category in categories:
-        rows = session.execute(
-            select(CatalogItem, Chain.name_he)
-            .join(Chain, Chain.id == CatalogItem.chain_id)
-            .where(CatalogItem.category == category)
-            .order_by(CatalogItem.price_agorot)
-        ).all()
-        if not rows:
-            continue
-        spread = [0, len(rows) // 2, len(rows) - 1][:STARTER_PER_CATEGORY]
-        for index in sorted(set(spread)):
-            item, chain_name = rows[index]
-            picked.append((item, chain_name))
-    return picked
 
 
 def _from_catalog(
@@ -349,6 +340,50 @@ def add_envelope(session: Session, *, couple: Couple) -> OwnerItem:
         session.rollback()
         raise _constraint_error(exc) from exc
     return to_owner_item(item)
+
+
+def add_voucher(
+    session: Session, *, couple: Couple, body: AddVoucherRequest
+) -> tuple[OwnerItem, bool]:
+    """Turn on a chain gift-card type. A second POST of the same slug is a replay.
+
+    Unlike the envelope, "already on" is 200 rather than 409: the UI will POST
+    this as a toggle, not as a one-shot create.
+    """
+    spec = VOUCHER_TYPES.get(body.chain_slug)
+    if spec is None:
+        raise OwnerError("voucher_type_unknown", 404)
+
+    registry = _load(session, couple)
+    existing = next(
+        (
+            item
+            for item in registry.items
+            if item.kind == "voucher"
+            and item.chain_slug == body.chain_slug
+            and item.is_active
+        ),
+        None,
+    )
+    if existing is not None:
+        return to_owner_item(existing), False
+
+    _guard_capacity(registry)
+    chain_name_he = spec["chain_name_he"]
+    item = RegistryItem(
+        registry_id=registry.id,
+        position=_next_position(session, registry.id),
+        kind="voucher",
+        title=f"שובר {chain_name_he}",
+        subtitle=f"כרטיס מתנה באתר {chain_name_he}",
+        caption=VOUCHER_CAPTION,
+        chain_slug=body.chain_slug,
+        chain_name_he=chain_name_he,
+        canonical_url=spec["canonical_url"],
+    )
+    session.add(item)
+    session.commit()
+    return to_owner_item(item), True
 
 
 def patch_item(session: Session, *, couple: Couple, item_id: UUID, body: ItemPatch) -> OwnerItem:

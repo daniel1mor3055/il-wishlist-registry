@@ -336,17 +336,51 @@ def test_the_handle_is_revealed_only_by_its_own_request(client: TestClient, sess
     page = client.get(f"/api/v1/public/registries/{registry.slug}")
 
     assert revealed.json() == {
-        "method": "bit",
-        "handle": "050-123-4567",
-        "displayName": "נועה",
+        "rails": [
+            {
+                "method": "bit",
+                "handle": "050-123-4567",
+                "displayName": "נועה",
+            }
+        ]
     }
     assert "050-123-4567" not in page.text
 
 
+def test_both_live_rails_are_revealed_together(client: TestClient, session: Session):
+    registry = make_registry(session)
+    registry.paybox_handle = "052-000-1111"
+    session.flush()
+
+    revealed = client.get(f"/api/v1/public/registries/{registry.slug}/payment-handle")
+
+    assert revealed.json() == {
+        "rails": [
+            {"method": "bit", "handle": "050-123-4567", "displayName": "נועה"},
+            {"method": "paybox", "handle": "052-000-1111", "displayName": "נועה"},
+        ]
+    }
+
+
+def test_a_paybox_only_list_does_not_invent_bit(client: TestClient, session: Session):
+    registry = make_registry(session)
+    registry.bit_handle = None
+    registry.paybox_handle = "052-000-1111"
+    session.flush()
+
+    revealed = client.get(f"/api/v1/public/registries/{registry.slug}/payment-handle")
+
+    assert revealed.json() == {
+        "rails": [
+            {"method": "paybox", "handle": "052-000-1111", "displayName": "נועה"},
+        ]
+    }
+
+
 def test_a_couple_with_no_handle_reveals_nothing(client: TestClient, session: Session):
     registry = make_registry(session)
-    registry.payment_method = None
-    registry.payment_handle = None
+    registry.bit_handle = None
+    registry.paybox_handle = None
     session.flush()
 
     response = client.get(f"/api/v1/public/registries/{registry.slug}/payment-handle")

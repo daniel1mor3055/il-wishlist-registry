@@ -27,7 +27,7 @@ export const FILTERS = [
   { id: "100to300", label: "₪100–₪300" },
   { id: "over300", label: "מעל ₪300" },
   { id: "group", label: "מתנות משותפות" },
-  { id: "cash", label: "מעטפה ושוברים" },
+  { id: "cash", label: "שי ושוברים" },
 ] as const;
 
 export type FilterId = (typeof FILTERS)[number]["id"];
@@ -41,16 +41,15 @@ export type FilterId = (typeof FILTERS)[number]["id"];
 const RACE_LOST = "בזמן שהתלבטת, אורח אחר לקח את הפריט";
 
 export const copy = {
-  /** G1 hero and reassurance. */
+  /** G1 hero. */
   hero: {
     titleFor: (names: string) => `רשימת הלידה של ${names}`,
-    reassurance: "בלי הרשמה · בלי פרטי אשראי · המתנה נשלחת אחרי הלידה",
     progress: (claimed: number, total: number) => `נתפסו ${claimed} מתוך ${total} פריטים`,
     cta: "לראות את הרשימה",
     howItWorksTitle: "איך זה עובד",
     howItWorks: [
       "בוחרים מתנה מהרשימה",
-      "קונים באתר החנות, או שולחים כסף ישירות אלינו בביט",
+      "קונים באתר החנות, או שולחים כסף ישירות אלינו",
       "מסמנים שרכשתם — כדי שאף אחד לא יקנה את אותו דבר פעמיים",
     ],
     shipsAfterBirth: "נשלח אחרי הלידה",
@@ -60,7 +59,7 @@ export const copy = {
   grid: {
     empty: (names: string) => `${names} עוד מכינים את הרשימה`,
     singleItem: "בינתיים יש פריט אחד ברשימה",
-    fullyClaimed: "כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה",
+    fullyClaimed: "כל הפריטים ברשימה נתפסו. אפשר עוד לתת שי",
     noneInFilter: "אין פריטים בסינון הזה",
     offline: "משהו נתקע. לנסות שוב?",
     retry: "לנסות שוב",
@@ -142,7 +141,18 @@ export const copy = {
     /* What the envelope has collected. No target follows it, so the sentence
        ends at the amount rather than at a "מתוך" (D28). */
     collected: "נאספו עד כה",
-    sendViaBit: "לשלוח בביט",
+    send: (hasBit: boolean, hasPaybox: boolean) => {
+      if (hasBit && hasPaybox) return "לשלוח בביט או בפייבוקס";
+      if (hasBit) return "לשלוח בביט";
+      if (hasPaybox) return "לשלוח בפייבוקס";
+      return "לשלוח שי";
+    },
+    tile: (hasBit: boolean, hasPaybox: boolean) => {
+      if (hasBit && hasPaybox) return "חיבוק בביט / פייבוקס 💛";
+      if (hasBit) return "חיבוק בביט 💛";
+      if (hasPaybox) return "חיבוק בפייבוקס 💛";
+      return "חיבוק 💛";
+    },
     voucherBody: (chain: string) => `הקנייה מתבצעת באתר ${chain}, לא כאן`,
     voucherContinue: (chain: string) => `להמשיך לאתר ${chain}`,
     voucherCaption: "אתם בוחרים את הסכום באתר החנות",
@@ -152,12 +162,19 @@ export const copy = {
   /** G8 the D13 contact reveal. */
   contact: {
     title: (names: string) => `צריכים את הפרטים של ${names}?`,
-    body: "הכסף נשלח ישירות אליהם בביט או בפייבוקס. האתר הזה לא גובה תשלום ולא שומר פרטי אשראי.",
+    body: "הכסף נשלח ישירות אליהם.",
+    bodyFor: (hasBit: boolean, hasPaybox: boolean) => {
+      if (hasBit && hasPaybox) return "הכסף נשלח ישירות אליהם בביט או בפייבוקס.";
+      if (hasBit) return "הכסף נשלח ישירות אליהם בביט.";
+      if (hasPaybox) return "הכסף נשלח ישירות אליהם בפייבוקס.";
+      return "הכסף נשלח ישירות אליהם.";
+    },
     copy: "העתקה",
     copied: "המספר הועתק",
     loading: "רגע…",
     amountReminder: "הסכום שבחרתם:",
-    handleLabel: (name: string) => `מספר הביט של ${name}`,
+    handleLabel: (method: "bit" | "paybox", name: string) =>
+      method === "bit" ? `מספר הביט של ${name}` : `מספר הפייבוקס של ${name}`,
     sent: "שלחתי",
     notSent: "עוד לא שלחתי",
   },
@@ -187,12 +204,12 @@ export const copy = {
   taken: {
     title: "אורח אחר כבר לקח את זה",
     body: (names: string) =>
-      `הפריט הזה כבר נתפס. אפשר לבחור מתנה אחרת מהרשימה, או לשלוח מעטפה ל${names}.`,
+      `הפריט הזה כבר נתפס. אפשר לבחור מתנה אחרת מהרשימה, או לתת שי ל${names}.`,
     /* Losing a live race is a different experience from opening something that
        was already gone, and the guest deserves to be told which happened. */
     raceBody: (names: string) =>
-      `${RACE_LOST}. אפשר לבחור מתנה אחרת מהרשימה, או לשלוח מעטפה ל${names}.`,
-    fundInstead: "לשלוח מעטפה במקום",
+      `${RACE_LOST}. אפשר לבחור מתנה אחרת מהרשימה, או לתת שי ל${names}.`,
+    fundInstead: "לתת שי במקום",
   },
 
   /** G10 lifecycle and error shells. An unpublished registry has no shell of
@@ -212,6 +229,9 @@ export const copy = {
 
   /** The couple's side. Nothing here is ever shown to a guest. */
   editor: {
+    /* Inspect, not buy. Guest G4 keeps להמשיך לאתר for the purchase handoff. */
+    viewOnSite: (chain: string | null) =>
+      chain && chain.trim() ? `לראות באתר ${chain}` : "לראות באתר",
     /* ed-C0, the door. Deliberately not called "התחברות": there is no account to
        log into, and the mail is the whole mechanism (D23). */
     enter: {
@@ -229,7 +249,7 @@ export const copy = {
       signOut: "יציאה",
     },
 
-    /* ed-C1, three questions. */
+    /* ed-C1, two questions. */
     wizard: {
       title: "בואו נתחיל",
       step: (current: number, total: number) => `שלב ${current} מתוך ${total}`,
@@ -254,11 +274,6 @@ export const copy = {
       notesHint: "למקרים שהשדות למעלה לא מכסים",
       postalLabel: "מיקוד",
       postalPlaceholder: "6433228",
-      starterTitle: "מאיפה נתחיל?",
-      starterHint: "נוסיף לכם כמה פריטים מהקטגוריות שתבחרו. אפשר למחוק כל דבר אחר כך.",
-      starterBlank: "להתחיל מרשימה ריקה",
-      envelopeLabel: "להוסיף מעטפה לכסף",
-      envelopeHint: "אורחים שיעדיפו לשלוח כסף יעשו את זה בביט או בפייבוקס, ישירות אליכם",
       next: "הלאה",
       create: "ליצור את הרשימה",
       creating: "מכינים…",
@@ -270,9 +285,14 @@ export const copy = {
       itemCount: (n: number) => (n === 1 ? "פריט אחד" : `${n} פריטים`),
       claimed: (claimed: number, total: number) => `${claimed} מתוך ${total} נתפסו`,
       addItem: "להוסיף פריט",
-      addEnvelope: "להוסיף מעטפה לכסף",
+      addEnvelope: "להוסיף שי",
+      filterAll: "הכול",
+      filterLabel: "סינון לפי קטגוריה",
       preview: "לראות איך זה נראה לאורחים",
-      address: "כתובת למשלוח",
+      share: "לשתף בוואטסאפ",
+      remove: "להסיר",
+      removed: "הוסר מהרשימה",
+      undo: "לבטל",
       /* D30: the only place an unpublished list is ever named, and it is named to
          its owner, not to a guest. */
       unpublishedTitle: "הרשימה עוד לא פורסמה",
@@ -294,6 +314,18 @@ export const copy = {
       settings: "הגדרות",
     },
 
+    /* Header gear on home. Story, payment and address live here, not on the list. */
+    settings: {
+      title: "הגדרות",
+      gearLabel: "הגדרות",
+      signOut: "לצאת מהחשבון",
+      guestGroup: "מה שהאורחים רואים",
+      handoffGroup: "כשהאורח נותן מתנה",
+      storyHint: "השמות, התמונה והמסר בראש העמוד",
+      paymentHint: "המספר שאורחים מעתיקים בביט ובפייבוקס, ושוברים מהחנויות",
+      addressHint: "מוצגת בקופה, לא ברשימה עצמה",
+    },
+
     /* The street guests copy at checkout (D49). Same fields as wizard step 2. */
     address: {
       title: "כתובת למשלוח",
@@ -301,6 +333,69 @@ export const copy = {
       save: "לשמור",
       saving: "שומרים…",
       saved: "נשמר",
+    },
+
+    /* The number D13 reveals, the שי tile, and chain vouchers (PRD ed-C5). */
+    payment: {
+      title: "ביט, פייבוקס ושי",
+      tabCash: "שי",
+      tabVouchers: "שוברים",
+      explainer: "הכסף נשלח ישירות אליכם. אנחנו לא מחזיקים אותו ולא נוגעים בו.",
+      handleLabel: "מספר טלפון",
+      handlePlaceholder: "050-1234567",
+      displayNameLabel: "על שם מי המספר?",
+      displayNamePlaceholder: "נועה",
+      displayNameHint: "אפשר לשנות. אם ריק, האורחים יראו את השם שלכם מהרשימה.",
+      envelopeTitle: "שי",
+      envelopeHint: "אורחים שיעדיפו לתת כסף יעתיקו את המספר וישלחו ישירות אליכם",
+      addEnvelope: "להוסיף שי",
+      removeEnvelope: "להוריד את השי",
+      envelopeLocked: "אורחים כבר נתנו שי, אז אי אפשר להוריד אותו",
+      vouchersTitle: "שוברים מהחנויות",
+      vouchersHint: "אורחים קונים את השובר באתר החנות. אנחנו לא מוכרים אותו.",
+      voucherLocked: "אורח כבר שלח את השובר הזה, אז אי אפשר להוריד אותו",
+      voucherShilav: "שובר שילב",
+      voucherMotsetsim: "שובר מוצצים",
+      voucherAgalis: "שובר עגליס",
+      voucherBabyStar: "שובר בייבי סטאר",
+      save: "לשמור",
+      saving: "שומרים…",
+      saved: "נשמר",
+    },
+
+    /* ed-C6. Cover is a URL paste for the POC; both fields are public on the hero. */
+    story: {
+      title: "הסיפור והתמונה",
+      body: "זה מה שמופיע בראש העמוד שהאורחים פותחים, וגם בתצוגה המקדימה בוואטסאפ.",
+      storyLabel: "כמה מילים עלינו",
+      storyPlaceholder: "יעל בדרך, ואנחנו מתרגשים לקבל אתכם לתוך הסיפור הזה.",
+      coverLabel: "תמונת כיסוי",
+      coverHint: "מדביקים קישור לתמונה. אין העלאה כרגע. שדה ריק מוריד אותה.",
+      coverPlaceholder: "https://…",
+      save: "לשמור",
+      saving: "שומרים…",
+      saved: "נשמר",
+    },
+
+    /* ed-C7. Owner-only; unpublished /r/{slug} still 404s (D30). */
+    preview: {
+      banner: "זו התצוגה שהאורחים רואים",
+      back: "חזרה לעריכה",
+    },
+
+    /* C8 leftover after D48: WhatsApp, the preview card, and a QR for the ברית. */
+    share: {
+      title: "לשתף את הרשימה",
+      body: "שולחים את הקישור בוואטסאפ, או מדפיסים את הקוד לברית.",
+      messageLabel: "ההודעה",
+      defaultMessage: "היי, פתחנו רשימת לידה — הכול מרוכז בקישור אחד:",
+      whatsapp: "לשתף בוואטסאפ",
+      copyLink: "העתקה",
+      copiedLink: "הקישור הועתק",
+      previewLabel: "איך זה ייראה בוואטסאפ",
+      previewFallback: "בלי תמונת כיסוי עדיין",
+      qrLabel: "קוד לברית",
+      qrHint: "מדפיסים ומשאירים ליד המתנות, כדי שאורחים יפתחו את הרשימה בלי להעתיק קישור.",
     },
 
     /* ed-C3, adding. */
@@ -348,7 +443,10 @@ export const copy = {
       saved: "נשמר",
       remove: "להסיר מהרשימה",
       removeTaken: "הפריט נתפס, אז הוא ייעלם מהאורחים אבל יישאר אצלכם",
+      removeContributed: "אורחים כבר השתתפו בסכום, אז הוא ייעלם מהאורחים אבל יישאר אצלכם",
       removeConfirm: "להסיר את הפריט מהרשימה?",
+      removeConfirmTaken: "להסתיר מהאורחים",
+      removeCancel: "לא להסיר",
     },
   },
 } as const;
@@ -371,6 +469,9 @@ export const ERROR_COPY: Record<string, string> = {
   item_not_found: copy.item.gone,
   fund_complete: copy.group.complete,
   rate_limited: copy.shell.rateLimited,
+  payment_handle_unset:
+    "עוד אין לנו מספר להעביר. אפשר לתת שי אחר כך, או לשאול את הזוג",
+  voucher_type_unknown: copy.shell.genericError,
 
   // The couple's side. A refusal here is almost always the API protecting
   // something a guest already did, so it is worth saying which thing.

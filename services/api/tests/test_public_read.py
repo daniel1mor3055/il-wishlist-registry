@@ -24,6 +24,8 @@ REGISTRY_KEYS = {
     "itemsTotal",
     "itemsClaimed",
     "hasShippingAddress",
+    "hasBit",
+    "hasPaybox",
     "items",
 }
 
@@ -85,6 +87,10 @@ def test_private_fields_never_appear_anywhere_in_the_payload(client: TestClient,
     for forbidden in (
         "paymentHandle",
         "payment_handle",
+        "bitHandle",
+        "bit_handle",
+        "payboxHandle",
+        "paybox_handle",
         "shippingStreet",
         "shipping_street",
         "shippingApartment",

@@ -90,9 +90,9 @@ class OwnerRegistry(BaseModel):
     published_at: datetime | None
     closed_at: datetime | None
 
-    payment_method: Literal["bit", "paybox"] | None
-    payment_handle: str | None
     payment_display_name: str | None
+    bit_handle: str | None
+    paybox_handle: str | None
 
     items_total: int
     items_claimed: int
@@ -118,9 +118,7 @@ class CreateRegistryRequest(BaseModel):
     shipping_apartment: str | None = Field(default=None, max_length=80)
     shipping_notes: str | None = Field(default=None, max_length=300)
     shipping_postal_code: str | None = Field(default=None, max_length=10)
-    #: "מאיפה נתחיל": categories to pre-fill from the catalog, or none for blank.
-    starter_categories: list[Category] = Field(default_factory=list, max_length=6)
-    #: The envelope is opt-in, and the wizard is where it is offered.
+    #: שי is on by default; the couple turns it off later if they want.
     include_envelope: bool = True
 
     @field_validator("couple_names")
@@ -150,6 +148,7 @@ class RegistryPatch(BaseModel):
 
     couple_names: str | None = Field(default=None, min_length=2, max_length=120)
     story: str | None = Field(default=None, max_length=2000)
+    cover_image_url: str | None = Field(default=None, max_length=500)
     city: str | None = Field(default=None, max_length=80)
     due_date: date | None = None
     baby_name: str | None = Field(default=None, max_length=80)
@@ -159,8 +158,8 @@ class RegistryPatch(BaseModel):
     shipping_apartment: str | None = Field(default=None, max_length=80)
     shipping_notes: str | None = Field(default=None, max_length=300)
     shipping_postal_code: str | None = Field(default=None, max_length=10)
-    payment_method: Literal["bit", "paybox"] | None = None
-    payment_handle: str | None = Field(default=None, max_length=40)
+    bit_handle: str | None = Field(default=None, max_length=40)
+    paybox_handle: str | None = Field(default=None, max_length=40)
     payment_display_name: str | None = Field(default=None, max_length=80)
 
     @field_validator(
@@ -171,10 +170,11 @@ class RegistryPatch(BaseModel):
         "shipping_apartment",
         "shipping_notes",
         "shipping_postal_code",
-        "payment_handle",
+        "bit_handle",
+        "paybox_handle",
         "payment_display_name",
         "baby_name",
-        "story",
+        "cover_image_url",
     )
     @classmethod
     def _blank_to_none(cls, value: str | None) -> str | None:
@@ -195,6 +195,19 @@ class AddCatalogItemRequest(BaseModel):
     catalog_item_id: UUID
     quantity_wanted: int = Field(default=1, ge=1, le=MAX_QUANTITY)
     note: str | None = Field(default=None, max_length=500)
+
+
+class AddVoucherRequest(BaseModel):
+    """Turn on a chain gift-card type. The client sends a slug, never copy."""
+
+    model_config = WireModel
+
+    chain_slug: str = Field(min_length=1, max_length=40)
+
+    @field_validator("chain_slug")
+    @classmethod
+    def _trim(cls, value: str) -> str:
+        return value.strip()
 
 
 class AddManualItemRequest(BaseModel):

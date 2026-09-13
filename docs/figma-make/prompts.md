@@ -28,8 +28,8 @@ Build a mobile-first Hebrew web app: a baby gift registry ("רשימת לידה"
 The couple is נועה ואיתי, expecting a girl named יעל, due 12 בפברואר 2026. Shops referenced on items: שילב, מוצצים, עגליס, בייבי סטאר.
 
 Build these screens in this order:
-1. Hero landing: couple photo, "רשימת הלידה של נועה ואיתי", one-line personal story, a progress line showing how much of the list is claimed, and a reassurance strip reading "בלי הרשמה · בלי פרטי אשראי · המתנה נשלחת אחרי הלידה". Below it, "איך זה עובד" in three short lines. Primary button: "לראות את הרשימה".
-2. Item grid: two-column cards. Sticky filter chips: "הכול", "מה שעוד חסר", "עד ₪100", "₪100–₪300", "מעל ₪300", "מתנות משותפות", "מעטפה ושוברים". Each card shows image, two-line product name, price, and a small shop-name chip.
+1. Hero landing: couple photo, "רשימת הלידה של נועה ואיתי", one-line personal story, a progress line showing how much of the list is claimed. Below it, "איך זה עובד" in three short lines. Primary button: "לראות את הרשימה". No reassurance strip about signup or credit cards.
+2. Item grid: two-column cards. Sticky filter chips: "הכול", "מה שעוד חסר", "עד ₪100", "₪100–₪300", "מעל ₪300", "מתנות משותפות", "שי ושוברים". Each card shows image, two-line product name, price, and a small shop-name chip.
 3. Item detail bottom sheet: large image, full product name, price, shop chip, quantity line, a short note from the couple, a quiet grey line "המחיר מתעדכן באתר החנות", and a primary button "אני קונה את זה".
 4. Reserve and handoff sheet: explains the item is now held for this guest, a primary button "להמשיך לאתר שילב" that sends the guest to the shop's own site, and a link "צריכים את כתובת המשלוח של נועה ואיתי?" that reveals the formatted address with a copy button and the line "הכתובת לא עוברת אוטומטית לאתר החנות". No name field here.
 5. Return confirmation modal: asks "האם רכשת את הפריט?" with two buttons, "כן, רכשתי" and "עוד לא".
@@ -39,7 +39,7 @@ Build these screens in this order:
 
 Critical product rule: this app never processes payments. There is no checkout, no card field, no CVV, no order summary. Guests either go out to a shop's own website, or send money directly to the couple via Bit or PayBox using the revealed phone number, and then self-report what they did. Reservation state is public so nobody buys the same thing twice, but the identity of who gave what is never shown to other guests.
 
-Visual style: warm, personal and calm, like a message from friends rather than a storefront. Not a baby-cliché palette: no pink, no baby blue, no pastel gradients. Photography over illustration. Background #FDFCFA, surfaces #FFFFFF, text #1F1D1B, secondary text #6B6560, primary green #2F6F62 for buttons and active chips, amber #E5A24B for funding meters and progress, success #3E7D55, muted grey #9A938C for claimed items, borders #E8E3DC. Card radius 16px, button radius 12px, chips fully rounded. 8px spacing grid. Type scale: H1 28px, H2 22px, H3 18px, body 16px, small 14px, weights 400/500/700. Mobile canvas 390px wide.
+Visual style: warm, personal and calm, like a message from friends rather than a storefront. Gender-reveal pastels, unisex: primary fill #FFB6C1, accent #A2CFFE. Both are light tints, so button and chip copy is charcoal #2A2528, never white. Links and affordances on paper use a darker rose #7A3F54. Photography over illustration. Background #FBF6F4, surfaces #FFFCFB, text #2A2528, secondary text #6A6366, success #3E7D55, borders #E8DDE0. Card radius 16px, button radius 12px, chips fully rounded. 8px spacing grid. Type scale: H1 28px, H2 22px, H3 18px, body 16px, small 14px, weights 400/500/700. Mobile canvas 390px wide.
 
 Interactions: filter chips filter the grid; tapping a card opens the detail sheet from the bottom; "אני קונה את זה" opens the reserve sheet; returning from the shop triggers the confirmation modal; amount chips select a value in the group gift sheet; the copy button copies the phone number and shows a brief confirmation.
 
@@ -62,7 +62,7 @@ Hebrew does not hyphenate: clamp product names to two lines with reserved height
 Send this one first. It completes the hybrid gifting model, since the master prompt covers products and group gifts but not cash or gift cards.
 
 ```
-Add a "מעטפה ושוברים" sheet: one plain cash envelope with amount chips and no target or meter, plus gift-card options from שילב and מוצצים. The envelope opens the contact reveal; gift cards send the guest to the shop's own site.
+Add a "שי ושוברים" sheet: one plain cash gift with amount chips and no target or meter, plus gift-card options from שילב and מוצצים. The cash gift opens the contact reveal; gift cards send the guest to the shop's own site.
 ```
 
 The rest are states. Figma Make defaults to the happy path and to full lists, so each must become its own view.
@@ -94,7 +94,7 @@ Add a single-item state: one full-width hero card instead of a two-column grid.
 ```
 
 ```
-Add a fully-claimed banner above the grid: "כל הפריטים ברשימה נתפסו. אפשר עוד לשלוח מעטפה".
+Add a fully-claimed banner above the grid: "כל הפריטים ברשימה נתפסו. אפשר עוד לתת שי".
 ```
 
 ```
@@ -111,8 +111,8 @@ Send this as a new screen set, only after the guest surface is agreed.
 Now add a second screen set: the COUPLE EDITOR, the private side where נועה ואיתי build and manage the registry on a phone. Same visual language, same RTL rules, same palette and type scale as the guest view.
 
 Screens in this order:
-1. Create wizard, three steps, step 1 at the far right: "מי אתם", then "התאריך המשוער ללידה", then "מאיפה נתחיל" offering a starter template or a blank list. Button "נתחיל את הרשימה".
-2. Editor home: the list grouped by category with drag handles, a progress ring, and a prominent draft banner reading "הרשימה עדיין לא פורסמה" with a button "לפרסם את הרשימה". Primary action "הוספת פריט".
+1. Create wizard, two steps, step 1 at the far right: "איך לקרוא לכם", then "התאריך המשוער ללידה" plus a skippable shipping address. Button "ליצור את הרשימה". שי is on by default. No starter-category picker.
+2. Editor home: a sticky chip row "הכול" plus the category groups that currently have items (לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים). Unpublished banner "הרשימה עוד לא פורסמה" with "לפרסם את הרשימה". Primary action "להוסיף פריט". Trailing × on untouched products.
 3. Add item, three tabs: "לחפש בחנויות" showing a mock cross-shop catalog, "להדביק קישור" showing a pasted link resolving into a preview card, and "להוסיף ידנית".
 4. Item settings: a quantity field "כמה נשמח לקבל", a note field, and a toggle "לאפשר מתנה משותפת" with the hint "מומלץ בפריטים מעל ₪400".
 5. Envelope and payment details: a single toggle for accepting a cash envelope, with nothing to name and no target to set, plus gift-card types and the Bit or PayBox phone number that guests will see. Explain that money goes directly to the couple and never through the app.
@@ -130,7 +130,7 @@ Amounts given by individual guests appear only in this tracker, never on the pub
 ## P10 to P13. Couple editor follow-ups
 
 ```
-Add an empty editor state: a starter template suggestion instead of a blank list.
+Add an empty editor state: names, unpublished banner, add-item, and a default שי tile. No starter-template prompt.
 ```
 
 ```

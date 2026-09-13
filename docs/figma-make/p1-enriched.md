@@ -4,7 +4,7 @@ Paste **only** the fenced block into Figma Make as the first prompt. Do not past
 
 This replaces the short P1 in [prompts.md](prompts.md). After the first render, go back to that file for P2 onward (states), then the couple editor, then the widget.
 
-Kept as sent, because it is the prompt that produced the render we reviewed. Two parts of it are now superseded and should not be re-pasted as written: the priority badges (`חובה` / `רצוי` / `נחמד שיהיה`) are gone per D27, and card G is a plain cash envelope with no target and no meter rather than `קופה לעגלה` per D28. [p3-missing-states.md](p3-missing-states.md) opens with the two prompts that undo them.
+Kept as sent, because it is the prompt that produced the render we reviewed. Parts of it are now superseded and should not be re-pasted as written: the priority badges (`חובה` / `רצוי` / `נחמד שיהיה`) are gone per D27; card G is a plain cash envelope with no target and no meter rather than `קופה לעגלה` per D28; Bit and PayBox are two independent phone numbers, not XOR, and G8 shows one copy row per live rail (D50). [p3-missing-states.md](p3-missing-states.md) opens with the two prompts that undo D27/D28.
 
 What this prompt is for: one populated, published registry, mobile 390px, Hebrew RTL, guest-only. It is not the couple editor and not the retailer widget.
 
@@ -44,12 +44,11 @@ Top to bottom:
 3. One-line story, body: "יעל בדרך, ואנחנו מתרגשים לקבל אתכם לתוך הסיפור הזה. כל מתנה עוזרת לנו להתכונן. באהבה, נועה ואיתי"
 4. Small muted line: "תל אביב · נשלח אחרי הלידה"
 5. Progress: a thin amber bar filling right-to-left, caption "נתפסו 4 מתוך 12 פריטים"
-6. Reassurance strip, three phrases separated by middots, muted, no icons that look like padlocks from a bank: "בלי הרשמה · בלי פרטי אשראי · המתנה נשלחת אחרי הלידה"
-7. Section heading "איך זה עובד" then three short numbered lines, numbers as 1 2 3 in Western digits:
+6. Section heading "איך זה עובד" then three short numbered lines, numbers as 1 2 3 in Western digits:
    "1. בוחרים מתנה מהרשימה"
    "2. קונים באתר החנות, או שולחים כסף ישירות אלינו בביט"
    "3. מסמנים שרכשתם — כדי שאף אחד לא יקנה את אותו דבר פעמיים"
-8. Primary button, full width, #2F6F62: "לראות את הרשימה"
+7. Primary button, full width, #2F6F62: "לראות את הרשימה"
 Footer: tiny muted "רשימת לידה" wordmark, no English.
 
 SCREEN 2 — Item grid
@@ -137,7 +136,7 @@ No card fields.
 SCREEN 8 — Contact reveal
 This is the money moment. The UI becomes calmer, plainer, more explicit. Still no card fields.
 Heading: "צריכים את הפרטים של נועה ואיתי?"
-Body: "הכסף נשלח ישירות אליהם בביט או בפייבוקס. האתר הזה לא גובה תשלום ולא שומר פרטי אשראי."
+Body: "הכסף נשלח ישירות אליהם בביט או בפייבוקס."
 A phone row, LTR digits inside RTL layout: "050-123-4567" with a button "העתקה"
 Caption under the number: "מספר הביט של נועה"
 Primary: "שלחתי"

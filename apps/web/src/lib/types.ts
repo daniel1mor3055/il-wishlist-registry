@@ -80,10 +80,13 @@ export interface PublicRegistry {
   itemsClaimed: number;
 
   /**
-   * Presence only (D49). The street itself is a separate GET, like the Bit
-   * handle, so the page source cannot name where the couple lives.
+   * Presence only (D49). The street itself is a separate GET, like the
+   * payment rails, so the page source cannot name where the couple lives.
    */
   hasShippingAddress: boolean;
+  /** Presence only (D13). The numbers themselves are a separate GET. */
+  hasBit: boolean;
+  hasPaybox: boolean;
 
   items: PublicItem[];
 }
@@ -123,19 +126,23 @@ export interface ContributionView {
  */
 export type WriteResult<T> = { ok: true; data: T } | { ok: false; code: string };
 
-/**
- * Revealed only on explicit guest interaction (D13), never part of the
- * registry payload. Present here because the same client code consumes it.
- */
-export interface PaymentHandle {
+export interface PaymentRail {
   method: "bit" | "paybox";
   handle: string;
   displayName: string;
 }
 
 /**
+ * Revealed only on explicit guest interaction (D13), never part of the
+ * registry payload. Present here because the same client code consumes it.
+ */
+export interface PaymentHandle {
+  rails: PaymentRail[];
+}
+
+/**
  * Revealed only when a guest on the product handoff asks (D49). Same split as
- * the Bit handle: never part of the registry payload.
+ * the payment rails: never part of the registry payload.
  */
 export interface ShippingAddress {
   recipientName: string;
@@ -211,8 +218,8 @@ export interface OwnerRegistry {
   publishedAt: string | null;
   closedAt: string | null;
 
-  paymentMethod: "bit" | "paybox" | null;
-  paymentHandle: string | null;
+  bitHandle: string | null;
+  payboxHandle: string | null;
   paymentDisplayName: string | null;
 
   itemsTotal: number;

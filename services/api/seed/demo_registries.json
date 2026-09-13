@@ -22,8 +22,8 @@
       "baby_name": "יעל",
       "published": true,
       "closed": false,
-      "payment_method": "bit",
-      "payment_handle": "050-123-4567",
+      "bit_handle": "050-123-4567",
+      "paybox_handle": null,
       "payment_display_name": "נועה",
       "items": [
         {
@@ -258,7 +258,7 @@
         },
         {
           "kind": "fund",
-          "title": "חיבוק בביט / פייבוקס 💛",
+          "title": "חיבוק 💛",
           "source_title": null,
           "note": null,
           "category": null,
@@ -321,8 +321,8 @@
       "baby_name": "יעל",
       "published": true,
       "closed": false,
-      "payment_method": "bit",
-      "payment_handle": "050-123-4567",
+      "bit_handle": "050-123-4567",
+      "paybox_handle": null,
       "payment_display_name": "נועה",
       "items": []
     },
@@ -343,8 +343,8 @@
       "baby_name": "יעל",
       "published": true,
       "closed": false,
-      "payment_method": "bit",
-      "payment_handle": "050-123-4567",
+      "bit_handle": "050-123-4567",
+      "paybox_handle": null,
       "payment_display_name": "נועה",
       "items": [
         {
@@ -389,8 +389,8 @@
       "baby_name": "יעל",
       "published": true,
       "closed": false,
-      "payment_method": "bit",
-      "payment_handle": "050-123-4567",
+      "bit_handle": "050-123-4567",
+      "paybox_handle": null,
       "payment_display_name": "נועה",
       "items": [
         {
@@ -625,7 +625,7 @@
         },
         {
           "kind": "fund",
-          "title": "חיבוק בביט / פייבוקס 💛",
+          "title": "חיבוק 💛",
           "source_title": null,
           "note": null,
           "category": null,
@@ -688,8 +688,8 @@
       "baby_name": "יעל",
       "published": true,
       "closed": true,
-      "payment_method": "bit",
-      "payment_handle": "050-123-4567",
+      "bit_handle": "050-123-4567",
+      "paybox_handle": null,
       "payment_display_name": "נועה",
       "items": [
         {
@@ -924,7 +924,7 @@
         },
         {
           "kind": "fund",
-          "title": "חיבוק בביט / פייבוקס 💛",
+          "title": "חיבוק 💛",
           "source_title": null,
           "note": null,
           "category": null,

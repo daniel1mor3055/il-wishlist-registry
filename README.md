@@ -85,10 +85,15 @@ The couple's side works the other way round: `/editor` pages read the API from t
 ```
 /editor/enter      ask for a magic link
 /editor/session    where the link lands: spends the token, sets the cookie, redirects
-/editor/new        the three-step create wizard
+/editor/new        the two-step create wizard
 /editor            the list, the publish banner, the link to share
+/editor/settings   story, payment, address, sign out (header gear)
 /editor/add        search the harvested catalog, or add something by hand
 /editor/items/{id} quantity, note, group gifting, remove
+/editor/payment    Bit/PayBox handle, envelope, voucher types (D13)
+/editor/story      two-line story and cover URL
+/editor/preview    what guests see, including unpublished drafts (D30 stays)
+/editor/share      WhatsApp, preview card, QR (published only)
 /editor/address    the street guests copy at the shop (D49)
 ```
 
@@ -104,6 +109,7 @@ To sign in to the seeded demo list, ask for a link as `noa.itai@example.com` and
 | http://localhost:3000/r/noa-itai-k4m2xq8vp3wt | The main demo registry (נועה ואיתי)           |
 | http://localhost:3000/editor                  | The couple's editor (magic link, no password) |
 | http://localhost:3000/dev/states              | State gallery — every PRD state on one page   |
+| http://localhost:3000/dev/og                | WhatsApp-shaped card from the guest page's OG tags |
 | http://localhost:8000/docs                    | API docs, guest and owner endpoints alike     |
 | http://localhost:8025                         | Mailpit — where the magic links arrive        |
 
@@ -119,15 +125,15 @@ npm run seed             # load both into Postgres
 
 ## Status
 
-C5 done: the couple can now build the list a guest buys from. A magic link mailed to Mailpit and exchanged for a session (D42, D43), a three-step wizard that seeds a starter list from the harvested catalog, search over that catalog, item settings, and one button that makes the link work (D48). Before it, every registry in the product came from the seed script.
+C6 done: the couple can now fill in everything a guest needs after the list exists. Bit or PayBox number and the envelope/vouchers at `/editor/payment` (D13, D28, D37), story and cover at `/editor/story`, a session-gated preview at `/editor/preview` that does not make an unpublished `/r/{slug}` work (D30), and the share kit at `/editor/share` — WhatsApp message, a mock preview card, a QR for the ברית. Publish and copy-link were already in C5 (D48). `/dev/og` parses the guest page's real meta tags so the Open Graph gate can be checked on localhost.
 
-The shipping address is the other half of the product handoff (D49): the couple may store a street during the wizard or later at `/editor/address`, and a guest leaving for the shop can copy it. The street is not in the public page; it is fetched only after they tap, the same split as the Bit number.
+C5 still stands: a magic link mailed to Mailpit and exchanged for a session (D42, D43), a two-step wizard (names, then due date and a skippable address), search over the harvested catalog, item settings, and one button that makes the link work. The shipping address is the other half of the product handoff (D49), at `/editor/address`.
 
 The rule the editor is built around is that the couple may not edit away a guest's action (D45): quantity will not drop below what is already held, group gifting will not switch off over real contributions, and an item with history is hidden from guests rather than deleted. Ownership is a query filter, not a comparison — `/me/registry` carries no id, so someone else's item and a made-up one are the same `404`.
 
 Earlier checkpoints stand: the reserve path is one conditional `UPDATE ... WHERE quantity_claimed < quantity_wanted RETURNING`, and both it and the contribution counter are guarded by concurrency tests checked by regression rather than inspection — a read-then-write reserve oversold a two-unit item to five guests, and a read-then-write contribution lost ₪410 of ₪940, while every sequential test still passed.
 
-Next is C6: the envelope and voucher settings, the payment handle the couple enters for D13, story and cover, preview-as-guest, and the share surface — WhatsApp message, link preview card, QR.
+Next is C7: the gift tracker (who gave what, D15/D17), release and correct (D16), and closing the list.
 
 ## License
 

@@ -41,6 +41,7 @@ from app.gifting.schemas import (
     HoldView,
     MyHoldsView,
     PaymentHandleView,
+    PaymentRailView,
     ReservationView,
     ShippingAddressView,
 )
@@ -473,20 +474,27 @@ def list_my_holds(session: Session, *, slug: str, guest_id: UUID) -> MyHoldsView
 def reveal_payment_handle(session: Session, *, slug: str) -> PaymentHandleView:
     """D13, on explicit interaction only.
 
-    The handle is on the registry row but never in `PublicRegistry`, so seeing
-    it takes a deliberate second request. That is the whole mechanism: a page
-    scrape gets the list, not the couple's phone number.
+    The handles are on the registry row but never in `PublicRegistry`, so seeing
+    them takes a deliberate second request. That is the whole mechanism: a page
+    scrape gets the list, not the couple's phone numbers.
     """
     registry = _load_open_registry(session, slug)
-
-    if not registry.payment_method or not registry.payment_handle:
+    display_name = registry.payment_display_name or registry.couple_names
+    rails = []
+    if (registry.bit_handle or "").strip():
+        rails.append(
+            PaymentRailView(method="bit", handle=registry.bit_handle, display_name=display_name)
+        )
+    if (registry.paybox_handle or "").strip():
+        rails.append(
+            PaymentRailView(
+                method="paybox", handle=registry.paybox_handle, display_name=display_name
+            )
+        )
+    if not rails:
         raise GiftingError("payment_handle_unset", 404)
 
-    return PaymentHandleView(
-        method=registry.payment_method,
-        handle=registry.payment_handle,
-        display_name=registry.payment_display_name or registry.couple_names,
-    )
+    return PaymentHandleView(rails=rails)
 
 
 def reveal_shipping_address(session: Session, *, slug: str) -> ShippingAddressView:

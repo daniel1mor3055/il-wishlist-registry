@@ -25,7 +25,7 @@ export default async function AddressPage() {
   } = state.registry;
 
   return (
-    <EditorShell title={copy.editor.address.title} back="/editor">
+    <EditorShell title={copy.editor.address.title} back="/editor/settings">
       <AddressForm
         city={city}
         street={shippingStreet}

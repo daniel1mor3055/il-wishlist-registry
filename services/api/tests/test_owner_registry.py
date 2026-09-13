@@ -71,26 +71,20 @@ def test_the_wizard_creates_an_unpublished_list(client: TestClient, owner: dict[
     assert body["slug"].startswith("noa-vaiti-")
 
 
-def test_the_starter_categories_put_real_products_on_the_list(
+def test_create_does_not_seed_products_from_a_category_list(
     client: TestClient, owner: dict[str, str], session: Session
 ) -> None:
     make_catalog_item(session, category="bath", title="אמבטיה", price_agorot=12_000)
     make_catalog_item(session, category="bath", title="מגבת", price_agorot=4_000)
 
-    body = client.post(
+    response = client.post(
         f"{ME}/registry",
         headers=owner,
-        json={
-            "coupleNames": "נועה ואיתי",
-            "starterCategories": ["bath"],
-            "includeEnvelope": False,
-        },
-    ).json()
-
-    products = [item for item in body["items"] if item["kind"] == "product"]
-    assert products, "a chosen category should contribute items"
-    assert all(item["category"] == "bath" for item in products)
-    assert all(item["priceAgorot"] for item in products)
+        json={"coupleNames": "נועה ואיתי", "includeEnvelope": True},
+    )
+    assert response.status_code == 201
+    kinds = [item["kind"] for item in response.json()["items"]]
+    assert kinds == ["fund"]
 
 
 def test_the_envelope_is_offered_and_can_be_declined(
@@ -128,8 +122,8 @@ def test_the_owner_view_carries_what_the_guest_view_hides(
 
     body = client.get(f"{ME}/registry", headers=headers).json()
 
-    assert body["paymentHandle"] == "050-123-4567"
-    assert body["paymentMethod"] == "bit"
+    assert body["bitHandle"] == "050-123-4567"
+    assert body["payboxHandle"] is None
     assert body["shippingStreet"] == "דיזנגוף 99"
     assert body["publishedAt"] is not None
 
@@ -456,13 +450,48 @@ def test_payment_details_are_saved_but_not_published(
     saved = client.patch(
         f"{ME}/registry",
         headers=headers,
-        json={"paymentMethod": "paybox", "paymentHandle": "052-000-1111"},
+        json={"payboxHandle": "052-000-1111"},
     ).json()
-    assert saved["paymentHandle"] == "052-000-1111"
+    assert saved["payboxHandle"] == "052-000-1111"
+    assert saved["bitHandle"] == "050-123-4567"
 
     public = client.get(f"/api/v1/public/registries/{registry.slug}").json()
-    assert "paymentHandle" not in public
+    assert public["hasBit"] is True
+    assert public["hasPaybox"] is True
+    assert "payboxHandle" not in public
+    assert "bitHandle" not in public
     assert "052-000-1111" not in str(public)
+
+
+def test_cover_image_is_saved_and_published(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry]
+) -> None:
+    """Cover is public on the guest hero and OG. The payment handle is not."""
+    headers, registry = owner_with_list
+    cover = "https://example.test/new-cover.jpg"
+    story = "יעל בדרך, ואנחנו מתרגשים"
+
+    saved = client.patch(
+        f"{ME}/registry",
+        headers=headers,
+        json={"story": story, "coverImageUrl": cover},
+    ).json()
+    assert saved["coverImageUrl"] == cover
+    assert saved["story"] == story
+
+    public = client.get(f"/api/v1/public/registries/{registry.slug}").json()
+    assert public["coverImageUrl"] == cover
+    assert public["story"] == story
+    assert "paymentHandle" not in public
+    assert "050-123-4567" not in str(public)
+
+    cleared = client.patch(
+        f"{ME}/registry",
+        headers=headers,
+        json={"coverImageUrl": ""},
+    ).json()
+    assert cleared["coverImageUrl"] is None
+    assert client.get(f"/api/v1/public/registries/{registry.slug}").json()["coverImageUrl"] is None
 
 
 def test_shipping_address_is_saved_but_not_published(
@@ -516,3 +545,97 @@ def test_the_slug_is_not_guessable(client: TestClient, session: Session) -> None
         session.execute(select(Registry).where(Registry.slug.in_(slugs))).scalars().all()
         is not None
     )
+
+
+def test_adding_a_shilav_voucher_copies_the_seed_fields(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry]
+) -> None:
+    headers, _ = owner_with_list
+
+    added = client.post(f"{ME}/registry/vouchers", headers=headers, json={"chainSlug": "shilav"})
+
+    assert added.status_code == 201
+    body = added.json()
+    assert body["kind"] == "voucher"
+    assert body["title"] == "שובר שילב"
+    assert body["chainSlug"] == "shilav"
+    assert body["chainNameHe"] == "שילב"
+    assert body["canonicalUrl"] == "https://www.shilav.co.il/products/gift-card"
+    assert body["subtitle"] == "כרטיס מתנה באתר שילב"
+    assert body["caption"] == "אתם בוחרים את הסכום באתר החנות"
+    assert body["priceAgorot"] is None
+    assert body["quantityWanted"] == 1
+    assert body["groupGiftEnabled"] is False
+
+    listed = client.get(f"{ME}/registry", headers=headers).json()
+    vouchers = [item for item in listed["items"] if item["kind"] == "voucher"]
+    assert [item["id"] for item in vouchers] == [body["id"]]
+
+
+def test_adding_the_same_voucher_type_twice_is_a_replay(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry], session: Session
+) -> None:
+    headers, registry = owner_with_list
+
+    first = client.post(f"{ME}/registry/vouchers", headers=headers, json={"chainSlug": "shilav"})
+    second = client.post(f"{ME}/registry/vouchers", headers=headers, json={"chainSlug": "shilav"})
+
+    assert first.status_code == 201
+    assert second.status_code == 200
+    assert second.json()["id"] == first.json()["id"]
+
+    session.expire_all()
+    rows = session.execute(
+        select(RegistryItem).where(
+            RegistryItem.registry_id == registry.id, RegistryItem.kind == "voucher"
+        )
+    ).scalars().all()
+    assert len(rows) == 1
+
+
+def test_an_unknown_voucher_type_is_not_found(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry]
+) -> None:
+    headers, _ = owner_with_list
+
+    response = client.post(
+        f"{ME}/registry/vouchers", headers=headers, json={"chainSlug": "buyme"}
+    )
+
+    assert response.status_code == 404
+    assert response.json()["detail"]["code"] == "voucher_type_unknown"
+
+
+def test_vouchers_can_be_added_to_an_unpublished_list(
+    client: TestClient, owner: dict[str, str]
+) -> None:
+    created = client.post(
+        f"{ME}/registry",
+        headers=owner,
+        json={"coupleNames": "נועה ואיתי", "includeEnvelope": False},
+    ).json()
+    slug = created["slug"]
+
+    added = client.post(f"{ME}/registry/vouchers", headers=owner, json={"chainSlug": "shilav"})
+
+    assert added.status_code == 201
+    assert added.json()["kind"] == "voucher"
+    assert client.get(f"/api/v1/public/registries/{slug}").status_code == 404
+
+
+def test_the_guest_sees_the_voucher_but_never_the_payment_handle(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry]
+) -> None:
+    headers, registry = owner_with_list
+
+    client.post(f"{ME}/registry/vouchers", headers=headers, json={"chainSlug": "shilav"})
+
+    public = client.get(f"/api/v1/public/registries/{registry.slug}")
+    body = public.json()
+    vouchers = [item for item in body["items"] if item["kind"] == "voucher"]
+
+    assert public.status_code == 200
+    assert len(vouchers) == 1
+    assert vouchers[0]["title"] == "שובר שילב"
+    assert "paymentHandle" not in body
+    assert "050-123-4567" not in public.text

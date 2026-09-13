@@ -47,10 +47,6 @@ export function Hero({ registry }: { registry: PublicRegistry }) {
             </p>
           </div>
         )}
-
-        {/* PRD risk 1: the link reads as phishing. D11 lets us say this
-            truthfully, so we say it above the fold. */}
-        <p className="text-small text-ink-muted">{copy.hero.reassurance}</p>
       </div>
     </>
   );
@@ -62,7 +58,7 @@ export function HowItWorks() {
       <h2 className="text-h3 font-bold text-ink">{copy.hero.howItWorksTitle}</h2>
       {copy.hero.howItWorks.map((line, index) => (
         <div key={line} className="flex items-start gap-3">
-          <span className="ltr-token grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary text-small font-bold text-white">
+          <span className="ltr-token grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent text-small font-bold text-on-accent">
             {index + 1}
           </span>
           <p className="text-small text-ink">{line}</p>

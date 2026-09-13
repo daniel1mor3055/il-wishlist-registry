@@ -96,9 +96,9 @@ def make_registry(
         shipping_apartment="12",
         shipping_notes="קוד לבניין 4580",
         shipping_postal_code="6433228",
-        payment_method="bit",
-        payment_handle="050-123-4567",
         payment_display_name="נועה",
+        bit_handle="050-123-4567",
+        paybox_handle=None,
     )
     session.add(registry)
     session.flush()
@@ -128,7 +128,7 @@ def add_envelope(session: Session, registry: Registry, **overrides: object) -> R
     defaults: dict[str, object] = {
         "kind": "fund",
         "position": 90,
-        "title": "חיבוק בביט / פייבוקס 💛",
+        "title": "חיבוק 💛",
         "subtitle": "כל סכום, ישירות אלינו",
         "contributed_agorot": 180_000,
         "contributor_count": 9,
