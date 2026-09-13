@@ -70,6 +70,7 @@ export type CreateInput = {
   shippingNotes: string | null;
   shippingPostalCode: string | null;
   includeEnvelope: boolean;
+  babyGender: "boy" | "girl" | null;
 };
 
 export async function createRegistry(input: CreateInput): Promise<ActionResult> {
@@ -98,6 +99,7 @@ export type RegistryPatchInput = {
   bitHandle?: string | null;
   payboxHandle?: string | null;
   paymentDisplayName?: string | null;
+  babyGender?: "boy" | "girl" | null;
 };
 
 export async function patchRegistry(patch: RegistryPatchInput): Promise<ActionResult> {
@@ -113,6 +115,7 @@ export async function patchRegistry(patch: RegistryPatchInput): Promise<ActionRe
   revalidatePath("/editor/address");
   revalidatePath("/editor/payment");
   revalidatePath("/editor/story");
+  revalidatePath("/editor/preview");
   return { ok: true, data: undefined };
 }
 

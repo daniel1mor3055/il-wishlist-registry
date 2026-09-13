@@ -6,6 +6,7 @@ import { ClosedRegistrySummary } from "@/components/registry/RegistryShell";
 import { copy } from "@/lib/copy";
 import { getOwnerRegistry } from "@/lib/owner";
 import { ownerToPublicRegistry } from "@/lib/preview";
+import { themeFromGender } from "@/lib/theme";
 
 export const metadata = {
   title: copy.editor.preview.banner,
@@ -20,7 +21,10 @@ export default async function PreviewPage() {
   const registry = ownerToPublicRegistry(state.registry);
 
   return (
-    <div className="paper-wash flex min-h-dvh flex-col">
+    <div
+      data-theme={themeFromGender(state.registry.babyGender)}
+      className="paper-wash flex min-h-dvh flex-col"
+    >
       <header className="sticky top-0 z-30 border-b border-border bg-surface">
         <div className="mx-auto flex w-full max-w-[430px] items-center gap-2 px-4 py-3">
           <Link

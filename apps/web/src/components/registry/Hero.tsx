@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { Meter } from "@/components/primitives/Meter";
 import { copy } from "@/lib/copy";
+import { coverIsCustom, coverSrc } from "@/lib/cover";
 import type { PublicRegistry } from "@/lib/types";
 
 /**
@@ -10,20 +11,22 @@ import type { PublicRegistry } from "@/lib/types";
 export function Hero({ registry }: { registry: PublicRegistry }) {
   const percent =
     registry.itemsTotal > 0 ? (registry.itemsClaimed / registry.itemsTotal) * 100 : 0;
+  const cover = coverSrc(registry.coverImageUrl);
+  const alt = coverIsCustom(registry.coverImageUrl)
+    ? `${registry.coupleNames} בבית`
+    : copy.hero.defaultCoverAlt;
 
   return (
     <>
       <div className="relative aspect-[16/10] w-full bg-image-bg">
-        {registry.coverImageUrl && (
-          <Image
-            src={registry.coverImageUrl}
-            alt={`${registry.coupleNames} בבית`}
-            fill
-            sizes="(max-width: 640px) 100vw, 640px"
-            priority
-            className="object-cover"
-          />
-        )}
+        <Image
+          src={cover}
+          alt={alt}
+          fill
+          sizes="(max-width: 640px) 100vw, 640px"
+          priority
+          className="object-cover object-center"
+        />
       </div>
 
       <div className="flex flex-col gap-4 px-5 pt-5">

@@ -14,16 +14,7 @@ export default async function PaymentPage() {
   if (!state.signedIn) redirect("/editor/enter");
   if (!state.registry) redirect("/editor/new");
 
-  const { bitHandle, payboxHandle, paymentDisplayName, coupleNames, items } =
-    state.registry;
-  const envelope = items.find((item) => item.kind === "fund" && item.isActive);
-  const vouchers = items
-    .filter((item) => item.kind === "voucher" && item.isActive && item.chainSlug)
-    .map((item) => ({
-      id: item.id,
-      chainSlug: item.chainSlug as string,
-      contributedAgorot: item.contributedAgorot,
-    }));
+  const { bitHandle, payboxHandle, paymentDisplayName, coupleNames } = state.registry;
 
   return (
     <EditorShell title={copy.editor.payment.title} back="/editor/settings">
@@ -32,12 +23,6 @@ export default async function PaymentPage() {
         payboxHandle={payboxHandle}
         paymentDisplayName={paymentDisplayName}
         coupleNames={coupleNames}
-        envelope={
-          envelope
-            ? { id: envelope.id, contributedAgorot: envelope.contributedAgorot }
-            : null
-        }
-        vouchers={vouchers}
       />
     </EditorShell>
   );

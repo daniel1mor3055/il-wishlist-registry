@@ -53,6 +53,7 @@ export const copy = {
       "מסמנים שרכשתם — כדי שאף אחד לא יקנה את אותו דבר פעמיים",
     ],
     shipsAfterBirth: "נשלח אחרי הלידה",
+    defaultCoverAlt: "דובי חום-דבש יושב על בד פשתן שמנת",
   },
 
   /** G2 grid states. */
@@ -279,13 +280,27 @@ export const copy = {
       creating: "מכינים…",
     },
 
+    gender: {
+      label: "ילד או ילדה?",
+      hint: "זה צבע הרשימה שהאורחים רואים. אפשר לשנות אחר כך.",
+      boy: "ילד",
+      girl: "ילדה",
+      unset: "עוד לא יודעים",
+    },
+
     /* ed-C2, the home screen. */
     home: {
       title: "הרשימה שלכם",
       itemCount: (n: number) => (n === 1 ? "פריט אחד" : `${n} פריטים`),
       claimed: (claimed: number, total: number) => `${claimed} מתוך ${total} נתפסו`,
       addItem: "להוסיף פריט",
-      addEnvelope: "להוסיף שי",
+      addEnvelope: "להוסיף ביט / פייבוקס",
+      vouchersTitle: "שוברים מהחנויות",
+      vouchersHint: "אורחים קונים את השובר באתר החנות. אנחנו לא מוכרים אותו.",
+      voucherShilav: "שובר שילב",
+      voucherMotsetsim: "שובר מוצצים",
+      voucherAgalis: "שובר עגליס",
+      voucherBabyStar: "שובר בייבי סטאר",
       filterAll: "הכול",
       filterLabel: "סינון לפי קטגוריה",
       preview: "לראות איך זה נראה לאורחים",
@@ -321,8 +336,8 @@ export const copy = {
       signOut: "לצאת מהחשבון",
       guestGroup: "מה שהאורחים רואים",
       handoffGroup: "כשהאורח נותן מתנה",
-      storyHint: "השמות, התמונה והמסר בראש העמוד",
-      paymentHint: "המספר שאורחים מעתיקים בביט ובפייבוקס, ושוברים מהחנויות",
+      storyHint: "השמות, התמונה, המסר וצבע הרשימה",
+      paymentHint: "המספר שאורחים מעתיקים בביט ובפייבוקס",
       addressHint: "מוצגת בקופה, לא ברשימה עצמה",
     },
 
@@ -335,29 +350,16 @@ export const copy = {
       saved: "נשמר",
     },
 
-    /* The number D13 reveals, the שי tile, and chain vouchers (PRD ed-C5). */
+    /* The number D13 reveals. The Bit/Paybox tile and chain vouchers live
+       on editor home, not here. */
     payment: {
-      title: "ביט, פייבוקס ושי",
-      tabCash: "שי",
-      tabVouchers: "שוברים",
+      title: "ביט ופייבוקס",
       explainer: "הכסף נשלח ישירות אליכם. אנחנו לא מחזיקים אותו ולא נוגעים בו.",
       handleLabel: "מספר טלפון",
       handlePlaceholder: "050-1234567",
       displayNameLabel: "על שם מי המספר?",
       displayNamePlaceholder: "נועה",
       displayNameHint: "אפשר לשנות. אם ריק, האורחים יראו את השם שלכם מהרשימה.",
-      envelopeTitle: "שי",
-      envelopeHint: "אורחים שיעדיפו לתת כסף יעתיקו את המספר וישלחו ישירות אליכם",
-      addEnvelope: "להוסיף שי",
-      removeEnvelope: "להוריד את השי",
-      envelopeLocked: "אורחים כבר נתנו שי, אז אי אפשר להוריד אותו",
-      vouchersTitle: "שוברים מהחנויות",
-      vouchersHint: "אורחים קונים את השובר באתר החנות. אנחנו לא מוכרים אותו.",
-      voucherLocked: "אורח כבר שלח את השובר הזה, אז אי אפשר להוריד אותו",
-      voucherShilav: "שובר שילב",
-      voucherMotsetsim: "שובר מוצצים",
-      voucherAgalis: "שובר עגליס",
-      voucherBabyStar: "שובר בייבי סטאר",
       save: "לשמור",
       saving: "שומרים…",
       saved: "נשמר",
@@ -370,7 +372,7 @@ export const copy = {
       storyLabel: "כמה מילים עלינו",
       storyPlaceholder: "יעל בדרך, ואנחנו מתרגשים לקבל אתכם לתוך הסיפור הזה.",
       coverLabel: "תמונת כיסוי",
-      coverHint: "מדביקים קישור לתמונה. אין העלאה כרגע. שדה ריק מוריד אותה.",
+      coverHint: "מדביקים קישור לתמונה. אין העלאה כרגע. שדה ריק משאיר את הדובי.",
       coverPlaceholder: "https://…",
       save: "לשמור",
       saving: "שומרים…",
@@ -395,7 +397,8 @@ export const copy = {
       previewLabel: "איך זה ייראה בוואטסאפ",
       previewFallback: "בלי תמונת כיסוי עדיין",
       qrLabel: "קוד לברית",
-      qrHint: "מדפיסים ומשאירים ליד המתנות, כדי שאורחים יפתחו את הרשימה בלי להעתיק קישור.",
+      qrHint:
+        "מדפיסים ומשאירים ליד המתנות, כדי שאורחים יפתחו את הרשימה בלי להעתיק קישור.",
     },
 
     /* ed-C3, adding. */
@@ -469,8 +472,7 @@ export const ERROR_COPY: Record<string, string> = {
   item_not_found: copy.item.gone,
   fund_complete: copy.group.complete,
   rate_limited: copy.shell.rateLimited,
-  payment_handle_unset:
-    "עוד אין לנו מספר להעביר. אפשר לתת שי אחר כך, או לשאול את הזוג",
+  payment_handle_unset: "עוד אין לנו מספר להעביר. אפשר לתת שי אחר כך, או לשאול את הזוג",
   voucher_type_unknown: copy.shell.genericError,
 
   // The couple's side. A refusal here is almost always the API protecting

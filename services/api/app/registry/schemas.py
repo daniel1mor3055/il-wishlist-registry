@@ -69,6 +69,7 @@ class PublicRegistry(BaseModel):
     city: str | None
     due_date: date | None
     baby_name: str | None
+    baby_gender: Literal["boy", "girl"] | None
     #: Unpublished never reaches a guest, so it is not one of the values (D30).
     lifecycle: Literal["published", "closed"]
 

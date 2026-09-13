@@ -5,15 +5,14 @@ import { useState, useTransition } from "react";
 import { createRegistry } from "@/app/editor/actions";
 import { AddressFields } from "@/components/editor/AddressFields";
 import { Field, FormError, inputClass } from "@/components/editor/EditorShell";
+import { GenderChips } from "@/components/editor/GenderChips";
 import { PrimaryButton, SecondaryButton } from "@/components/primitives/Buttons";
 import { copy } from "@/lib/copy";
+import { themeFromGender, type BabyGender } from "@/lib/theme";
 
 /**
- * Two questions, in two steps (PRD ed-C1).
- *
- * Categories are a filter on the list, not a create-time guess. שי is on by
- * default and toggleable later. Only step 1 is required. The street on step 2
- * is skippable; it is private even when they fill it (D49).
+ * Names on step 1. Step 2 is due date, list colour, then a skippable street
+ * (D49). שי is on by default and toggleable later. Only step 1 is required.
  */
 
 const STEPS = 2;
@@ -23,6 +22,7 @@ export function CreateWizard() {
   const [step, setStep] = useState(1);
   const [names, setNames] = useState("");
   const [dueDate, setDueDate] = useState("");
+  const [gender, setGender] = useState<BabyGender>(null);
   const [city, setCity] = useState("");
   const [street, setStreet] = useState("");
   const [entrance, setEntrance] = useState("");
@@ -47,6 +47,7 @@ export function CreateWizard() {
         shippingNotes: notes.trim() || null,
         shippingPostalCode: postalCode.trim() || null,
         includeEnvelope: true,
+        babyGender: gender,
       });
       if (result.ok) router.replace("/editor");
       else setError(result.error);
@@ -54,7 +55,7 @@ export function CreateWizard() {
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-5">
+    <div data-theme={themeFromGender(gender)} className="flex flex-1 flex-col gap-5">
       <Progress step={step} />
 
       {step === 1 && (
@@ -88,6 +89,7 @@ export function CreateWizard() {
               className={inputClass}
             />
           </Field>
+          <GenderChips value={gender} onChange={setGender} />
           <AddressFields
             value={{ street, entrance, floor, apartment, city, postalCode, notes }}
             onChange={(next) => {

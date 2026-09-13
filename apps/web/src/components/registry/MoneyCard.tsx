@@ -75,7 +75,7 @@ export function MoneyCard({
       type="button"
       onClick={onClick}
       data-testid="item-card"
-      data-kind={item.kind === "voucher" ? "voucher" : "envelope"}
+      data-kind={item.kind}
       className="flex flex-col gap-2.5 rounded-card border border-dashed border-border bg-surface p-3 text-right transition-transform active:scale-[0.98]"
     >
       <EnvelopeArt />

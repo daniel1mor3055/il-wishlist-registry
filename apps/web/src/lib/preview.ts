@@ -14,6 +14,7 @@ export function ownerToPublicRegistry(owner: OwnerRegistry): PublicRegistry {
     city: owner.city,
     dueDate: owner.dueDate,
     babyName: owner.babyName,
+    babyGender: owner.babyGender,
     lifecycle: owner.closedAt ? "closed" : "published",
     itemsTotal: owner.itemsTotal,
     itemsClaimed: owner.itemsClaimed,

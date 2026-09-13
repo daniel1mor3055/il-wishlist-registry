@@ -5,7 +5,9 @@ import { RegistryClient } from "@/components/registry/RegistryClient";
 import { ClosedRegistrySummary } from "@/components/registry/RegistryShell";
 import { getPublicRegistry } from "@/lib/api";
 import { copy } from "@/lib/copy";
+import { DEFAULT_COVER_PATH, coverIsCustom, coverSrc } from "@/lib/cover";
 import { OG_HEIGHT, OG_WIDTH, ogImageUrl } from "@/lib/og";
+import { themeFromGender } from "@/lib/theme";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -39,16 +41,25 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description,
       type: "website",
       locale: "he_IL",
-      images: registry.coverImageUrl
-        ? [ogImage(registry.coverImageUrl, title)]
-        : undefined,
+      images: [
+        ogCover(
+          registry.coverImageUrl,
+          coverIsCustom(registry.coverImageUrl) ? title : copy.hero.defaultCoverAlt,
+        ),
+      ],
     },
   };
 }
 
-function ogImage(coverImageUrl: string, alt: string) {
-  const { url, resized } = ogImageUrl(coverImageUrl);
-  return resized ? { url, width: OG_WIDTH, height: OG_HEIGHT, alt } : { url, alt };
+function ogCover(url: string | null, alt: string) {
+  const src = coverSrc(url);
+  if (src === DEFAULT_COVER_PATH) {
+    return { url: src, width: OG_WIDTH, height: OG_HEIGHT, alt };
+  }
+  const { url: sized, resized } = ogImageUrl(src);
+  return resized
+    ? { url: sized, width: OG_WIDTH, height: OG_HEIGHT, alt }
+    : { url: src, alt };
 }
 
 export default async function RegistryPage({ params }: Props) {
@@ -57,12 +68,17 @@ export default async function RegistryPage({ params }: Props) {
 
   if (!registry) notFound();
 
+  const theme = themeFromGender(registry.babyGender);
   if (registry.lifecycle === "closed") {
-    return <ClosedRegistrySummary registry={registry} />;
+    return (
+      <div data-theme={theme}>
+        <ClosedRegistrySummary registry={registry} />
+      </div>
+    );
   }
 
   return (
-    <main className="paper-wash mx-auto flex min-h-dvh w-full max-w-[430px] flex-col">
+    <main data-theme={theme} className="paper-wash mx-auto flex min-h-dvh w-full max-w-[430px] flex-col">
       <Hero registry={registry} />
       <HowItWorks />
 

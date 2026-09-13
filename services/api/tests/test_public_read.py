@@ -20,6 +20,7 @@ REGISTRY_KEYS = {
     "city",
     "dueDate",
     "babyName",
+    "babyGender",
     "lifecycle",
     "itemsTotal",
     "itemsClaimed",
@@ -65,6 +66,7 @@ def test_payload_has_exactly_the_agreed_keys(client: TestClient, session: Sessio
     body = read(client, registry.slug).json()
 
     assert set(body) == REGISTRY_KEYS
+    assert body["babyGender"] is None
     for item in body["items"]:
         assert set(item) == ITEM_KEYS
 

@@ -74,6 +74,8 @@ export interface PublicRegistry {
   /** ISO date. The expected birth date. */
   dueDate: string | null;
   babyName: string | null;
+  /** Palette for the guest page. Null is "not known yet" (theme `unset`). */
+  babyGender: "boy" | "girl" | null;
   lifecycle: Lifecycle;
 
   itemsTotal: number;
@@ -206,6 +208,7 @@ export interface OwnerRegistry {
   city: string | null;
   dueDate: string | null;
   babyName: string | null;
+  babyGender: "boy" | "girl" | null;
 
   shippingStreet: string | null;
   shippingEntrance: string | null;

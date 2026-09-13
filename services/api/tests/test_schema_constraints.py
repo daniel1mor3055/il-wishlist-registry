@@ -46,3 +46,10 @@ def test_claim_state_is_constrained(session: Session):
     registry = make_registry(session)
     with pytest.raises(IntegrityError, match="ck_item_claim_state"):
         add_product(session, registry, claim_state="shipped")
+
+
+def test_baby_gender_is_constrained(session: Session):
+    registry = make_registry(session)
+    registry.baby_gender = "surprise"
+    with pytest.raises(IntegrityError, match="ck_registry_baby_gender"):
+        session.flush()

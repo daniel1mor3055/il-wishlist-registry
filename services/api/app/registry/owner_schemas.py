@@ -79,6 +79,7 @@ class OwnerRegistry(BaseModel):
     city: str | None
     due_date: date | None
     baby_name: str | None
+    baby_gender: Literal["boy", "girl"] | None
 
     shipping_street: str | None
     shipping_entrance: str | None
@@ -118,6 +119,7 @@ class CreateRegistryRequest(BaseModel):
     shipping_apartment: str | None = Field(default=None, max_length=80)
     shipping_notes: str | None = Field(default=None, max_length=300)
     shipping_postal_code: str | None = Field(default=None, max_length=10)
+    baby_gender: Literal["boy", "girl"] | None = None
     #: שי is on by default; the couple turns it off later if they want.
     include_envelope: bool = True
 
@@ -152,6 +154,7 @@ class RegistryPatch(BaseModel):
     city: str | None = Field(default=None, max_length=80)
     due_date: date | None = None
     baby_name: str | None = Field(default=None, max_length=80)
+    baby_gender: Literal["boy", "girl"] | None = None
     shipping_street: str | None = Field(default=None, max_length=160)
     shipping_entrance: str | None = Field(default=None, max_length=40)
     shipping_floor: str | None = Field(default=None, max_length=40)

@@ -120,6 +120,7 @@ def to_owner_registry(registry: Registry) -> OwnerRegistry:
         city=registry.city,
         due_date=registry.due_date,
         baby_name=registry.baby_name,
+        baby_gender=registry.baby_gender,
         shipping_street=registry.shipping_street,
         shipping_entrance=registry.shipping_entrance,
         shipping_floor=registry.shipping_floor,
@@ -190,6 +191,7 @@ def create_registry(
         shipping_notes=body.shipping_notes,
         shipping_postal_code=body.shipping_postal_code,
         due_date=body.due_date,
+        baby_gender=body.baby_gender,
     )
     session.add(registry)
     session.flush()

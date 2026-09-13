@@ -639,3 +639,72 @@ def test_the_guest_sees_the_voucher_but_never_the_payment_handle(
     assert vouchers[0]["title"] == "שובר שילב"
     assert "paymentHandle" not in body
     assert "050-123-4567" not in public.text
+
+
+def test_create_omits_baby_gender(client: TestClient, owner: dict[str, str]) -> None:
+    body = client.post(
+        f"{ME}/registry",
+        headers=owner,
+        json={"coupleNames": "נועה ואיתי"},
+    ).json()
+    assert body["babyGender"] is None
+
+
+def test_create_persists_baby_gender_and_publishes_it(
+    client: TestClient, owner: dict[str, str]
+) -> None:
+    created = client.post(
+        f"{ME}/registry",
+        headers=owner,
+        json={"coupleNames": "נועה ואיתי", "babyGender": "girl"},
+    )
+    assert created.status_code == 201
+    body = created.json()
+    assert body["babyGender"] == "girl"
+
+    published = client.post(f"{ME}/registry/publish", headers=owner)
+    assert published.status_code == 200
+    public = client.get(f"/api/v1/public/registries/{body['slug']}").json()
+    assert public["babyGender"] == "girl"
+    assert "bitHandle" not in public
+    assert "payboxHandle" not in public
+    assert "paymentHandle" not in public
+
+
+def test_patch_sets_baby_gender(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry]
+) -> None:
+    headers, _ = owner_with_list
+    saved = client.patch(f"{ME}/registry", headers=headers, json={"babyGender": "boy"}).json()
+    assert saved["babyGender"] == "boy"
+
+
+def test_patch_null_clears_baby_gender(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry]
+) -> None:
+    headers, _ = owner_with_list
+    client.patch(f"{ME}/registry", headers=headers, json={"babyGender": "girl"})
+    cleared = client.patch(f"{ME}/registry", headers=headers, json={"babyGender": None}).json()
+    assert cleared["babyGender"] is None
+
+
+@pytest.mark.parametrize("value", ["surprise", "unset"])
+def test_create_rejects_invalid_baby_gender(
+    client: TestClient, owner: dict[str, str], value: str
+) -> None:
+    response = client.post(
+        f"{ME}/registry",
+        headers=owner,
+        json={"coupleNames": "נועה ואיתי", "babyGender": value},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.parametrize("value", ["surprise", "unset"])
+def test_patch_rejects_invalid_baby_gender(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry], value: str
+) -> None:
+    headers, _ = owner_with_list
+    response = client.patch(f"{ME}/registry", headers=headers, json={"babyGender": value})
+    assert response.status_code == 422
+

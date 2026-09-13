@@ -65,6 +65,7 @@ def get_public_registry(session: Session, slug: str) -> PublicRegistry | None:
         city=registry.city,
         due_date=registry.due_date,
         baby_name=registry.baby_name,
+        baby_gender=registry.baby_gender,
         lifecycle="closed" if registry.closed_at is not None else "published",
         # Progress counts products. An envelope has nothing to complete (D28),
         # so counting it would make a full list unreachable.

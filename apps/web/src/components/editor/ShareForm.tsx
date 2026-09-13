@@ -5,6 +5,7 @@ import QRCode from "qrcode";
 import { Field, inputClass } from "@/components/editor/EditorShell";
 import { PrimaryButton, SecondaryButton } from "@/components/primitives/Buttons";
 import { copy } from "@/lib/copy";
+import { coverSrc } from "@/lib/cover";
 
 function guestPath(slug: string) {
   return `/r/${slug}`;
@@ -78,7 +79,9 @@ export function ShareForm({
       </Field>
 
       <div className="flex flex-col gap-1.5">
-        <p className="text-small font-medium text-ink">{copy.editor.share.previewLabel}</p>
+        <p className="text-small font-medium text-ink">
+          {copy.editor.share.previewLabel}
+        </p>
         <PreviewCard
           coupleNames={coupleNames}
           story={story}
@@ -140,15 +143,13 @@ function PreviewCard({
   return (
     <div className="overflow-hidden rounded-card border border-border bg-surface">
       <div className="relative aspect-[1200/630] w-full bg-image-bg">
-        {coverImageUrl ? (
-          // Arbitrary pasted URLs are not on the Next image allowlist.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={coverImageUrl} alt="" className="h-full w-full object-cover" />
-        ) : (
-          <div className="grid h-full w-full place-items-center">
-            <p className="text-tiny text-ink-muted">{copy.editor.share.previewFallback}</p>
-          </div>
-        )}
+        {/* Arbitrary pasted URLs are not on the Next image allowlist. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={coverSrc(coverImageUrl)}
+          alt=""
+          className="h-full w-full object-cover object-center"
+        />
       </div>
       <div className="flex flex-col gap-0.5 px-3 py-2.5">
         <p className="line-clamp-2 text-small font-medium text-ink">

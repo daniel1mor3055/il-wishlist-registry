@@ -2,11 +2,20 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { addEnvelope, publishRegistry, removeItem } from "@/app/editor/actions";
+import {
+  addEnvelope,
+  addVoucher,
+  publishRegistry,
+  removeItem,
+} from "@/app/editor/actions";
 import { FormError } from "@/components/editor/EditorShell";
 import { Toast } from "@/components/feedback/Toast";
 import { Pill } from "@/components/primitives/Badges";
-import { fillPrimary, PrimaryButton, SecondaryButton } from "@/components/primitives/Buttons";
+import {
+  fillPrimary,
+  PrimaryButton,
+  SecondaryButton,
+} from "@/components/primitives/Buttons";
 import { ItemImage } from "@/components/primitives/ItemImage";
 import { CATEGORY_LABELS, copy } from "@/lib/copy";
 import { formatAgorot } from "@/lib/money";
@@ -15,14 +24,20 @@ import type { Category, OwnerItem, OwnerRegistry } from "@/lib/types";
 /** Hide first, write after. Long enough to tap לבטל, short enough not to linger. */
 const UNDO_MS = 4000;
 
-/** × lives on the home row only for products nobody has touched. */
+const VOUCHER_OPTIONS = [
+  { slug: "shilav", label: copy.editor.home.voucherShilav },
+  { slug: "motsetsim", label: copy.editor.home.voucherMotsetsim },
+  { slug: "agalis", label: copy.editor.home.voucherAgalis },
+  { slug: "baby-star", label: copy.editor.home.voucherBabyStar },
+] as const;
+
+/** × lives on the home row for anything a guest has not already acted on. */
 function canRemoveOnHome(item: OwnerItem): boolean {
-  return (
-    item.kind === "product" &&
-    item.claimState === "available" &&
-    item.quantityClaimed === 0 &&
-    item.contributedAgorot === 0
-  );
+  if (item.contributedAgorot > 0) return false;
+  if (item.kind === "product") {
+    return item.claimState === "available" && item.quantityClaimed === 0;
+  }
+  return item.kind === "fund" || item.kind === "voucher";
 }
 
 const CATEGORIES = Object.keys(CATEGORY_LABELS) as Category[];
@@ -52,9 +67,9 @@ export type EditorHomeView = Pick<
  * Reordering by drag is not here yet - it arrives with the tracker checkpoint,
  * and a fake handle would be worse than none.
  *
- * Untouched products hide from the row with undo. Taken items, שי and vouchers
- * stay on their settings screens, because a guest already acted (D45) or the
- * control lives on payment.
+ * Untouched products, an unused Bit/Paybox tile, and unused vouchers hide from
+ * the row with undo. A guest's gift stays (D45): no × once money is attached.
+ * Vouchers are picked below the list; the payment screen is only the number.
  *
  * Categories that currently have products get a filter row. הכול is the
  * default. Guest price chips stay on the guest grid, not here. The filters
@@ -75,15 +90,20 @@ export function EditorHome({ registry }: { registry: EditorHomeView }) {
   const active = registry.items.filter(
     (item) => item.isActive && !hiddenIds.includes(item.id),
   );
+  const products = active.filter((item) => item.kind === "product");
+  const envelope = active.find((item) => item.kind === "fund");
+  const vouchers = active.filter((item) => item.kind === "voucher");
+  const hasFundItem = registry.items.some((item) => item.kind === "fund");
   const presentCategories = CATEGORIES.filter((category) =>
-    active.some((item) => item.kind === "product" && item.category === category),
+    products.some((item) => item.category === category),
   );
   const selected =
     filter !== "all" && presentCategories.includes(filter) ? filter : "all";
-  const shown =
-    selected === "all"
-      ? active
-      : active.filter((item) => item.kind === "product" && item.category === selected);
+  const showCash = selected === "all";
+  const shownProducts =
+    selected === "all" ? products : products.filter((item) => item.category === selected);
+  const listRows = showCash && envelope ? [...shownProducts, envelope] : shownProducts;
+  const showEmpty = products.length === 0 && !envelope && vouchers.length === 0;
 
   function commit(id: string) {
     if (pending.current?.id === id) {
@@ -162,7 +182,7 @@ export function EditorHome({ registry }: { registry: EditorHomeView }) {
         >
           {copy.editor.home.addItem}
         </Link>
-        {!registry.items.some((item) => item.kind === "fund") && <AddEnvelopeButton />}
+        {showCash && !hasFundItem && <AddEnvelopeButton />}
       </div>
 
       <FormError message={removeError} />
@@ -175,11 +195,11 @@ export function EditorHome({ registry }: { registry: EditorHomeView }) {
         />
       )}
 
-      {active.length === 0 ? (
+      {showEmpty ? (
         <EmptyList />
-      ) : (
+      ) : listRows.length > 0 ? (
         <ul className="flex flex-col gap-2">
-          {shown.map((item) => (
+          {listRows.map((item) => (
             <ItemRow
               key={item.id}
               item={item}
@@ -189,6 +209,18 @@ export function EditorHome({ registry }: { registry: EditorHomeView }) {
             />
           ))}
         </ul>
+      ) : null}
+
+      {showCash && (
+        <VoucherSection
+          vouchers={vouchers}
+          claimedSlugs={registry.items
+            .filter((item) => item.kind === "voucher" && item.isActive && item.chainSlug)
+            .map((item) => item.chainSlug as string)}
+          hasBit={registry.hasBit}
+          hasPaybox={registry.hasPaybox}
+          onRemove={queueRemove}
+        />
       )}
 
       {toastOpen && (
@@ -253,9 +285,7 @@ function Chip({
       onClick={onClick}
       aria-pressed={pressed}
       className={`h-9 shrink-0 whitespace-nowrap rounded-btn px-3.5 text-small font-medium transition-colors ${
-        pressed
-          ? "bg-accent text-on-accent"
-          : "bg-neutral-tint text-ink"
+        pressed ? "bg-accent text-on-accent" : "bg-neutral-tint text-ink"
       }`}
     >
       {children}
@@ -284,8 +314,7 @@ function ItemRow({
   onRemove?: () => void;
 }) {
   const taken = item.claimState !== "available";
-  const title =
-    item.kind === "fund" ? copy.fund.tile(hasBit, hasPaybox) : item.title;
+  const title = item.kind === "fund" ? copy.fund.tile(hasBit, hasPaybox) : item.title;
 
   return (
     <li className="flex items-center rounded-card border border-border bg-surface">
@@ -309,9 +338,7 @@ function ItemRow({
         </span>
 
         <span className="flex min-w-0 flex-1 flex-col gap-1">
-          <span className="line-clamp-1 text-small font-medium text-ink">
-            {title}
-          </span>
+          <span className="line-clamp-1 text-small font-medium text-ink">{title}</span>
           <span className="flex flex-wrap items-center gap-1.5">
             {item.priceAgorot !== null && (
               <span className="text-tiny text-ink-muted">
@@ -416,6 +443,85 @@ function ShareCard({ slug }: { slug: string }) {
         {copied ? copy.editor.home.copiedLink : copy.editor.home.copyLink}
       </SecondaryButton>
     </div>
+  );
+}
+
+function VoucherSection({
+  vouchers,
+  claimedSlugs,
+  hasBit,
+  hasPaybox,
+  onRemove,
+}: {
+  vouchers: OwnerItem[];
+  claimedSlugs: string[];
+  hasBit: boolean;
+  hasPaybox: boolean;
+  onRemove: (item: OwnerItem) => void;
+}) {
+  const [addError, setAddError] = useState<string | null>(null);
+  const unused = VOUCHER_OPTIONS.filter((option) => !claimedSlugs.includes(option.slug));
+
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-small font-medium text-ink">{copy.editor.home.vouchersTitle}</p>
+      <p className="text-tiny text-ink-muted">{copy.editor.home.vouchersHint}</p>
+      {unused.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {unused.map((option) => (
+            <AddVoucherChip
+              key={option.slug}
+              slug={option.slug}
+              label={option.label}
+              onError={setAddError}
+            />
+          ))}
+        </div>
+      )}
+      <FormError message={addError} />
+      {vouchers.length > 0 && (
+        <ul className="flex flex-col gap-2">
+          {vouchers.map((item) => (
+            <ItemRow
+              key={item.id}
+              item={item}
+              hasBit={hasBit}
+              hasPaybox={hasPaybox}
+              onRemove={canRemoveOnHome(item) ? () => onRemove(item) : undefined}
+            />
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function AddVoucherChip({
+  slug,
+  label,
+  onError,
+}: {
+  slug: string;
+  label: string;
+  onError: (message: string | null) => void;
+}) {
+  const [pending, startTransition] = useTransition();
+
+  return (
+    <button
+      type="button"
+      disabled={pending}
+      onClick={() =>
+        startTransition(async () => {
+          onError(null);
+          const result = await addVoucher(slug);
+          if (!result.ok) onError(result.error);
+        })
+      }
+      className="h-9 shrink-0 whitespace-nowrap rounded-btn bg-neutral-tint px-3.5 text-small font-medium text-ink transition-colors disabled:opacity-50"
+    >
+      {label}
+    </button>
   );
 }
 

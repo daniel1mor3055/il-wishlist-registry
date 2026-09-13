@@ -47,6 +47,12 @@ CLAIM_STATES = ("available", "reserved", "purchased")
 
 class Registry(Base):
     __tablename__ = "registries"
+    __table_args__ = (
+        CheckConstraint(
+            "baby_gender IS NULL OR baby_gender IN ('boy', 'girl')",
+            name="ck_registry_baby_gender",
+        ),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     #: Unique: one registry per couple, which is why the editor's routes are
@@ -74,6 +80,7 @@ class Registry(Base):
     shipping_postal_code: Mapped[str | None] = mapped_column(String(10), default=None)
     due_date: Mapped[date | None] = mapped_column(Date, default=None)
     baby_name: Mapped[str | None] = mapped_column(String(80), default=None)
+    baby_gender: Mapped[str | None] = mapped_column(String(8), default=None)
 
     #: Null means the couple is still building it. Guests get 404 (D30).
     published_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), default=None)

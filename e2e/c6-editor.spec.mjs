@@ -27,12 +27,12 @@ test.describe("C6 editor", () => {
     await page.goto("/editor");
 
     await page.getByRole("link", { name: "הגדרות", exact: true }).click();
-    await page.getByRole("link", { name: "ביט, פייבוקס ושי" }).click();
+    await page.getByRole("link", { name: "ביט ופייבוקס" }).click();
     await expect(page.getByText("אנחנו לא מחזיקים אותו")).toBeVisible();
     await expect(page.getByText("מספר טלפון")).toBeVisible();
     await expect(page.locator("input[type='tel']")).toHaveCount(1);
     await expect(page.locator("input[type='tel']")).toHaveValue(/050/);
-    await expect(page.getByRole("button", { name: "שוברים" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "שוברים" })).toHaveCount(0);
 
     await page.goto("/editor/story");
     await expect(page.getByText("כמה מילים עלינו")).toBeVisible();
@@ -85,7 +85,10 @@ test.describe("C6 editor", () => {
     const slug = await ownerSlug(page);
     await page.goto(`/r/${slug}`);
     await page.locator("[data-testid='item-card'][data-kind='fund']").click();
-    await page.getByRole("dialog").getByRole("button", { name: "₪100", exact: true }).click();
+    await page
+      .getByRole("dialog")
+      .getByRole("button", { name: "₪100", exact: true })
+      .click();
     await page.getByRole("button", { name: "לשלוח שי" }).click();
 
     await expect(page.getByText("עוד אין לנו מספר להעביר")).toBeVisible();
@@ -93,7 +96,9 @@ test.describe("C6 editor", () => {
     await expect(page.getByText("050-123-4567")).toHaveCount(0);
   });
 
-  test("an untouched product leaves the list from the row, with undo", async ({ page }) => {
+  test("an untouched product leaves the list from the row, with undo", async ({
+    page,
+  }) => {
     const email = `c6-remove-${Date.now()}@example.com`;
     await signIn(page, email);
     await createDraftList(page, "נועה ומשה");
@@ -112,7 +117,9 @@ test.describe("C6 editor", () => {
     await expect(page.getByText("עגלה לבדיקה")).toBeVisible();
   });
 
-  test("category chips cut the editor list, and הכול brings שי back", async ({ page }) => {
+  test("category chips cut the editor list, and הכול brings שי back", async ({
+    page,
+  }) => {
     const email = `c6-filter-${Date.now()}@example.com`;
     await signIn(page, email);
     await createDraftList(page, "נועה ומשה");
@@ -122,16 +129,40 @@ test.describe("C6 editor", () => {
     await page.getByRole("link", { name: "להוסיף פריט" }).click();
     await page.getByRole("button", { name: "משהו אחר" }).click();
     await page.getByPlaceholder("משאבת חלב ידנית").fill("עגלה לבדיקה");
-    await page.getByRole("button", { name: "ניידות" }).click();
+    await page.getByRole("button", { name: "ניידות", exact: true }).click();
     await page.getByRole("button", { name: "להוסיף לרשימה" }).click();
     await page.waitForURL(/\/editor\/?$/);
 
     await expect(page.getByRole("button", { name: "הכול" })).toBeVisible();
-    await expect(page.getByRole("button", { name: "ניידות" })).toBeVisible();
-    await page.getByRole("button", { name: "ניידות" }).click();
-    await expect(page.getByText("עגלה לבדיקה")).toBeVisible();
+    await expect(page.getByRole("button", { name: "ניידות", exact: true })).toBeVisible();
+    await expect(page.getByText("שוברים מהחנויות")).toBeVisible();
+    await page.getByRole("button", { name: "ניידות", exact: true }).click();
+    await expect(page.locator("li").filter({ hasText: "עגלה לבדיקה" })).toBeVisible();
     await expect(page.getByText("חיבוק 💛")).toHaveCount(0);
+    await expect(page.getByText("שוברים מהחנויות")).toHaveCount(0);
     await page.getByRole("button", { name: "הכול" }).click();
     await expect(page.getByText("חיבוק 💛")).toBeVisible();
+    await expect(page.getByText("שוברים מהחנויות")).toBeVisible();
+  });
+
+  test("a voucher is added under the list and leaves from the row", async ({ page }) => {
+    const email = `c6-voucher-${Date.now()}@example.com`;
+    await signIn(page, email);
+    await createDraftList(page, "נועה ומשה");
+
+    await expect(page.getByRole("button", { name: "שובר שילב" })).toBeVisible();
+    await page.getByRole("button", { name: "שובר שילב" }).click();
+    await expect(page.getByRole("button", { name: "שובר שילב" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /שובר שילב/ })).toBeVisible();
+
+    await page
+      .locator("li")
+      .filter({ hasText: "שובר שילב" })
+      .getByRole("button", { name: "להסיר" })
+      .click();
+    await expect(page.getByText("שובר שילב")).toHaveCount(0);
+    await expect(page.getByText("הוסר מהרשימה")).toBeVisible();
+    await page.getByRole("button", { name: "לבטל" }).click();
+    await expect(page.getByRole("link", { name: /שובר שילב/ })).toBeVisible();
   });
 });

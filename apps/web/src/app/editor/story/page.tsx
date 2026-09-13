@@ -14,11 +14,11 @@ export default async function StoryPage() {
   if (!state.signedIn) redirect("/editor/enter");
   if (!state.registry) redirect("/editor/new");
 
-  const { story, coverImageUrl } = state.registry;
+  const { story, coverImageUrl, babyGender } = state.registry;
 
   return (
     <EditorShell title={copy.editor.story.title} back="/editor/settings">
-      <StoryForm story={story} coverImageUrl={coverImageUrl} />
+      <StoryForm story={story} coverImageUrl={coverImageUrl} babyGender={babyGender} />
     </EditorShell>
   );
 }

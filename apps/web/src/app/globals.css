@@ -1,41 +1,40 @@
 @import "tailwindcss";
 
 /* Design tokens: PRD section 9. This block is the only place a colour, radius
-   or type size is defined. A hex literal anywhere under src/components is a bug. */
+   or type size is defined. A hex literal anywhere under src/components is a bug.
+   Default palette is unset yellow (gender not chosen); girl/boy override via
+   [data-theme]. */
 @theme {
   --color-bg: #fbf6f4;
   --color-surface: #fffcfb;
   --color-ink: #2a2528;
   --color-ink-muted: #6a6366;
-  --color-primary: #ffb6c1;
-  --color-primary-hover: #dfa0aa;
-  --color-primary-active: #d0969f;
+  --color-primary: #fff4a3;
+  --color-primary-hover: #e8d86c;
+  --color-primary-active: #d4c45a;
   --color-on-primary: #2a2528;
-  /* Dark rose for primary *text* on paper. The fill itself is too light. */
-  --color-primary-ink: #7a3f54;
-  --color-accent: #a2cffe;
-  --color-accent-hover: #90b6de;
-  --color-accent-active: #88aacf;
+  /* Dark gold for primary *text* on paper. The fill itself is too light. */
+  --color-primary-ink: #6a5b24;
+  --color-accent: #f0d45a;
+  --color-accent-hover: #d4bc4a;
+  --color-accent-active: #c4ac3c;
   --color-on-accent: #2a2528;
-  --color-accent-ink: #2e4a66;
+  --color-accent-ink: #5c4e18;
   --color-success: #3e7d55;
   --color-on-success: #ffffff;
   /* Only the couple ever sees this: a refused save, or the remove action. The
      guest surface states problems in words, never in red. */
   --color-danger: #a8443b;
   --color-muted: #8a8588;
-  --color-border: #e8dde0;
+  --color-border: #ede4c8;
 
   /* Tints derived from the palette, used for badge and panel fills. */
-  --color-primary-tint: #fff0f3;
-  --color-accent-tint: #eef5fc;
-  --color-neutral-tint: #f4eef0;
-  --color-panel: #f7f1f2;
-  --color-image-bg: #f3eaec;
-  --color-meter-track: #e4eaf3;
-
-  --color-wash-blush: #ffb6c1;
-  --color-wash-sky: #a2cffe;
+  --color-primary-tint: #fff8d6;
+  --color-accent-tint: #fff6c8;
+  --color-neutral-tint: #f3eedc;
+  --color-panel: #f7f3e4;
+  --color-image-bg: #f4eed8;
+  --color-meter-track: #f3ebc0;
 
   --radius-card: 16px;
   --radius-btn: 12px;
@@ -58,6 +57,67 @@
   --text-micro--line-height: 1.4;
 
   --font-sans: var(--font-heebo), system-ui, sans-serif;
+}
+
+/* Nested wizard/story can return to yellow while a parent is girl/boy. */
+[data-theme="unset"] {
+  --color-primary: #fff4a3;
+  --color-primary-hover: #e8d86c;
+  --color-primary-active: #d4c45a;
+  --color-on-primary: #2a2528;
+  --color-primary-ink: #6a5b24;
+  --color-primary-tint: #fff8d6;
+  --color-accent: #f0d45a;
+  --color-accent-hover: #d4bc4a;
+  --color-accent-active: #c4ac3c;
+  --color-on-accent: #2a2528;
+  --color-accent-ink: #5c4e18;
+  --color-accent-tint: #fff6c8;
+  --color-meter-track: #f3ebc0;
+  --color-border: #ede4c8;
+  --color-panel: #f7f3e4;
+  --color-image-bg: #f4eed8;
+  --color-neutral-tint: #f3eedc;
+}
+
+[data-theme="girl"] {
+  --color-primary: #ffb6c1;
+  --color-primary-hover: #dfa0aa;
+  --color-primary-active: #d0969f;
+  --color-on-primary: #2a2528;
+  --color-primary-ink: #7a3f54;
+  --color-primary-tint: #fff0f3;
+  --color-accent: #e8a4b4;
+  --color-accent-hover: #d090a0;
+  --color-accent-active: #c48494;
+  --color-on-accent: #2a2528;
+  --color-accent-ink: #6b3a4a;
+  --color-accent-tint: #fcecee;
+  --color-meter-track: #f3e4e8;
+  --color-border: #e8dde0;
+  --color-panel: #f7f1f2;
+  --color-image-bg: #f3eaec;
+  --color-neutral-tint: #f4eef0;
+}
+
+[data-theme="boy"] {
+  --color-primary: #a2cffe;
+  --color-primary-hover: #90b6de;
+  --color-primary-active: #88aacf;
+  --color-on-primary: #2a2528;
+  --color-primary-ink: #2e4a66;
+  --color-primary-tint: #eef5fc;
+  --color-accent: #7eb4e8;
+  --color-accent-hover: #70a0ca;
+  --color-accent-active: #6794bc;
+  --color-on-accent: #2a2528;
+  --color-accent-ink: #24405c;
+  --color-accent-tint: #e3f0fa;
+  --color-meter-track: #dce8f4;
+  --color-border: #d5e3ef;
+  --color-panel: #f0f5f9;
+  --color-image-bg: #e8f0f6;
+  --color-neutral-tint: #eaf1f6;
 }
 
 html,
@@ -86,29 +146,19 @@ input[type="radio"] {
   white-space: nowrap;
 }
 
-/* Dual unisex wash. Blush at the inline start (visual right in RTL), sky
-   opposite, so neither pastel owns the page. Guest paper is full strength;
-   the editor uses the quieter recipe so the guest surface stays the pretty one. */
-.paper-wash {
-  background-color: var(--color-bg);
-  background-image:
-    radial-gradient(ellipse 90% 50% at 100% -8%, color-mix(in srgb, var(--color-wash-blush) 52%, transparent), transparent 60%),
-    radial-gradient(ellipse 80% 48% at -8% 108%, color-mix(in srgb, var(--color-wash-sky) 52%, transparent), transparent 58%);
+/* Cream paper with a 56px charcoal muslin speckle. Paper grain is charcoal-only
+   so neither pastel owns the frame. */
+html {
+  --paper-muslin: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56' viewBox='0 0 56 56'%3E%3Ccircle cx='8' cy='11' r='1.10' fill='%232A2528' fill-opacity='.14'/%3E%3Ccircle cx='22' cy='6' r='0.90' fill='%232A2528' fill-opacity='.12'/%3E%3Ccircle cx='41' cy='14' r='1.20' fill='%232A2528' fill-opacity='.12'/%3E%3Ccircle cx='51' cy='28' r='1.00' fill='%232A2528' fill-opacity='.14'/%3E%3Ccircle cx='17' cy='31' r='1.15' fill='%232A2528' fill-opacity='.12'/%3E%3Ccircle cx='33' cy='44' r='1.00' fill='%232A2528' fill-opacity='.14'/%3E%3Ccircle cx='6' cy='48' r='0.95' fill='%232A2528' fill-opacity='.12'/%3E%3C/svg%3E");
 }
 
-.paper-wash-quiet {
-  background-color: var(--color-bg);
-  background-image:
-    radial-gradient(ellipse 90% 45% at 100% -8%, color-mix(in srgb, var(--color-wash-blush) 28%, transparent), transparent 58%),
-    radial-gradient(ellipse 70% 40% at -10% 108%, color-mix(in srgb, var(--color-wash-sky) 28%, transparent), transparent 55%);
-}
-
+.paper-wash,
+.paper-wash-quiet,
 .editor-wash {
-  /* Alias while screens move to paper-wash-quiet. */
   background-color: var(--color-bg);
-  background-image:
-    radial-gradient(ellipse 90% 45% at 100% -8%, color-mix(in srgb, var(--color-wash-blush) 28%, transparent), transparent 58%),
-    radial-gradient(ellipse 70% 40% at -10% 108%, color-mix(in srgb, var(--color-wash-sky) 28%, transparent), transparent 55%);
+  background-image: var(--paper-muslin);
+  background-repeat: repeat;
+  background-size: 56px 56px;
 }
 
 .hide-scroll {

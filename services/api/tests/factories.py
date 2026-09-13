@@ -73,6 +73,7 @@ def make_registry(
     closed: bool = False,
     slug: str | None = None,
     couple: Couple | None = None,
+    baby_gender: str | None = None,
 ) -> Registry:
     couple = couple or make_couple(session)
 
@@ -86,6 +87,7 @@ def make_registry(
         city="תל אביב",
         due_date=date(2026, 2, 12),
         baby_name="יעל",
+        baby_gender=baby_gender,
         published_at=now if published else None,
         closed_at=now if closed else None,
         # Private (D13, D49). Present precisely so the read tests can prove they
