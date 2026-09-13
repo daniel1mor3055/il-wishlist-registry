@@ -4,7 +4,7 @@ Paste **only** the fenced block into Figma Make as the first prompt. Do not past
 
 This replaces the short P1 in [prompts.md](prompts.md). After the first render, go back to that file for P2 onward (states), then the couple editor, then the widget.
 
-Kept as sent, because it is the prompt that produced the render we reviewed. Parts of it are now superseded and should not be re-pasted as written: the priority badges (`חובה` / `רצוי` / `נחמד שיהיה`) are gone per D27; card G is a plain cash envelope with no target and no meter rather than `קופה לעגלה` per D28; Bit and PayBox are two independent phone numbers, not XOR, and G8 shows one copy row per live rail (D50). [p3-missing-states.md](p3-missing-states.md) opens with the two prompts that undo D27/D28.
+Kept as sent, because it is the prompt that produced the render we reviewed. Parts of it are now superseded and should not be re-pasted as written: the priority badges (`חובה` / `רצוי` / `נחמד שיהיה`) are gone per D27; card G is a plain cash envelope with no target and no meter rather than `קופה לעגלה` per D28; there is no shop-card tile; Bit and PayBox are two independent phone numbers, not XOR, and G8 shows one copy row per live rail (D50). [p3-missing-states.md](p3-missing-states.md) opens with the two prompts that undo D27/D28.
 
 What this prompt is for: one populated, published registry, mobile 390px, Hebrew RTL, guest-only. It is not the couple editor and not the retailer widget.
 
@@ -52,10 +52,10 @@ Top to bottom:
 Footer: tiny muted "רשימת לידה" wordmark, no English.
 
 SCREEN 2 — Item grid
-Sticky filter row under a compact header that repeats the couple names in small type. Chips, right to left, "הכול" is active: "הכול" · "מה שעוד חסר" · "עד ₪100" · "₪100–₪300" · "מעל ₪300" · "מתנות משותפות" · "כספיות ושוברים".
+Sticky filter row under a compact header that repeats the couple names in small type. Chips, right to left, "הכול" is active: "הכול" · "מה שעוד חסר" · "עד ₪100" · "₪100–₪300" · "מעל ₪300" · "מתנות משותפות" · "שי".
 Two-column card grid. Product cards must look richer than money cards (photo, shop chip, priority badge) so money is the fallback, not the easiest tap.
 
-Populate exactly these 8 cards, mixed states, do not invent extra items:
+Populate exactly these 7 cards, mixed states, do not invent extra items:
 
 Card A — available product
 Image: stroller. Name (2-line clamp): "עגלה משולבת צ'יקו מיסה שמנת"
@@ -85,16 +85,10 @@ Card F — cheap available
 Image: baby bath. Name: "אמבטיה לתינוק עם מעמד"
 Shop chip: "מוצצים". Priority: "רצוי". Price: "₪79"
 
-Card G — cash fund (plainer than product cards: no lifestyle photo, just a simple envelope-like composition in the palette, no stock "money" clipart)
-Title: "קופה לעגלה"
-Subtitle: "מעטפה דיגיטלית — נשלח אלינו בביט"
-Target line: "נותרו ₪1,200 מתוך ₪3,000"
-No per-guest amounts.
-
-Card H — gift card / voucher (also plainer than product cards)
-Title: "שובר שילב"
-Subtitle: "כרטיס מתנה באתר שילב"
-Caption: "אתם בוחרים את הסכום באתר החנות"
+Card G — cash envelope (plainer than product cards: no lifestyle photo, just a simple envelope-like composition in the palette, no stock "money" clipart)
+Title: "חיבוק בביט / פייבוקס 💛"
+Subtitle: "כל סכום, ישירות אלינו"
+No target, no meter, no per-guest amounts. Guest word is שי, never מעטפה. We do not sell gift cards.
 
 Card anatomy, every product card: square image on top, then name, then a row with shop chip on the right and priority badge wrapping below if needed, then price on the left of that row. Never truncate a price or a badge. Latin brand fragments like Maxi-Cosi and Chicco stay as-is, isolated as LTR tokens inside the Hebrew name.
 
@@ -127,10 +121,9 @@ Helper: "כל סכום עוזר — גם קטן"
 Primary: "להשתתף במתנה"
 After tapping, go to Screen 7 (contact reveal), not to a payment form.
 
-SCREEN 7 — Cash fund / gift card sheet (opened from Card G or Card H)
-Two stacked options, not a checkout.
-Block 1, fund: heading "קופה לעגלה". Line "נותרו ₪1,200 מתוך ₪3,000". Amount chips "₪100" "₪200" "₪500". Button "לשלוח בביט" which opens Screen 8.
-Block 2, voucher: heading "שובר שילב". Line "הקנייה מתבצעת באתר שילב, לא כאן". Button "להמשיך לאתר שילב"
+SCREEN 7 — Cash envelope sheet (opened from Card G)
+One plain cash gift, not a checkout. No shop cards.
+Heading: "חיבוק בביט / פייבוקס 💛". Line: "כל סכום, ישירות אלינו". Amount chips "₪100" "₪200" "₪500". Button "לשלוח שי" which opens Screen 8.
 No card fields.
 
 SCREEN 8 — Contact reveal
@@ -157,7 +150,7 @@ Interactions:
 - Filter chips filter the grid (do not navigate away).
 - Tap Card E → Screen 3 → "אני קונה את זה" → Screen 4. Treat "להמשיך לאתר מוצצים" as leaving the site; returning shows Screen 5.
 - Tap Card B → Screen 6 → "להשתתף במתנה" → Screen 8.
-- Tap Card G → Screen 7 → "לשלוח בביט" → Screen 8 → "שלחתי" → Screen 9.
+- Tap Card G → Screen 7 → "לשלוח שי" → Screen 8 → "שלחתי" → Screen 9.
 - Tap Card C does not start a purchase; the sheet only explains "אורח אחר כבר לקח את זה" with a secondary action "להשתתף בקופה במקום".
 - Copy on Screen 8 shows a brief toast "המספר הועתק" with the toast close affordance on the LEFT.
 

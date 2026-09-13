@@ -90,7 +90,7 @@ The couple's side works the other way round: `/editor` pages read the API from t
 /editor/settings   story, payment, address, sign out (header gear)
 /editor/add        search the harvested catalog, or add something by hand
 /editor/items/{id} quantity, note, group gifting, remove
-/editor/payment    Bit/PayBox handle, envelope, voucher types (D13)
+/editor/payment    Bit/PayBox handle only (D13)
 /editor/story      two-line story and cover URL
 /editor/preview    what guests see, including unpublished drafts (D30 stays)
 /editor/share      WhatsApp, preview card, QR (published only)
@@ -125,7 +125,7 @@ npm run seed             # load both into Postgres
 
 ## Status
 
-C6 done: the couple can now fill in everything a guest needs after the list exists. Bit or PayBox number and the envelope/vouchers at `/editor/payment` (D13, D28, D37), story and cover at `/editor/story`, a session-gated preview at `/editor/preview` that does not make an unpublished `/r/{slug}` work (D30), and the share kit at `/editor/share` — WhatsApp message, a mock preview card, a QR for the ברית. Publish and copy-link were already in C5 (D48). `/dev/og` parses the guest page's real meta tags so the Open Graph gate can be checked on localhost.
+C6 done: the couple can now fill in everything a guest needs after the list exists. Bit or PayBox number at `/editor/payment` (D13, D28, D37), story and cover at `/editor/story`, a session-gated preview at `/editor/preview` that does not make an unpublished `/r/{slug}` work (D30), and the share kit at `/editor/share` — WhatsApp message, a mock preview card, a QR for the ברית. Publish and copy-link were already in C5 (D48). `/dev/og` parses the guest page's real meta tags so the Open Graph gate can be checked on localhost.
 
 C5 still stands: a magic link mailed to Mailpit and exchanged for a session (D42, D43), a two-step wizard (names, then due date and a skippable address), search over the harvested catalog, item settings, and one button that makes the link work. The shipping address is the other half of the product handoff (D49), at `/editor/address`.
 

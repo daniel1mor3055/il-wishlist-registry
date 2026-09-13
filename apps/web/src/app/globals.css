@@ -2,39 +2,39 @@
 
 /* Design tokens: PRD section 9. This block is the only place a colour, radius
    or type size is defined. A hex literal anywhere under src/components is a bug.
-   Default palette is unset yellow (gender not chosen); girl/boy override via
+   Default palette is unset mint (gender not chosen); girl/boy override via
    [data-theme]. */
 @theme {
   --color-bg: #fbf6f4;
   --color-surface: #fffcfb;
   --color-ink: #2a2528;
   --color-ink-muted: #6a6366;
-  --color-primary: #fff4a3;
-  --color-primary-hover: #e8d86c;
-  --color-primary-active: #d4c45a;
+  --color-primary: #a8e6cf;
+  --color-primary-hover: #8fc4b0;
+  --color-primary-active: #82b5a2;
   --color-on-primary: #2a2528;
-  /* Dark gold for primary *text* on paper. The fill itself is too light. */
-  --color-primary-ink: #6a5b24;
-  --color-accent: #f0d45a;
-  --color-accent-hover: #d4bc4a;
-  --color-accent-active: #c4ac3c;
+  /* Dark sage for primary *text* on paper. The fill itself is too light. */
+  --color-primary-ink: #2b5c48;
+  --color-accent: #74c9a8;
+  --color-accent-hover: #64b496;
+  --color-accent-active: #5aa88b;
   --color-on-accent: #2a2528;
-  --color-accent-ink: #5c4e18;
+  --color-accent-ink: #214c3c;
   --color-success: #3e7d55;
   --color-on-success: #ffffff;
   /* Only the couple ever sees this: a refused save, or the remove action. The
      guest surface states problems in words, never in red. */
   --color-danger: #a8443b;
   --color-muted: #8a8588;
-  --color-border: #ede4c8;
+  --color-border: #d6e6dc;
 
   /* Tints derived from the palette, used for badge and panel fills. */
-  --color-primary-tint: #fff8d6;
-  --color-accent-tint: #fff6c8;
-  --color-neutral-tint: #f3eedc;
-  --color-panel: #f7f3e4;
-  --color-image-bg: #f4eed8;
-  --color-meter-track: #f3ebc0;
+  --color-primary-tint: #edfaf5;
+  --color-accent-tint: #e4f6ee;
+  --color-neutral-tint: #ebf3ef;
+  --color-panel: #f1f7f3;
+  --color-image-bg: #e8f2ed;
+  --color-meter-track: #dceee4;
 
   --radius-card: 16px;
   --radius-btn: 12px;
@@ -59,25 +59,25 @@
   --font-sans: var(--font-heebo), system-ui, sans-serif;
 }
 
-/* Nested wizard/story can return to yellow while a parent is girl/boy. */
+/* Nested wizard/gender can return to mint while a parent is girl/boy. */
 [data-theme="unset"] {
-  --color-primary: #fff4a3;
-  --color-primary-hover: #e8d86c;
-  --color-primary-active: #d4c45a;
+  --color-primary: #a8e6cf;
+  --color-primary-hover: #8fc4b0;
+  --color-primary-active: #82b5a2;
   --color-on-primary: #2a2528;
-  --color-primary-ink: #6a5b24;
-  --color-primary-tint: #fff8d6;
-  --color-accent: #f0d45a;
-  --color-accent-hover: #d4bc4a;
-  --color-accent-active: #c4ac3c;
+  --color-primary-ink: #2b5c48;
+  --color-primary-tint: #edfaf5;
+  --color-accent: #74c9a8;
+  --color-accent-hover: #64b496;
+  --color-accent-active: #5aa88b;
   --color-on-accent: #2a2528;
-  --color-accent-ink: #5c4e18;
-  --color-accent-tint: #fff6c8;
-  --color-meter-track: #f3ebc0;
-  --color-border: #ede4c8;
-  --color-panel: #f7f3e4;
-  --color-image-bg: #f4eed8;
-  --color-neutral-tint: #f3eedc;
+  --color-accent-ink: #214c3c;
+  --color-accent-tint: #e4f6ee;
+  --color-meter-track: #dceee4;
+  --color-border: #d6e6dc;
+  --color-panel: #f1f7f3;
+  --color-image-bg: #e8f2ed;
+  --color-neutral-tint: #ebf3ef;
 }
 
 [data-theme="girl"] {

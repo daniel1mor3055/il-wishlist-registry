@@ -172,8 +172,8 @@ def reserve_item(
     if item.registry_id != registry.id or not item.is_active:
         raise GiftingError("item_not_found", 404)
     if item.kind != "product":
-        # Money is given, not held. The envelope and vouchers have no unit to
-        # take, and group gifting contributes rather than reserves (D28).
+        # Money is given, not held. The envelope has no unit to take,
+        # and group gifting contributes rather than reserves (D28).
         raise GiftingError("item_not_reservable", 409)
 
     claimed = session.execute(

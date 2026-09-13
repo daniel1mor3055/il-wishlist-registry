@@ -59,9 +59,9 @@ Ranked by expected cost.
 
    Cheaper: split it. **C3a** is the double-buy core — guest token, reserve, the conditional update and 409, self-report, taken state, and the two-window gate. **C3b** is the money-adjacent surface — contributions, contact reveal, blessing, confirmation. C3a is the one that must be right; C3b is mostly forms over a ledger.
 
-2. **The editor is two checkpoints for ten screens.** `ed-C1` through `ed-C10` is a create wizard, an editor home with reordering, a three-tab add-item flow, item settings, funds and vouchers and payment details, story and cover, preview-as-guest, publish and share, the gift tracker, and settings and lifecycle. That is more surface area than C1 through C3 combined, and C4 and C5 as written will each overrun by a factor of two.
+2. **The editor is two checkpoints for ten screens.** `ed-C1` through `ed-C10` is a create wizard, an editor home with reordering, a three-tab add-item flow, item settings, funds and payment details, story and cover, preview-as-guest, publish and share, the gift tracker, and settings and lifecycle. That is more surface area than C1 through C3 combined, and C4 and C5 as written will each overrun by a factor of two.
 
-   Cheaper: three checkpoints, sliced by capability rather than by screen count. **C4** is identity plus create plus add-item from seed plus item settings — enough to build a list. **C5** is funds, vouchers, payment handle, story and cover, publish and share. **C6** is the tracker, release and correct, thank-you, and lifecycle. The old C6 hardening becomes **C7**.
+   Cheaper: three checkpoints, sliced by capability rather than by screen count. **C4** is identity plus create plus add-item from seed plus item settings — enough to build a list. **C5** is funds, payment handle, story and cover, publish and share. **C6** is the tracker, release and correct, thank-you, and lifecycle. The old C6 hardening becomes **C7**.
 
 3. **The C5 gate is not verifiable as written.** It asks the human to "paste the link somewhere that renders a preview card" while everything runs on localhost. WhatsApp's crawler cannot reach localhost. Neither can Slack's, Twitter's, or any validator. The gate as written can only be failed or faked.
 

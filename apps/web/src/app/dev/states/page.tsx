@@ -108,7 +108,6 @@ function cardStates(items: PublicItem[]): CardState[] {
   const takenItem = find((i) => i.claimState !== "available", "taken item");
   const partialQty = find((i) => i.quantityWanted > 1, "partial quantity");
   const envelope = find((i) => i.kind === "fund", "cash envelope");
-  const voucher = find((i) => i.kind === "voucher", "voucher");
   const longName = items
     .filter((i) => i.kind === "product")
     .reduce((longest, i) => (i.title.length > longest.title.length ? i : longest));
@@ -175,13 +174,6 @@ function cardStates(items: PublicItem[]): CardState[] {
       status: "c1",
       item: envelope,
     },
-    {
-      id: "voucher",
-      prd: "G7 — voucher tile",
-      hebrew: "אתם בוחרים את הסכום באתר החנות",
-      status: "c1",
-      item: voucher,
-    },
   ];
 }
 
@@ -196,11 +188,6 @@ const PENDING_STATES: Array<{ prd: string; hebrew: string; status: Status }> = [
     prd: "G2 — offline while browsing",
     hebrew: "משהו נתקע. לנסות שוב?",
     status: "c3",
-  },
-  {
-    prd: "G9, C9 — gift card sent",
-    hebrew: "השובר נשלח לנועה ואיתי",
-    status: "c5",
   },
 ];
 

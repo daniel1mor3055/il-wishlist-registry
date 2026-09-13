@@ -20,7 +20,7 @@
  */
 export type Lifecycle = "published" | "closed";
 
-export type ItemKind = "product" | "fund" | "voucher";
+export type ItemKind = "product" | "fund";
 
 export type Category = "linens" | "feeding" | "mobility" | "bath" | "clothing" | "toys";
 
@@ -36,11 +36,11 @@ export interface PublicItem {
   sourceTitle: string | null;
   /** The couple's own note about the item. */
   note: string | null;
-  /** Null for the envelope and vouchers, and for a manually added item. */
+  /** Null for the envelope, and for a manually added item. */
   category: Category | null;
   imageUrl: string | null;
 
-  /** Product fields. Null for funds and vouchers. */
+  /** Product fields. Null for funds. */
   chainSlug: string | null;
   chainNameHe: string | null;
   canonicalUrl: string | null;
@@ -60,7 +60,7 @@ export interface PublicItem {
   /** A count, never the identities and never the individual amounts (D15). */
   contributorCount: number;
 
-  /** Fund and voucher presentation. */
+  /** Fund presentation. */
   subtitle: string | null;
   caption: string | null;
 }

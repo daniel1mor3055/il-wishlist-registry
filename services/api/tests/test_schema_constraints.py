@@ -39,7 +39,7 @@ def test_the_envelope_cannot_have_a_target(session: Session):
 def test_group_gifting_only_applies_to_a_product(session: Session):
     registry = make_registry(session)
     with pytest.raises(IntegrityError, match="ck_item_group_product"):
-        add_product(session, registry, kind="voucher", group_gift_enabled=True)
+        add_product(session, registry, kind="fund", group_gift_enabled=True)
 
 
 def test_claim_state_is_constrained(session: Session):

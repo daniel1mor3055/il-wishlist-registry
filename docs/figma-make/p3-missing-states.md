@@ -2,7 +2,7 @@
 
 Cross-checked against the state inventory in [../prd.md](../prd.md) section 7, and against `ILBabyRegistryFigmaMake/src/App.tsx`. Run [p2-render-fixes.md](p2-render-fixes.md) first. Paste **only** each fenced block, one at a time.
 
-Already present in the render, so not listed below: the cash/voucher sheet, the claimed-item state (Card C, badge `כבר נתפס`), and the partial-quantity chip (Card D, `נשארו 2 מתוך 4`). These three still appear as separate follow-ups in `prompts.md`'s original P2-P8 list, written before the render existed — skip them, they are redundant now.
+Already present in the render, so not listed below: the cash envelope sheet, the claimed-item state (Card C, badge `כבר נתפס`), and the partial-quantity chip (Card D, `נשארו 2 מתוך 4`). These three still appear as separate follow-ups in `prompts.md`'s original P2-P8 list, written before the render existed — skip them, they are redundant now.
 
 ---
 
@@ -44,10 +44,6 @@ Add a fully-claimed banner above the grid: "כל הפריטים ברשימה נ�
 
 ```
 Add a broken-image placeholder: branded square with a category glyph, never a grey box.
-```
-
-```
-Give card H, the gift voucher, its own icon distinct from card G's envelope, so cash and vouchers read as different instruments.
 ```
 
 ---

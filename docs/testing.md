@@ -92,9 +92,9 @@ need Mailpit: they sign in through a real magic link.
    that documents a lie. Add the spec in the same change that ships the
    behaviour.
 
-C6 owner API (handle not in the public payload, cover/story published,
-vouchers) belongs in `test_owner_registry.py` next to the other couple
-writes. The Playwright file is the screens.
+C6 owner API (handle not in the public payload, cover/story published)
+belongs in `test_owner_registry.py` next to the other couple writes.
+The Playwright file is the screens.
 
 ## What this is not
 

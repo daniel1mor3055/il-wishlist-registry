@@ -33,7 +33,7 @@ apps/web/src/
                                   RegistryClient  <- the single client boundary
     sheets/                       SheetShell Modal BackButton CloseButton
                                   ItemDetailSheet HandoffSheet ReportModal
-                                  GroupGiftSheet CashVoucherSheet ContactRevealSheet
+                                  GroupGiftSheet CashEnvelopeSheet ContactRevealSheet
                                   BlessingSheet ConfirmedSheet TakenSheet
     feedback/                     Toast ToastProvider
   lib/

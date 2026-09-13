@@ -5,7 +5,7 @@ import { DEMO_COUPLE, createDraftList, ownerSlug, signIn } from "./editor.mjs";
 /**
  * C6. Payment handle, story, preview-as-guest, share.
  *
- * API contract for handle/story/vouchers lives in test_owner_registry.py.
+ * API contract for handle/story lives in test_owner_registry.py.
  * These specs lock what a person can see go wrong: preview writing as a
  * guest, unpublished looking published (D30), and money with no number
  * falling through to the generic toast.
@@ -15,6 +15,8 @@ test.describe("C6 editor", () => {
 
   test("unsigned editor screens send the couple to the door", async ({ page }) => {
     await page.goto("/editor/payment");
+    await expect(page).toHaveURL(/\/editor\/enter/);
+    await page.goto("/editor/gender");
     await expect(page).toHaveURL(/\/editor\/enter/);
     await page.goto("/editor/settings");
     await expect(page).toHaveURL(/\/editor\/enter/);
@@ -27,12 +29,14 @@ test.describe("C6 editor", () => {
     await page.goto("/editor");
 
     await page.getByRole("link", { name: "הגדרות", exact: true }).click();
+    await page.getByRole("link", { name: "ילד או ילדה?" }).click();
+    await expect(page.getByRole("radio", { name: "ילדה" })).toBeVisible();
+    await page.getByRole("link", { name: "חזרה", exact: true }).click();
     await page.getByRole("link", { name: "ביט ופייבוקס" }).click();
-    await expect(page.getByText("אנחנו לא מחזיקים אותו")).toBeVisible();
+    await expect(page.getByText("זה המספר לחיבוק ברשימה")).toBeVisible();
     await expect(page.getByText("מספר טלפון")).toBeVisible();
     await expect(page.locator("input[type='tel']")).toHaveCount(1);
     await expect(page.locator("input[type='tel']")).toHaveValue(/050/);
-    await expect(page.getByRole("button", { name: "שוברים" })).toHaveCount(0);
 
     await page.goto("/editor/story");
     await expect(page.getByText("כמה מילים עלינו")).toBeVisible();
@@ -109,12 +113,13 @@ test.describe("C6 editor", () => {
     await page.getByRole("button", { name: "להוסיף לרשימה" }).click();
     await page.waitForURL(/\/editor\/?$/);
 
-    await expect(page.getByText("עגלה לבדיקה")).toBeVisible();
-    await page.getByRole("button", { name: "להסיר" }).click();
-    await expect(page.getByText("עגלה לבדיקה")).toHaveCount(0);
+    const row = page.locator("li").filter({ hasText: "עגלה לבדיקה" });
+    await expect(row).toBeVisible();
+    await row.getByRole("button", { name: "להסיר" }).click();
+    await expect(row).toHaveCount(0);
     await expect(page.getByText("הוסר מהרשימה")).toBeVisible();
     await page.getByRole("button", { name: "לבטל" }).click();
-    await expect(page.getByText("עגלה לבדיקה")).toBeVisible();
+    await expect(page.locator("li").filter({ hasText: "עגלה לבדיקה" })).toBeVisible();
   });
 
   test("category chips cut the editor list, and הכול brings שי back", async ({
@@ -135,34 +140,49 @@ test.describe("C6 editor", () => {
 
     await expect(page.getByRole("button", { name: "הכול" })).toBeVisible();
     await expect(page.getByRole("button", { name: "ניידות", exact: true })).toBeVisible();
-    await expect(page.getByText("שוברים מהחנויות")).toBeVisible();
     await page.getByRole("button", { name: "ניידות", exact: true }).click();
     await expect(page.locator("li").filter({ hasText: "עגלה לבדיקה" })).toBeVisible();
-    await expect(page.getByText("חיבוק 💛")).toHaveCount(0);
-    await expect(page.getByText("שוברים מהחנויות")).toHaveCount(0);
+    await expect(page.getByText("חיבוק בביט / פייבוקס 💛")).toHaveCount(0);
     await page.getByRole("button", { name: "הכול" }).click();
-    await expect(page.getByText("חיבוק 💛")).toBeVisible();
-    await expect(page.getByText("שוברים מהחנויות")).toBeVisible();
+    await expect(page.getByText("חיבוק בביט / פייבוקס 💛")).toBeVisible();
   });
 
-  test("a voucher is added under the list and leaves from the row", async ({ page }) => {
-    const email = `c6-voucher-${Date.now()}@example.com`;
+  test("the hug on the list is Bit/Paybox, not a product", async ({ page }) => {
+    const email = `c6-hug-${Date.now()}@example.com`;
     await signIn(page, email);
     await createDraftList(page, "נועה ומשה");
 
-    await expect(page.getByRole("button", { name: "שובר שילב" })).toBeVisible();
-    await page.getByRole("button", { name: "שובר שילב" }).click();
-    await expect(page.getByRole("button", { name: "שובר שילב" })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: /שובר שילב/ })).toBeVisible();
+    await expect(page.getByText("חסר מספר")).toBeVisible();
+    await page.getByRole("link", { name: /חיבוק בביט \/ פייבוקס/ }).click();
+    await expect(page).toHaveURL(/\/editor\/payment/);
+    await expect(page.getByText("מה זה?")).toHaveCount(0);
+    await expect(page.getByText("זה המספר לחיבוק ברשימה")).toBeVisible();
+    await expect(page.getByText("מספר טלפון")).toBeVisible();
+  });
 
-    await page
-      .locator("li")
-      .filter({ hasText: "שובר שילב" })
-      .getByRole("button", { name: "להסיר" })
-      .click();
-    await expect(page.getByText("שובר שילב")).toHaveCount(0);
-    await expect(page.getByText("הוסר מהרשימה")).toBeVisible();
-    await page.getByRole("button", { name: "לבטל" }).click();
-    await expect(page.getByRole("link", { name: /שובר שילב/ })).toBeVisible();
+  test("adding Bit/Paybox without a number asks for the number", async ({
+    page,
+  }) => {
+    const email = `c6-addbit-${Date.now()}@example.com`;
+    await signIn(page, email);
+    await createDraftList(page, "נועה ומשה");
+
+    const row = page.locator("li").filter({ hasText: "חיבוק בביט / פייבוקס" });
+    await row.getByRole("button", { name: "להסיר" }).click();
+    await expect(
+      page.getByRole("link", { name: "להוסיף ביט / פייבוקס" }),
+    ).toBeVisible({ timeout: 10_000 });
+
+    await page.getByRole("link", { name: "להוסיף ביט / פייבוקס" }).click();
+    await expect(page).toHaveURL(/\/editor\/payment\?setup=1/);
+
+    await page.getByRole("button", { name: "לשמור" }).click();
+    await expect(page.getByText("צריך מספר כדי שאורחים יוכלו לשלוח")).toBeVisible();
+
+    await page.locator("input[type='tel']").fill("0501234567");
+    await page.getByRole("button", { name: "לשמור" }).click();
+    await page.waitForURL(/\/editor\/?$/);
+    await expect(page.getByText("חיבוק בביט / פייבוקס 💛")).toBeVisible();
+    await expect(page.getByText("חסר מספר")).toHaveCount(0);
   });
 });

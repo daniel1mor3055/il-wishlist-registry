@@ -109,32 +109,6 @@ function envelopeItem(overrides = {}) {
   };
 }
 
-function voucherItem(overrides = {}) {
-  return {
-    kind: "voucher",
-    title: "שובר שילב",
-    source_title: null,
-    note: null,
-    category: null,
-    image_url: null,
-    chain_slug: "shilav",
-    chain_name_he: "שילב",
-    external_id: null,
-    canonical_url: "https://www.shilav.co.il/products/gift-card",
-    price_agorot: null,
-    quantity_wanted: 1,
-    quantity_claimed: 0,
-    claim_state: "available",
-    group_gift_enabled: false,
-    target_agorot: null,
-    contributed_agorot: 0,
-    contributor_count: 0,
-    subtitle: "כרטיס מתנה באתר שילב",
-    caption: "אתם בוחרים את הסכום באתר החנות",
-    ...overrides,
-  };
-}
-
 const COUPLE = "נועה ואיתי";
 const COVER =
   "https://images.unsplash.com/photo-1763713512973-ed285caa8ba1?w=780&h=488&fit=crop&auto=format";
@@ -192,7 +166,6 @@ const mainItems = [
   productItem(mobile),
   productItem(bodysuits),
   envelopeItem(),
-  voucherItem(),
 ];
 
 if (longName) {

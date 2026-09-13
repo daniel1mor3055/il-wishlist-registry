@@ -164,7 +164,7 @@ def upgrade() -> None:
         sa.CheckConstraint(
             "kind <> 'fund' OR target_agorot IS NULL", name="ck_item_fund_no_target"
         ),
-        sa.CheckConstraint("kind IN ('product', 'fund', 'voucher')", name="ck_item_kind"),
+        sa.CheckConstraint("kind IN ('product', 'fund')", name="ck_item_kind"),
         sa.CheckConstraint("contributed_agorot >= 0", name="ck_item_contributed"),
         sa.CheckConstraint("contributor_count >= 0", name="ck_item_contributors"),
         sa.CheckConstraint(

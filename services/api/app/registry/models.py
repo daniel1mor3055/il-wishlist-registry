@@ -41,7 +41,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db import Base
 
-ITEM_KINDS = ("product", "fund", "voucher")
+ITEM_KINDS = ("product", "fund")
 CLAIM_STATES = ("available", "reserved", "purchased")
 
 
@@ -144,7 +144,7 @@ class RegistryItem(Base):
     title: Mapped[str] = mapped_column(String(200))
     source_title: Mapped[str | None] = mapped_column(String(300), default=None)
     note: Mapped[str | None] = mapped_column(Text, default=None)
-    #: Null for the envelope and vouchers, and for a manually added item.
+    #: Null for the envelope, and for a manually added item.
     category: Mapped[str | None] = mapped_column(String(20), default=None)
     image_url: Mapped[str | None] = mapped_column(String(500), default=None)
     subtitle: Mapped[str | None] = mapped_column(String(200), default=None)

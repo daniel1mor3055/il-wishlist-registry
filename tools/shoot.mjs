@@ -257,7 +257,7 @@ const SCENES = {
   /** The money tiles in the grid, where the envelope shows what it has collected. */
   "money-cards": [
     { goto: MAIN },
-    { text: "שי ושוברים" },
+    { text: "שי" },
     { wait: 400 },
     { scrollTo: "[data-testid='item-card'][data-kind='fund']" },
     { wait: 300 },

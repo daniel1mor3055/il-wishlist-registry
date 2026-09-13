@@ -18,11 +18,11 @@ Design at 390px first. Desktop = same content, centered max-1120px, 3-col item g
 | ID | Screen | Job | Primary CTA (Hebrew, gloss) |
 |---|---|---|---|
 | G1 | Hero / land | Couple photo, names, due date, one-line story, claim progress, "how this works" in 3 short lines | `לראות את הרשימה` (see the list) |
-| G2 | Item grid + filter bar | Sticky chips: `הכול` / `מה שעוד חסר` (still needed) / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` (group gifts) / `כספיות ושוברים` (cash & vouchers). Sort: `לפי חשיבות` (by priority), `מהמחיר הנמוך לגבוה`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
+| G2 | Item grid + filter bar | Sticky chips: `הכול` / `מה שעוד חסר` (still needed) / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` (group gifts) / `שי` (cash). Sort: `לפי חשיבות` (by priority), `מהמחיר הנמוך לגבוה`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
 | G3 | Item sheet | Image, long name, price, store badge (שילב / מוצצים / עגליס / בייבי סטאר), priority badge (`חובה` must-have / `רצוי` wanted / `נחמד שיהיה` nice to have), quantity line, couple note | `אני קונה את זה` (I'm buying this) |
 | G4 | Reserve / buy | Two-step: reserve, then outbound `לרכישה באתר שילב` (buy at Shilav) and return marker `כבר קניתי` (I already bought it). Optional first name only | `לשמור לי את המתנה` (hold this for me) |
 | G5 | Group gift sheet | Funding meter, `נותרו ₪550 מתוך ₪1,290` (₪550 left of ₪1,290), `6 אורחים כבר השתתפו`, amount presets + free amount, explicit "any amount helps" line | `להשתתף במתנה` (join this gift) |
-| G6 | Fund / voucher sheet | Couple's named funds (`קופה לעגלה` stroller fund) and voucher types; amount presets | `להשתתף בקופה` (contribute) / `לשלוח שובר` (send a voucher) |
+| G6 | Cash envelope sheet | One plain cash gift (`שי`), no named fund and no shop cards; amount presets, then contact reveal | `לשלוח שי` (send cash) |
 | G7 | Blessing composer | Optional name + free text. Placeholder: `כמה מילים מהלב לנועה ואיתי…`. Field label `השם שלך (לא חובה)`. Opt-in toggle `להציג את הברכה בעמוד הברכות` | `לצרף ברכה` (attach blessing) |
 | G8 | Mock payment | Plain, high-contrast, no illustrations. Amount, item, `התשלום מאובטח`, `אין שמירה של פרטי כרטיס`, demo strip `בהדגמה הזו לא מתבצע חיוב אמיתי` | `לאשר ולשלם` (confirm & pay) |
 | G9 | Confirmation | `תודה, רשמנו את המתנה שלך` + what happens next + gentle share nudge, no upsell grid | `לשתף את הרשימה` (share) |
@@ -37,11 +37,11 @@ Design at 390px first. Desktop = same content, centered max-1120px, 3-col item g
 | C2 | Editor home | Sectioned list, drag to reorder, progress ring, three empty-state prompts | `הוספת פריט` (add item) |
 | C3 | Add item | Three tabs: `לחפש בחנויות` (search stores, mock catalog), `להדביק קישור` (paste a link, shows parsed preview), `להוסיף ידנית` (manual) | `להוסיף לרשימה` |
 | C4 | Item settings | Priority, `כמה נשמח לקבל` (quantity), couple note, `לאפשר מתנה משותפת` with hint `מומלץ בפריטים מעל ₪400` | `לשמור` (save) |
-| C5 | Funds & vouchers | Name a fund, target amount (optional), pick voucher types; explainer that money is a legitimate gift | `ליצור קופה` (create fund) |
+| C5 | Bit/Paybox fund | Toggle שי, one phone, display name; explainer that money goes directly to the couple. We do not sell gift cards | `לשמור` |
 | C6 | Story & cover | Photo, 2-line story, `כמה מילים עלינו`, privacy of address | `לשמור` |
 | C7 | Preview as guest | Real guest render inside a device frame, banner `זו התצוגה שהאורחים רואים` (this is what guests see) | `חזרה לעריכה` (back to editing) |
 | C8 | Share | WhatsApp-first. Prefilled: `היי, פתחנו רשימת לידה — הכול מרוכז בקישור אחד:` + copy link, QR for print | `לשתף בוואטסאפ` |
-| C9 | Gift tracker | Table: פריט / מי / מתי / סטטוס / תודה. Status chips `נתפס` (taken), `נרכש` (purchased), `השובר בהכנה` (voucher in prep), `התקבל` (received). Filter `ממתין לתודה` (awaiting thanks) | `לשלוח תודה` (send thanks) |
+| C9 | Gift tracker | Table: פריט / מי / מתי / סטטוס / תודה. Status chips `נתפס` (taken), `נרכש` (purchased), `התקבל` (received). Filter `ממתין לתודה` (awaiting thanks) | `לשלוח תודה` (send thanks) |
 | C10 | Thank-you composer | Editable template `תודה רבה על {פריט} — ממש התרגשנו.`, per-guest, batch-friendly | `לשלוח` (send) |
 | C11 | Settings | `לעדכן שהתינוק נולד` (announce birth), `לסגור את הרשימה` (close), visibility, delete | `לשמור` |
 
@@ -60,13 +60,12 @@ Design at 390px first. Desktop = same content, centered max-1120px, 3-col item g
 |---|---|---|---|
 | Empty registry | G1/G2 | No grid. Warm illustration-free card + blessing CTA | `נועה ואיתי עוד מכינים את הרשימה. אפשר להשאיר ברכה בינתיים` (still preparing; leave a blessing) |
 | Single item | G2 | One full-width hero card, never a lonely grid cell; funds/blessing below | `בינתיים יש פריט אחד ברשימה` (one item so far) |
-| Fully claimed | G2 | Celebratory band above list, funds/vouchers promoted | `כל הפריטים ברשימה נתפסו. אפשר עוד להשתתף בקופה או לשלוח שובר` |
+| Fully claimed | G2 | Celebratory band above list, שי promoted | `כל הפריטים ברשימה נתפסו. אפשר עוד לתת שי` |
 | Reserved by someone else | G3 card + sheet | Muted card, badge, CTA demoted to secondary | `נתפס` (taken) / `אורח אחר כבר לקח את זה` + `להשתתף בקופה במקום` (contribute instead) |
 | Group gift partially funded | G3/G5 | RTL meter, remaining amount is the headline, not the percent | `נותרו ₪550 מתוך ₪1,290` |
 | Group gift complete | G3/G5 | Full meter, closed CTA, thanks line | `המתנה הושלמה. תודה לכל מי שהשתתף` |
 | Quantity partially fulfilled | G2/G3 | Counter chip, CTA stays live | `נשארו 2 מתוך 4` (2 of 4 left) |
-| Gift card pending | G9/C9 | Neutral chip, no error color | `השובר בהכנה וישלח לנועה ואיתי` |
-| Out of stock | G3 | Price stays, CTA swaps to alternatives | `אזל מהמלאי בשילב` + `לחפש בחנות אחרת` / `להשתתף בקופה במקום` |
+| Out of stock | G3 | Price stays, CTA swaps to alternatives | `אזל מהמלאי בשילב` + `לחפש בחנות אחרת` / `לתת שי במקום` |
 | Broken image | G2/G3 | Branded 1:1 placeholder with category glyph + product name. Never a gray box with alt text, never a layout shift | (no error copy) |
 | Long Hebrew name | G2/G3 | 2-line clamp with reserved min-height; full name in sheet; badges wrap, never truncate | `עגלת תאומים משולבת עם סלקל…` |
 | Closed registry | G11 | Read-only archive, blessings still visible | `הרשימה נסגרה. תודה לכל מי שהשתתף` |
@@ -95,7 +94,7 @@ Guest surfaces read like a message from friends: first person plural, no marketi
 ## Non-goals
 
 - Guest accounts, guest login, saved guest profiles, guest-to-guest visibility of who gave what.
-- Real payment rails, real retailer APIs, real voucher issuance, shipping/address flows, price tracking, cart or multi-item checkout.
+- Real payment rails, real retailer APIs, shipping/address flows, price tracking, cart or multi-item checkout. We do not sell gift cards.
 - Occasions other than baby; any English UI; native app patterns; onboarding tours; gamification, badges, leaderboards.
 - Comments/social feed, guest-to-guest chat, item requests by guests, registry search/discovery directory.
 - Dark mode and accessibility audit as separate deliverables in this phase (contrast still meets AA in the specs).

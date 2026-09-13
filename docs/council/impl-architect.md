@@ -19,7 +19,7 @@ All API paths carry `/api/v1` except `/health`. `/public/**` is anonymous; `/me/
 | Method and path | Auth | Returns | CP |
 |---|---|---|---|
 | `GET /health` | none | `{status, version}` | C1 |
-| `GET /public/registries/{slug}` | none | `PublicRegistry`: names, story, cover, lifecycle state, due date, claimed/total counts, `items[]` as `PublicItem`, funds, vouchers | C2 |
+| `GET /public/registries/{slug}` | none | `PublicRegistry`: names, story, cover, lifecycle state, due date, claimed/total counts, `items[]` as `PublicItem`, funds | C2 |
 | `GET /public/registries/{slug}/items/{id}` | none | one `PublicItem` plus handoff URL; re-read on sheet open to catch races | C2 |
 | `POST /public/registries/{slug}/items/{id}/reservations` | guest cookie issued here | `{reservation_id, item}`; conditional insert, `409` on race | C3 |
 | `POST /public/reservations/{id}/report` | guest cookie | body `{purchased, giver_name?}` → updated `PublicItem` (D12) | C3 |
@@ -34,7 +34,7 @@ All API paths carry `/api/v1` except `/health`. `/public/**` is anonymous; `/me/
 | `PATCH /me/registry` | session | story, cover, due date, payment handle, lifecycle transition | C4, C6 |
 | `POST /me/registry/items`, `PATCH`/`DELETE /me/registry/items/{id}` | session | `OwnerItem` | C4 |
 | `POST /me/registry/items/reorder` | session | `{ordered_ids[]}` → `204` (ed-C2 drag) | C5 |
-| `POST /me/registry/funds`, `PATCH /me/registry/funds/{id}` | session | funds and voucher types (ed-C5) | C5 |
+| `POST /me/registry/funds`, `PATCH /me/registry/funds/{id}` | session | Bit/Paybox fund only (ed-C5) | C5 |
 | `GET /me/registry/gifts` | session | tracker rows: item, giver name, amount, timestamp, status, blessing. The only place D15 amounts and D17 blessings exist | C5 |
 | `POST /me/registry/gifts/{id}/release`, `/correct` | session | D16 controls → updated tracker row | C5 |
 | `GET /catalog/search?q=&chain=&category=` | session | seeded mock cards through `CatalogPort` | C4 |

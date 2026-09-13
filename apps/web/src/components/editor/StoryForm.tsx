@@ -1,35 +1,28 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { patchRegistry } from "@/app/editor/actions";
 import { Field, FormError, inputClass } from "@/components/editor/EditorShell";
-import { GenderChips } from "@/components/editor/GenderChips";
 import { PrimaryButton } from "@/components/primitives/Buttons";
 import { copy } from "@/lib/copy";
 import { coverSrc } from "@/lib/cover";
-import { themeFromGender, type BabyGender } from "@/lib/theme";
 
 /**
  * Cover is a URL paste for the POC. Empty string keeps the default teddy.
- * List colour is live on this form so they see the palette before save.
+ * List colour lives on /editor/gender, not here.
  */
 export function StoryForm({
   story,
   coverImageUrl,
-  babyGender,
 }: {
   story: string;
   coverImageUrl: string | null;
-  babyGender: BabyGender;
 }) {
   const [storyText, setStory] = useState(story);
   const [cover, setCover] = useState(coverImageUrl ?? "");
-  const [gender, setGender] = useState<BabyGender>(babyGender);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
-  const router = useRouter();
   const preview = coverSrc(cover);
 
   function save() {
@@ -39,19 +32,15 @@ export function StoryForm({
       const result = await patchRegistry({
         story: storyText.trim(),
         coverImageUrl: cover.trim() || null,
-        babyGender: gender,
       });
-      if (result.ok) {
-        setSaved(true);
-        router.refresh();
-      } else setError(result.error);
+      if (result.ok) setSaved(true);
+      else setError(result.error);
     });
   }
 
   return (
-    <div data-theme={themeFromGender(gender)} className="flex flex-1 flex-col gap-5">
+    <div className="flex flex-1 flex-col gap-5">
       <p className="text-small text-ink-muted">{copy.editor.story.body}</p>
-      <GenderChips value={gender} onChange={setGender} />
       <Field label={copy.editor.story.storyLabel}>
         <textarea
           value={storyText}
@@ -62,7 +51,7 @@ export function StoryForm({
           className={`${inputClass} resize-none`}
         />
       </Field>
-      <Field label={copy.editor.story.coverLabel} hint={copy.editor.story.coverHint}>
+      <Field label={copy.editor.story.coverLabel}>
         <input
           value={cover}
           onChange={(event) => setCover(event.target.value)}

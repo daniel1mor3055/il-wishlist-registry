@@ -27,7 +27,7 @@ export const FILTERS = [
   { id: "100to300", label: "₪100–₪300" },
   { id: "over300", label: "מעל ₪300" },
   { id: "group", label: "מתנות משותפות" },
-  { id: "cash", label: "שי ושוברים" },
+  { id: "cash", label: "שי" },
 ] as const;
 
 export type FilterId = (typeof FILTERS)[number]["id"];
@@ -52,7 +52,6 @@ export const copy = {
       "קונים באתר החנות, או שולחים כסף ישירות אלינו",
       "מסמנים שרכשתם — כדי שאף אחד לא יקנה את אותו דבר פעמיים",
     ],
-    shipsAfterBirth: "נשלח אחרי הלידה",
     defaultCoverAlt: "דובי חום-דבש יושב על בד פשתן שמנת",
   },
 
@@ -134,7 +133,7 @@ export const copy = {
     complete: "המתנה הושלמה. תודה לכל מי שהשתתף",
   },
 
-  /** G7 the cash envelope and vouchers. */
+  /** G7 the cash envelope only. */
   fund: {
     /* No target and no meter, so the subtitle carries "any amount" instead of
        a remaining sum (D28). The envelope's own title names Bit and PayBox. */
@@ -154,10 +153,6 @@ export const copy = {
       if (hasPaybox) return "חיבוק בפייבוקס 💛";
       return "חיבוק 💛";
     },
-    voucherBody: (chain: string) => `הקנייה מתבצעת באתר ${chain}, לא כאן`,
-    voucherContinue: (chain: string) => `להמשיך לאתר ${chain}`,
-    voucherCaption: "אתם בוחרים את הסכום באתר החנות",
-    voucherSent: (names: string) => `השובר נשלח ל${names}`,
   },
 
   /** G8 the D13 contact reveal. */
@@ -196,7 +191,7 @@ export const copy = {
     body: (names: string) => `${names} יראו שרכשת, וידעו למי להגיד תודה.`,
     /* Money is not a purchase, and this screen must not tell a guest who just
        sent ₪100 in Bit that the couple can see they bought something. Covers
-       the envelope, a group gift and a voucher alike. */
+       the envelope and a group gift. */
     giftBody: (names: string) => `${names} יראו את המתנה שלך, וידעו למי להגיד תודה.`,
     back: "חזרה לרשימה",
   },
@@ -282,10 +277,12 @@ export const copy = {
 
     gender: {
       label: "ילד או ילדה?",
-      hint: "זה צבע הרשימה שהאורחים רואים. אפשר לשנות אחר כך.",
       boy: "ילד",
       girl: "ילדה",
       unset: "עוד לא יודעים",
+      save: "לשמור",
+      saving: "שומרים…",
+      saved: "נשמר",
     },
 
     /* ed-C2, the home screen. */
@@ -295,12 +292,8 @@ export const copy = {
       claimed: (claimed: number, total: number) => `${claimed} מתוך ${total} נתפסו`,
       addItem: "להוסיף פריט",
       addEnvelope: "להוסיף ביט / פייבוקס",
-      vouchersTitle: "שוברים מהחנויות",
-      vouchersHint: "אורחים קונים את השובר באתר החנות. אנחנו לא מוכרים אותו.",
-      voucherShilav: "שובר שילב",
-      voucherMotsetsim: "שובר מוצצים",
-      voucherAgalis: "שובר עגליס",
-      voucherBabyStar: "שובר בייבי סטאר",
+      fundTitle: "חיבוק בביט / פייבוקס 💛",
+      fundNeedsNumber: "חסר מספר",
       filterAll: "הכול",
       filterLabel: "סינון לפי קטגוריה",
       preview: "לראות איך זה נראה לאורחים",
@@ -319,7 +312,6 @@ export const copy = {
       copyLink: "העתקה",
       copiedLink: "הקישור הועתק",
       emptyTitle: "אין עוד כלום ברשימה",
-      emptyBody: "מוסיפים פריט ראשון, ואז מפרסמים.",
       /* Item rows. A claimed item is not editable down to zero (see the API), so
          the row says why rather than offering a control that will refuse. */
       itemTaken: "נתפס",
@@ -329,16 +321,11 @@ export const copy = {
       settings: "הגדרות",
     },
 
-    /* Header gear on home. Story, payment and address live here, not on the list. */
+    /* Header gear on home. Story, list colour, payment and address live here, not on the list. */
     settings: {
       title: "הגדרות",
       gearLabel: "הגדרות",
       signOut: "לצאת מהחשבון",
-      guestGroup: "מה שהאורחים רואים",
-      handoffGroup: "כשהאורח נותן מתנה",
-      storyHint: "השמות, התמונה, המסר וצבע הרשימה",
-      paymentHint: "המספר שאורחים מעתיקים בביט ובפייבוקס",
-      addressHint: "מוצגת בקופה, לא ברשימה עצמה",
     },
 
     /* The street guests copy at checkout (D49). Same fields as wizard step 2. */
@@ -350,11 +337,12 @@ export const copy = {
       saved: "נשמר",
     },
 
-    /* The number D13 reveals. The Bit/Paybox tile and chain vouchers live
-       on editor home, not here. */
+    /* The number D13 reveals. The list tile is the same thing as this screen. */
     payment: {
       title: "ביט ופייבוקס",
-      explainer: "הכסף נשלח ישירות אליכם. אנחנו לא מחזיקים אותו ולא נוגעים בו.",
+      explainer:
+        "זה המספר לחיבוק ברשימה. אורחים מעתיקים אותו בביט ובפייבוקס. הכסף מגיע אליכם, אנחנו לא נוגעים בו.",
+      numberRequired: "צריך מספר כדי שאורחים יוכלו לשלוח",
       handleLabel: "מספר טלפון",
       handlePlaceholder: "050-1234567",
       displayNameLabel: "על שם מי המספר?",
@@ -372,7 +360,6 @@ export const copy = {
       storyLabel: "כמה מילים עלינו",
       storyPlaceholder: "יעל בדרך, ואנחנו מתרגשים לקבל אתכם לתוך הסיפור הזה.",
       coverLabel: "תמונת כיסוי",
-      coverHint: "מדביקים קישור לתמונה. אין העלאה כרגע. שדה ריק משאיר את הדובי.",
       coverPlaceholder: "https://…",
       save: "לשמור",
       saving: "שומרים…",
@@ -473,7 +460,6 @@ export const ERROR_COPY: Record<string, string> = {
   fund_complete: copy.group.complete,
   rate_limited: copy.shell.rateLimited,
   payment_handle_unset: "עוד אין לנו מספר להעביר. אפשר לתת שי אחר כך, או לשאול את הזוג",
-  voucher_type_unknown: copy.shell.genericError,
 
   // The couple's side. A refusal here is almost always the API protecting
   // something a guest already did, so it is worth saying which thing.
@@ -485,7 +471,7 @@ export const ERROR_COPY: Record<string, string> = {
   group_gift_has_money: copy.editor.itemSettings.groupGiftLocked,
   group_gift_needs_price: copy.editor.itemSettings.groupGiftNeedsPrice,
   group_gift_needs_single_unit: copy.editor.itemSettings.groupGiftNeedsSingle,
-  registry_empty: copy.editor.home.emptyBody,
+  registry_empty: copy.editor.home.emptyTitle,
 };
 
 export function errorCopy(code: string | undefined): string {

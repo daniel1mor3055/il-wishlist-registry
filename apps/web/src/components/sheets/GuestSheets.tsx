@@ -123,7 +123,6 @@ export function ItemDetailSheet({
 
         {/* Permanent and quiet, never a warning colour (PRD section 7). */}
         <p className="text-small text-ink-muted">{copy.item.priceMayDiffer}</p>
-        <p className="text-small text-ink-muted">{copy.hero.shipsAfterBirth}</p>
       </div>
     </Sheet>
   );
@@ -381,8 +380,8 @@ export function GroupGiftSheet({
   );
 }
 
-/** G7. The cash envelope, or a voucher. */
-export function CashVoucherSheet({
+/** G7 cash envelope only. */
+export function CashSheet({
   item,
   hasBit,
   hasPaybox,
@@ -393,44 +392,19 @@ export function CashVoucherSheet({
   hasBit: boolean;
   hasPaybox: boolean;
   onClose: () => void;
-  /** Agorot for the envelope, null for a voucher, whose amount is set at the chain. */
-  onSend: (agorot: number | null) => void;
+  onSend: (agorot: number) => void;
 }) {
   const [amount, setAmount] = useState<number | null>(null);
-  const isVoucher = item.kind === "voucher";
-
-  if (isVoucher) {
-    return (
-      <Sheet
-        onClose={onClose}
-        labelledBy="voucher-title"
-        cta={
-          <div className="flex flex-col items-center gap-2">
-            <SecondaryButton onClick={() => onSend(null)}>
-              {copy.fund.voucherContinue(item.chainNameHe ?? "")}
-            </SecondaryButton>
-          </div>
-        }
-      >
-        <div className="flex flex-col gap-4 pt-1">
-          <h2 id="voucher-title" className="text-h2 font-bold text-ink">
-            {item.title}
-          </h2>
-          <p className="text-small text-ink-muted">
-            {copy.fund.voucherBody(item.chainNameHe ?? "")}
-          </p>
-          {item.caption && <p className="text-small text-ink-muted">{item.caption}</p>}
-        </div>
-      </Sheet>
-    );
-  }
 
   return (
     <Sheet
       onClose={onClose}
       labelledBy="fund-title"
       cta={
-        <PrimaryButton onClick={() => onSend(amount)} disabled={amount === null}>
+        <PrimaryButton
+          onClick={() => amount !== null && onSend(amount)}
+          disabled={amount === null}
+        >
           {copy.fund.send(hasBit, hasPaybox)}
         </PrimaryButton>
       }

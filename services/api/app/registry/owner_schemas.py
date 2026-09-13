@@ -39,7 +39,7 @@ class OwnerItem(BaseModel):
 
     id: UUID
     position: int
-    kind: Literal["product", "fund", "voucher"]
+    kind: Literal["product", "fund"]
 
     title: str
     source_title: str | None
@@ -198,19 +198,6 @@ class AddCatalogItemRequest(BaseModel):
     catalog_item_id: UUID
     quantity_wanted: int = Field(default=1, ge=1, le=MAX_QUANTITY)
     note: str | None = Field(default=None, max_length=500)
-
-
-class AddVoucherRequest(BaseModel):
-    """Turn on a chain gift-card type. The client sends a slug, never copy."""
-
-    model_config = WireModel
-
-    chain_slug: str = Field(min_length=1, max_length=40)
-
-    @field_validator("chain_slug")
-    @classmethod
-    def _trim(cls, value: str) -> str:
-        return value.strip()
 
 
 class AddManualItemRequest(BaseModel):

@@ -20,7 +20,7 @@ Angle: the schema and the invariants. `C1`-`C6` are implementation checkpoints; 
 | `magic_tokens` | identity | login | `token_hash`, `couple_id`, `expires_at`, `consumed_at` (single-use) |
 | `sessions` | identity | the session | `token_hash`, `couple_id`, `expires_at` |
 | `registries` | registry | the list | `id`, `couple_id`, `slug` (unique), `couple_names`, `story`, `cover_image`, `city`, `due_date`, `lifecycle` (`draft`/`published`/`post_birth`/`closed`), `baby_name`, `born_on`, `bit_handle`, `paybox_handle`, `payment_display_name` |
-| `registry_items` | registry | one row per tile | `id`, `registry_id`, `kind` (`product`/`fund`/`voucher`), `position`, `title`, `note`, `priority`, `quantity_wanted`, `quantity_claimed`, `image_url`, `category`, `group_gift_enabled`, `target_agorot`, `contributed_agorot`, `is_active`, `out_of_stock`, plus catalog snapshot: `chain_slug`, `chain_name`, `external_id`, `canonical_url`, `price_agorot` |
+| `registry_items` | registry | one row per tile | `id`, `registry_id`, `kind` (`product`/`fund`), `position`, `title`, `note`, `priority`, `quantity_wanted`, `quantity_claimed`, `image_url`, `category`, `group_gift_enabled`, `target_agorot`, `contributed_agorot`, `is_active`, `out_of_stock`, plus catalog snapshot: `chain_slug`, `chain_name`, `external_id`, `canonical_url`, `price_agorot` |
 | `reservations` | gifting | a hold and its self-report | `id`, `item_id`, `registry_id`, `guest_token_hash`, `giver_name`, `status` (`held`/`purchased`/`released`), `created_at`, `reported_at`, `released_by` (`guest`/`couple`), `thanked_at` |
 | `contributions` | gifting | the ledger | `id`, `registry_id`, `item_id`, `guest_token_hash`, `giver_name`, `amount_agorot`, `declared_sent_at`, `created_at`, `thanked_at` |
 | `blessings` | gifting | a private message (D17) | `id`, `registry_id`, `guest_token_hash`, `giver_name`, `message`, `created_at` |
@@ -110,7 +110,7 @@ The plan says "the נועה ואיתי demo registry", singular. PRD section 7 h
 
 | Slug intent | Demonstrates |
 |---|---|
-| `noa-itai-...` (main) | the eight reference cards A-H, published, partially claimed, group gift at ₪740/₪1,290, quantity 2-of-4, one taken item, a fund, a voucher |
+| `noa-itai-...` (main) | the seven reference cards A-G, published, partially claimed, group gift at ₪740/₪1,290, quantity 2-of-4, one taken item, a fund |
 | empty | `נועה ואיתי עוד מכינים את הרשימה` |
 | single item | the full-width hero card |
 | fully claimed | the celebratory band with funds promoted |

@@ -11,8 +11,8 @@ Status values: `LOCKED` (design and POC assume it), `PARKED` (deliberately defer
 | D1 | Reference product | [Babylist](https://www.babylist.com/) is the UX north star: one public list page, guest buys without an account, gift tracker for the couple, group gifting, cash and gift-card funds, one shareable link. | LOCKED |
 | D2 | Wedge | Baby registry ("רשימת לידה") only. Wedding, birthday, and generic wishlists are out of this phase even though the platform should not architecturally forbid them. | LOCKED |
 | D3 | Design surfaces | Three surfaces get designed: (1) public guest registry page, (2) couple editor, (3) retailer embed widget. | LOCKED |
-| D4 | POC scope | POC implements only surfaces 1 and 2, with mocked shop catalogs and mocked gift cards. No real retailer APIs, no real payments, no cloud. | LOCKED |
-| D5 | Gifting model | Hybrid, like Babylist: product items (outbound or mocked checkout) + couple-chosen gift cards and cash funds + optional group gifting on expensive items. | LOCKED |
+| D4 | POC scope | POC implements only surfaces 1 and 2, with mocked shop catalogs. No shop cards, no real retailer APIs, no real payments, no cloud. | LOCKED |
+| D5 | Gifting model | Hybrid: product items (outbound) + one Bit/Paybox cash fund (`שי`) + optional group gifting on expensive items. Cash is D13/D50, never a shop card. Superseded gift-card half: see D51. | LOCKED |
 | D6 | Language | Hebrew only, RTL. No English UI in this phase. Internal docs stay in English; all user-facing copy is Hebrew. | LOCKED |
 | D7 | Guest identity | No guest account. Optional name and blessing. The couple sees who gave what (Babylist Gift Tracker default, not surprise-by-default). | LOCKED |
 | D8 | Double-buy prevention | Other guests must see that an item is already taken or partially funded. Reservation state is public, giver identity is not. | LOCKED |
@@ -140,17 +140,25 @@ a שי, not a choice of one app.
 |---|---|---|---|
 | D50 | Bit and PayBox are two rails from one Israeli mobile | Guests may send in Bit, PayBox, or either. The schema keeps `bit_handle` and `paybox_handle` so a reveal can list live rails; the public payload carries only `hasBit` / `hasPaybox`. The D13 reveal is still one GET `/payment-handle` (D41) and answers `{ rails: [{ method, handle, displayName }] }`. The editor does not XOR the apps and does not treat an empty field as an off switch: one phone and a display name, the שי checkbox enables the cash tile, and save writes that number to both columns. Contributions do not record which app was used. | LOCKED |
 
+## Locked, round ten (cash is Bit/Paybox only)
+
+Taken after C6. Shop cards were a leftover of D4/D5's Babylist-shaped hybrid. They are out.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D51 | No shop cards | Item kinds are `product` and `fund` only. There is no chain gift-card tile, no guest outbound to a merchant card page, and no couple picker for שילב / מוצצים / עגליס / בייבי סטאר cards. Guests who give money use Bit/Paybox (D13, D50). The guest cash filter is `שי`. Supersedes the gift-card half of D4 and D5. | LOCKED |
+
 ## Target retailers
 
 Design content should look like these chains. None of them is integrated in this phase; all catalog data is mock.
 
 | Chain | Site | What they have today |
 |---|---|---|
-| Shilav / שילב | [shilav.co.il](https://www.shilav.co.il/pages/baby-registry) | A baby-registry page behind login, plus a store gift card. Closest thing to a registry in the market. |
+| Shilav / שילב | [shilav.co.il](https://www.shilav.co.il/pages/baby-registry) | A baby-registry page behind login. Closest thing to a registry in the market. |
 | Motsetsim / מוצצים | [motsesim.co.il](https://motsesim.co.il/) | Smart checklist and printable birth list, not a shareable registry. |
 | Agalis / עגליס | [agalease-baby.co.il](https://www.agalease-baby.co.il/) | Birth packages and in-branch consultation, no registry. |
 | Baby Star / בייבי סטאר | [baby-star.co.il](https://www.baby-star.co.il/) | Birth packages, no registry. |
-| BuyMe | [buyme.co.il](https://buyme.co.il/) | Already sells baby gift cards and boxes. Candidate distribution partner later, not a v1 dependency. |
+| BuyMe | [buyme.co.il](https://buyme.co.il/) | Baby boxes and prepaid catalogs. Candidate distribution partner later, not a v1 dependency. |
 
 Market read: the gap is a *universal, shareable, cross-chain* registry. Every local player is single-chain and login-gated, so gift-givers cannot coordinate.
 

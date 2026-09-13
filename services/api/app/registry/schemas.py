@@ -33,7 +33,7 @@ class PublicItem(BaseModel):
     model_config = WireModel
 
     id: UUID
-    kind: Literal["product", "fund", "voucher"]
+    kind: Literal["product", "fund"]
     title: str
     source_title: str | None
     note: str | None

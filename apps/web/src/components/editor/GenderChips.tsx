@@ -53,7 +53,6 @@ export function GenderChips({
           );
         })}
       </div>
-      <span className="text-tiny text-ink-muted">{copy.editor.gender.hint}</span>
     </div>
   );
 }

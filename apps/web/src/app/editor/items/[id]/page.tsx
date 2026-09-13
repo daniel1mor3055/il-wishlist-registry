@@ -21,6 +21,7 @@ export default async function ItemSettingsPage({ params }: Props) {
   // here for the same reason it is one at the API.
   const item = state.registry.items.find((one) => one.id === id);
   if (!item) notFound();
+  if (item.kind === "fund") redirect("/editor/payment");
 
   return (
     <EditorShell title={item.title} back="/editor">

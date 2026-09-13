@@ -34,7 +34,6 @@ from app.registry.owner_schemas import (
     MAX_ITEMS,
     AddCatalogItemRequest,
     AddManualItemRequest,
-    AddVoucherRequest,
     CreateRegistryRequest,
     ItemPatch,
     OwnerItem,
@@ -47,28 +46,6 @@ from app.registry.slug import build_slug
 #: in copy.ts (D37, D50).
 ENVELOPE_TITLE = "חיבוק 💛"
 ENVELOPE_SUBTITLE = "כל סכום, ישירות אלינו"
-
-#: Closed set of chain gift cards. Names and homepages from the catalog seed;
-#: shilav's URL is the gift-card path already on the demo registries.
-VOUCHER_CAPTION = "אתם בוחרים את הסכום באתר החנות"
-VOUCHER_TYPES: dict[str, dict[str, str]] = {
-    "shilav": {
-        "chain_name_he": "שילב",
-        "canonical_url": "https://www.shilav.co.il/products/gift-card",
-    },
-    "motsetsim": {
-        "chain_name_he": "מוצצים",
-        "canonical_url": "https://motsesim.co.il",
-    },
-    "agalis": {
-        "chain_name_he": "עגליס",
-        "canonical_url": "https://www.agalease-baby.co.il",
-    },
-    "baby-star": {
-        "chain_name_he": "בייבי סטאר",
-        "canonical_url": "https://www.baby-star.co.il",
-    },
-}
 
 SLUG_ATTEMPTS = 5
 
@@ -342,50 +319,6 @@ def add_envelope(session: Session, *, couple: Couple) -> OwnerItem:
         session.rollback()
         raise _constraint_error(exc) from exc
     return to_owner_item(item)
-
-
-def add_voucher(
-    session: Session, *, couple: Couple, body: AddVoucherRequest
-) -> tuple[OwnerItem, bool]:
-    """Turn on a chain gift-card type. A second POST of the same slug is a replay.
-
-    Unlike the envelope, "already on" is 200 rather than 409: the UI will POST
-    this as a toggle, not as a one-shot create.
-    """
-    spec = VOUCHER_TYPES.get(body.chain_slug)
-    if spec is None:
-        raise OwnerError("voucher_type_unknown", 404)
-
-    registry = _load(session, couple)
-    existing = next(
-        (
-            item
-            for item in registry.items
-            if item.kind == "voucher"
-            and item.chain_slug == body.chain_slug
-            and item.is_active
-        ),
-        None,
-    )
-    if existing is not None:
-        return to_owner_item(existing), False
-
-    _guard_capacity(registry)
-    chain_name_he = spec["chain_name_he"]
-    item = RegistryItem(
-        registry_id=registry.id,
-        position=_next_position(session, registry.id),
-        kind="voucher",
-        title=f"שובר {chain_name_he}",
-        subtitle=f"כרטיס מתנה באתר {chain_name_he}",
-        caption=VOUCHER_CAPTION,
-        chain_slug=body.chain_slug,
-        chain_name_he=chain_name_he,
-        canonical_url=spec["canonical_url"],
-    )
-    session.add(item)
-    session.commit()
-    return to_owner_item(item), True
 
 
 def patch_item(session: Session, *, couple: Couple, item_id: UUID, body: ItemPatch) -> OwnerItem:

@@ -40,7 +40,7 @@ export function EnvelopeArt() {
 }
 
 /**
- * The cash envelope, or a voucher tile.
+ * The cash envelope tile.
  *
  * Dashed border so the money tile reads as a different kind of object from a
  * product, and deliberately quieter: PRD risk 3 is that cash cannibalises
@@ -66,9 +66,8 @@ export function MoneyCard({
   /** Optional so the card can be rendered statically from a server component. */
   onClick?: () => void;
 }) {
-  const collected = item.kind === "fund" && item.contributorCount > 0;
-  const title =
-    item.kind === "fund" ? copy.fund.tile(hasBit, hasPaybox) : item.title;
+  const collected = item.contributorCount > 0;
+  const title = copy.fund.tile(hasBit, hasPaybox);
 
   return (
     <button

@@ -36,9 +36,7 @@ export function Hero({ registry }: { registry: PublicRegistry }) {
           </h1>
           <p className="text-body text-ink">{registry.story}</p>
           {registry.city && (
-            <p className="text-small text-ink-muted">
-              {registry.city} · {copy.hero.shipsAfterBirth}
-            </p>
+            <p className="text-small text-ink-muted">{registry.city}</p>
           )}
         </div>
 

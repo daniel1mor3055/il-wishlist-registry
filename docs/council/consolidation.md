@@ -27,7 +27,7 @@ Each is a real fork, not a wording difference.
 
 | # | Dispute | Positions |
 |---|---|---|
-| X1 | **Who touches the money** | Adversary: nobody ever, Bit/Paybox handoff plus a `שילמתי בביט` ledger entry, which kills custody, float, licensing and partial-fund unwinding in one move. Product: mocked rail that visually invokes something Israelis already trust, else money items are abandoned. Integrator: settlement is a spectrum (S1 pledges, S2 escrow, S3 convert-to-voucher, S4 auth-and-capture) and the miss outcome must be stated before the guest pays. UX: designed a plain mock checkout with a demo strip. |
+| X1 | **Who touches the money** | Adversary: nobody ever, Bit/Paybox handoff plus a `שילמתי בביט` ledger entry, which kills custody, float, licensing and partial-fund unwinding in one move. Product: mocked rail that visually invokes something Israelis already trust, else money items are abandoned. Integrator: settlement is a spectrum (S1 pledges, S2 escrow, S4 auth-and-capture); convert-to-shop-credit is rejected because we do not sell cards. UX: designed a plain mock checkout with a demo strip. |
 | X2 | **Retailer embed widget depth** | Adversary: cut it, it is a partnership artifact drawn before any partnership conversation. Product: keep it, but as one sales-artifact screen. UX: designed four frames including the no-registry acquisition loop. Integrator: it is tier 1 of an adoption ladder and the no-registry fallback is the acquisition loop that makes it worth a chain's while. |
 | X3 | **Shekel amounts on the public page** | Product: hide them, show social progress (`עוד 2 משתתפים`), because family gift-value comparison is a real social hazard. UX and Adversary: show amounts explicitly, because a vague ask converts worse and the remaining amount is the motivator. |
 | X4 | **When the registry opens for giving** | Adversary: a meaningful share of Israeli families will not bring baby equipment home before the birth, so build pre-birth, publish at the announcement, and default to ships-after-birth. This turns the superstition into a feature. Product and UX: pre-birth countdown with a born-flip later, i.e. the Babylist shape. Only the Adversary raised this. |
@@ -56,7 +56,7 @@ Rejected outright, with the reason.
 
 - **Cannibalization.** If the digital envelope is the easiest tile, most guests take it, retailers see no attributed orders, and the B2B2C thesis loses its evidence. Tile hierarchy must make the product tile nicer than the money tile. (Product, flagged against locked D5.)
 - **The link reads as phishing.** An unfamiliar Hebrew domain in a group message, mentioning money, to an audience trained on delivery-SMS fraud. This can cap conversion regardless of visual quality. (Adversary.)
-- **Load-bearing decoration.** If gift-card margin is the revenue, the catalog is decoration, but nobody shares a link to a gift-card page. The catalog earns the share; the gift card earns the money. Say it plainly rather than pretending catalog breadth is the roadmap. (Adversary.)
+- **Load-bearing decoration.** We do not sell gift cards. Nobody shares a link to a cash page. The catalog earns the share; Bit/Paybox is the fallback. Say it plainly rather than pretending catalog breadth is the roadmap. (Adversary.)
 - **Privacy asymmetry.** Names of pregnant women, due dates, guest names and amounts, under a privacy regime that raised penalties in 2025. Collect almost nothing. (Adversary.)
 
 ## Resolution

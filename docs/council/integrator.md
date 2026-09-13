@@ -14,7 +14,7 @@
 | 0 | None | URL paste, outbound link, cross-chain list | Today, all four chains |
 | 1 | One script tag on the PDP | "Add to registry" button, capture at intent | Needs a theme edit |
 | 2 | One order webhook or pixel | Purchase confirmation, attribution, rev-share | Needs a contract |
-| 3 | Product feed + gift-card issuance | Live stock/price, native store credit | Needs an integration project |
+| 3 | Product feed | Live stock/price | Needs an integration project |
 
 **Grounded finding that changes the plan.** All four target chains run Shopify (verified via storefront fingerprints), and all four currently expose the public unauthenticated product JSON endpoints (`/products.json`, `/products/<handle>.js`). A live check on Baby Star returned title, vendor, price in agorot, availability, and images: exactly a registry card, from a documented platform contract rather than HTML scraping. Product pages also carry Open Graph and JSON-LD `Product` as a generic fallback. Tier 0 is therefore much stronger than assumed, and Shopify is the only platform the embed must target for v1.
 
@@ -57,17 +57,13 @@ Also reserve contract room, design only, for the reverse direction: a shopper ar
 
 **Be honest about the gap.** With no tier-2 webhook we cannot detect a purchase. Double-buy prevention (D8, LOCKED) therefore rests on guest self-declaration, with the couple able to correct it in the tracker. The UX must make reservation state trustworthy without claiming we verified anything.
 
-### Gift cards and funds
+### Cash, not cards
 
-Three instruments that behave differently and must not be blended in the UI.
+We do not sell chain cards or hold money. Cash is one Bit/Paybox envelope (`kind=fund`). The guest copies the couple's number and sends; we record the self-report. Shop cards and BuyMe-shaped SKUs were considered as a money model and rejected: they would make us a reseller or a money holder.
 
-| Instrument | Guest buys | Couple redeems | Scope | Main constraint |
+| Instrument | Guest does | Couple receives | Scope | Main constraint |
 |---|---|---|---|---|
-| Store credit, "שובר חנות" (shop voucher) | The chain's own gift-card SKU | A code per chain | One chain only | Chain lock-in, expiry rules, breakage |
-| General voucher, "כרטיס מתנה" (gift card), BuyMe-shaped | A multi-brand card | One flexible code | Partner network | We are a reseller; needs a deal |
-| Cash fund, "קופה משותפת" (shared pot) | A contribution to a named goal | Money | Anywhere | Custody and payment-services regulation |
-
-The couple selects gift-card **types**, not amounts; each becomes a card with a suggested amount, and the guest picks from amount chips. BuyMe slots in three ways, and the third is the strategic one: an escape hatch when the couple refuses chain lock-in, a distribution partner that already sells baby gift boxes, and a way to route a gift through someone else's regulated transaction instead of becoming a money holder ourselves. One chain already sells a gift-card SKU wired to its ERP, so tier-3 issuance is plausible later.
+| Cash (`שי`) | Sends via Bit or Paybox to the couple's number | Money in their own app | Anywhere | We never touch it (D11) |
 
 ### Group gifting settlement
 
@@ -77,11 +73,11 @@ Options, not an assumption. A deadline is mandatory in all of them; an open-ende
 |---|---|---|---|---|
 | S1 | Nobody. We track pledges only | Nothing to unwind | Coordination; guests pay later | None; weakest UX, high leakage |
 | S2 | Us or a PSP holding account | Refund every contributor | The item, or a payout | Highest |
-| S3 | Us, then the chain | Auto-converts to a chain voucher for the partial sum | A voucher | Medium; no refund ops |
+| S3 | Us, then the chain | Auto-converts the partial sum to shop credit | Rejected | Medium; no refund ops |
 | S4 | PSP holds an authorization, captured on goal | Authorizations expire uncharged | The item | Low, but auth windows are far shorter than registry timelines |
 | S5 | The chain hosts the fund | The chain's policy | Chain credit | Lowest for us; needs cooperation and kills the cross-chain promise |
 
-Design default: S3, with S2 as the upgrade path and S1 as the regulatory escape hatch. Whatever is chosen, the miss outcome must be stated **before** the guest pays: "אם היעד לא יושלם עד [תאריך], הסכום יומר לשובר של החנות" (If the goal is not met by [date], the amount will be converted into a shop voucher). The couple needs a visible contribution ledger and the ability to close a fund early.
+Design default: S1. Nobody holds contributions. Guests send via Bit/Paybox; we ledger the self-report. S3 (convert the miss to shop credit) is rejected: we do not sell cards. The couple needs a visible contribution ledger.
 
 ### What stays mocked, and how to mock it honestly
 
@@ -91,8 +87,7 @@ Rule: mock the **provider**, never the **contract**. Every mock returns the real
 |---|---|---|
 | Chain catalogs | 40-60 curated items per chain, real Hebrew title style and real price bands | Same shape as extractor output; must include out-of-stock and price-changed items |
 | URL paste | Resolver recognises the four chains' URL patterns, returns from the seed set | The "we could not read this page" state must appear in the demo |
-| Gift cards | Fake issuance with the real shape: type, amount, chain, expiry | No scannable or real-looking code; visibly labelled as a demo |
-| Payments | Stubbed success step, no PSP | Decline and pending states must be designed too |
+| Payments | Bit/Paybox handoff, no PSP | Unset-handle and copy-failed states must be designed too |
 | Purchase confirmation | Guest self-declaration only | Never imply we detected a purchase |
 | Embed widget | Designed, not shipped; demoed on an obviously-ours fake PDP | Do not clone a chain's storefront |
 
@@ -102,7 +97,7 @@ Anti-corner-painting rule: if a real integration could not supply a field, the m
 
 Traffic is unprovable at zero scale, basket-size lift is unprovable pre-launch, chains will not pay for data, and white-label is a downgrade pitch to Shilav, who already built one.
 
-The real pitch is **incremental, attributed, non-cannibalising demand**: a registry guest is a third party buying a specific SKU that someone else chose, whom the chain has no relationship with today. Sell attributed referral orders on CPA or revenue share, with the retailer's total cost being one script tag. The wedge is that we are cross-chain, the one thing no chain can offer its own customers, and the cross-chain list is exactly why the couple shares the link. The BuyMe pitch is different and easier: qualified demand for gift cards they already sell, at the moment of intent, with a named recipient. That is a distribution deal, not an integration.
+The real pitch is **incremental, attributed, non-cannibalising demand**: a registry guest is a third party buying a specific SKU that someone else chose, whom the chain has no relationship with today. Sell attributed referral orders on CPA or revenue share, with the retailer's total cost being one script tag. The wedge is that we are cross-chain, the one thing no chain can offer its own customers, and the cross-chain list is exactly why the couple shares the link. We do not sell gift cards and we do not pitch ourselves as a card reseller.
 
 ## Non-goals
 
@@ -117,7 +112,7 @@ The real pitch is **incremental, attributed, non-cannibalising demand**: a regis
 ## Top 5 risks
 
 1. **Purchase confirmation gap.** D8 is LOCKED but unverifiable at tier 0 or 1: reservation is not purchase. If the couple gets duplicates anyway, the core promise breaks and no amount of UX polish recovers it.
-2. **Money custody.** Cash funds and group gifting make us a money holder under Israeli payment-services rules. Designing only S2 and later failing to get a licence means rebuilding the entire funds experience; S1 and S3 must be designed as live options now, not retrofitted.
+2. **Money custody.** Cash funds and group gifting make us a money holder under Israeli payment-services rules if we ever take custody. Designing only S2 and later failing to get a licence means rebuilding the entire funds experience; S1 (Bit/Paybox, nobody holds) is the live model.
 3. **Platform dependency.** Our cheap tier-0 ingestion rests on Shopify public JSON endpoints that any store can disable and that are rate-limited. A chain that dislikes us can switch it off unilaterally, and the OG/JSON-LD fallback yields visibly worse cards.
 4. **Retailer indifference.** Shilav already has a login-gated registry, so we are asking a chain to help a competitor-neutral aggregator. Without measured attributed revenue, the tier-1 script tag never reaches a sprint, and tiers 2-3 never happen.
 5. **Legal and brand exposure.** Caching images and naming chains implies partnership; stale prices or stock generate consumer complaints aimed at the chain, which is precisely the argument they will use to refuse the embed.
@@ -125,6 +120,6 @@ The real pitch is **incremental, attributed, non-cannibalising demand**: a regis
 ## Open questions for the human
 
 1. **How real should paste-a-URL be in the POC?** (a) Fully mocked: URL matched against the seed catalog only. (b) Seed catalog plus live reads of the four chains' public Shopify product JSON, giving genuine cards with no HTML scraping. (c) Generic live Open Graph / JSON-LD extraction for any URL. Note that (b) and (c) push past "mocked shop catalogs" in D4.
-2. **Which settlement model do we design as the default?** (a) S1, pledges only, no money touched. (b) S3, contributions convert to a chain voucher if the goal is missed. (c) S2, escrow with refunds. (d) Design S3 but keep every screen switchable to S1.
-3. **How broad is the gift-card offer in the v1 design?** (a) Chain store credit only. (b) Chain credit plus one general voucher placeholder shaped like BuyMe. (c) Chain credit plus a cash fund, no third-party voucher. (d) All three.
+2. **Which settlement model do we design as the default?** (a) S1, pledges only, no money touched — live. (b) Rejected: S3, contributions convert to a shop card if the goal is missed. (c) S2, escrow with refunds. (d) Keep every screen switchable to S1.
+3. **Do we sell shop cards in v1?** No. We do not sell gift cards. Cash is Bit/Paybox only.
 4. **Which purchase-confirmation model do the screens assume?** (a) Guest self-declaration only. (b) Self-declaration plus couple confirm-or-undo in the tracker. (c) Design for a retailer webhook now and stub it, accepting that tier 2 may never arrive.

@@ -3,7 +3,7 @@ import { createDraftList, ownerSlug, signIn } from "./editor.mjs";
 
 /**
  * List colour follows baby gender. Assert the chip and data-theme attribute,
- * never a computed hex: the palette lives in globals.css.
+ * never a computed hex: the palette lives in globals.css. Unset is mint.
  */
 function theme(page, name) {
   return page.locator(`[data-theme="${name}"]`).first();
@@ -15,7 +15,7 @@ test.describe("gender theme", () => {
     await expect(theme(page, "unset")).toBeVisible();
   });
 
-  test("wizard chips recolor, create as girl, then story switches to boy", async ({
+  test("wizard chips recolor, create as girl, then settings switches to boy", async ({
     page,
   }) => {
     const email = `theme-${Date.now()}@example.com`;
@@ -56,7 +56,8 @@ test.describe("gender theme", () => {
     await page.goto("/editor/preview");
     await expect(theme(page, "girl")).toBeVisible();
 
-    await page.goto("/editor/story");
+    await page.goto("/editor/settings");
+    await page.getByRole("link", { name: "ילד או ילדה?" }).click();
     await page.getByRole("radio", { name: "ילד", exact: true }).click();
     await page.getByRole("button", { name: "לשמור" }).click();
     await expect(page.getByText("נשמר")).toBeVisible();

@@ -4,7 +4,7 @@ This reflects an actual review of the Figma Make output at `ILBabyRegistryFigmaM
 
 Paste **only** each fenced block, one at a time, in this order.
 
-Do not send `prompts.md`'s original P2-P8 "funds sheet", "claimed-item state", or "partial quantity chip" prompts — the render already has all three (the cash/voucher sheet, Card C, and Card D respectively). Sending them again risks Make building a second, slightly different version of a state that already exists.
+Do not send `prompts.md`'s original P2-P8 "funds sheet", "claimed-item state", or "partial quantity chip" prompts — the render already has all three (the cash envelope sheet, Card C, and Card D respectively). Sending them again risks Make building a second, slightly different version of a state that already exists.
 
 ---
 

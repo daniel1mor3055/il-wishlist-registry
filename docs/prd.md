@@ -8,7 +8,7 @@ This document is the direct input to [figma-make/prompts.md](figma-make/prompts.
 
 A Hebrew, mobile-first baby registry ("רשימת לידה") that works across Israeli baby chains instead of being trapped inside one of them.
 
-The couple builds one list during pregnancy, publishes it with the birth announcement, and shares one WhatsApp link. Guests open it without an account, see what is still needed, and give: a product from a chain, a contribution toward an expensive item, cash, or a gift card. Nobody double-buys, and the couple knows who to thank.
+The couple builds one list during pregnancy, publishes it with the birth announcement, and shares one WhatsApp link. Guests open it without an account, see what is still needed, and give: a product from a chain, a contribution toward an expensive item, or cash via Bit/Paybox. Not a gift card. Nobody double-buys, and the couple knows who to thank.
 
 **What we are not:** a shop. Because of D11 there is no checkout in our product and we never touch money. We are a coordination layer on top of transactions that happen somewhere else.
 
@@ -18,7 +18,7 @@ Every Israeli incumbent is single-chain and login-gated. [Shilav](https://www.sh
 
 Cross-chain neutrality is the one thing no chain can offer its own customers, and it is precisely why the couple shares the link.
 
-Honest read on the business, kept here so the design does not drift: the catalog earns the share, a gift-card partnership would earn the money. Nobody shares a link to a gift-card page; people share a link to "the things we need."
+Honest read on the business, kept here so the design does not drift: the catalog earns the share. We do not sell gift cards. Nobody shares a link to a cash page; people share a link to "the things we need."
 
 ## 3. Actors and jobs
 
@@ -48,8 +48,7 @@ flowchart LR
 |---|---|---|
 | Product from a chain | The chain's own product page | "כן, רכשתי" (yes, I bought it) |
 | Group gift on an expensive item | The couple's Bit or PayBox handle, revealed inline | That they sent it, plus an amount |
-| Cash fund | The couple's Bit or PayBox handle, revealed inline | That they sent it, plus an amount |
-| Gift card / voucher | The merchant's own gift-card page | That they sent it |
+| Cash (`שי`, Bit/Paybox) | The couple's Bit or PayBox handle, revealed inline | That they sent it, plus an amount |
 
 Consequences the design must honor:
 
@@ -86,12 +85,12 @@ Sample data for every mock: couple **נועה ואיתי** (Noa and Itai), baby 
 | ID | Screen | Job | Primary CTA |
 |---|---|---|---|
 | G1 | Hero / land | Couple photo, names, one-line story, progress, "how this works" in three lines | `לראות את הרשימה` (see the list) |
-| G2 | Item grid + filters | Chips: `הכול` / `מה שעוד חסר` / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` / `שי ושוברים`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
+| G2 | Item grid + filters | Chips: `הכול` / `מה שעוד חסר` / `עד ₪100` / `₪100–₪300` / `מעל ₪300` / `מתנות משותפות` / `שי`. Categories: לינה, האכלה, ניידות, רחצה והחתלה, ביגוד, צעצועים | `לפרטים` (details) |
 | G3 | Item detail sheet | Image, full name, price, chain chip, quantity line, couple note, price disclaimer | `אני קונה את זה` (I'm buying this) |
 | G4 | Reserve and hand off | Confirms the hold, then sends the guest out to the chain. Leaving this sheet without continuing hands the unit back (D33). No name is asked here - that happens once, at G9 (D36). If the couple stored a shipping address, a link `צריכים את כתובת המשלוח של נועה ואיתי?` reveals it on tap with a copy button and the line that it does not transfer into the shop (D49) | `להמשיך לאתר שילב` (continue to Shilav) |
 | G5 | Return self-report modal | The D12 moment. `האם רכשת את הפריט?` with `כן, רכשתי` and `לא רכשתי, לשחרר את הפריט`. Dismissing the question is the third answer and keeps the hold (D35) | `כן, רכשתי` (yes, I bought it) |
 | G6 | Group gift sheet | Funding meter, `נותרו ₪550 מתוך ₪1,290`, `6 אורחים כבר השתתפו`, amount chips with a free-amount field behind `סכום אחר`, then the contact reveal | `להשתתף במתנה` (join this gift) |
-| G7 | Envelope / gift card sheet | One plain cash envelope with no target and no meter (D28), titled from the live rails (`חיבוק בביט 💛` / `חיבוק בפייבוקס 💛` / `חיבוק בביט / פייבוקס 💛` / `חיבוק 💛`) (D37, D50), and voucher types. Shows what has been given so far - `נאספו עד כה ₪2,150`, `11 אורחים כבר השתתפו` - on both the card and the sheet, and nothing at all before the first gift. Amount chips, then contact reveal or outbound merchant. CTA names the live rails: `לשלוח בביט` / `לשלוח בפייבוקס` / `לשלוח בביט או בפייבוקס` / `לשלוח שי` | `לשלוח שי` (send cash) |
+| G7 | Cash envelope sheet | One plain cash envelope with no target and no meter (D28), titled from the live rails (`חיבוק בביט 💛` / `חיבוק בפייבוקס 💛` / `חיבוק בביט / פייבוקס 💛` / `חיבוק 💛`) (D37, D50). Guest word is `שי`, never `מעטפה`. Shows what has been given so far - `נאספו עד כה ₪2,150`, `11 אורחים כבר השתתפו` - on both the card and the sheet, and nothing at all before the first gift. Amount chips, then contact reveal. CTA names the live rails: `לשלוח בביט` / `לשלוח בפייבוקס` / `לשלוח בביט או בפייבוקס` / `לשלוח שי` | `לשלוח שי` (send cash) |
 | G8 | Contact reveal | The D13 component. `צריכים את הפרטים של נועה ואיתי?` with one copy row per live rail (Bit then PayBox), each a phone number, the chosen amount restated, plus one `שלחתי` (I sent it), which is the write that records the gift (D38). No app chooser; the contribution does not record which app was used | `העתקה` (copy) |
 | G9 | Private blessing + confirmation | Optional name and message straight to the couple, D17 private. The only place a guest is asked who they are (D36), and the write that attaches the name to the gift (D40). Then `תודה, רשמנו את המתנה שלך`, worded for a purchase or for money depending on which happened | `לצרף ברכה` (attach a blessing) |
 | G10 | Error and edge shell | Not found, closed, offline | `לנסות שוב` (try again) |
@@ -104,10 +103,10 @@ Emotional register: guest surfaces read like a message from friends. First perso
 |---|---|---|---|
 | C0 | Get in | One email field, no password. A mailed one-time link, and a note that it is valid for twenty minutes. Says nothing about whether the address is known (D43) | `לשלוח לי קישור` |
 | C1 | Create wizard, 2 steps | `איך לקרוא לכם` → `התאריך המשוער ללידה` + optional shipping address (street, entrance, floor, apartment, city, postal, notes; city is also the public caption). Address is skippable; the street is private (D49). שי is on by default; categories are filters on the list, not a create-time seed | `ליצור את הרשימה` |
-| C2 | Editor home | The list, the progress line, and while `published_at` is null an unpublished banner with `לפרסם את הרשימה`. This banner is the only place unpublished is ever surfaced (D30). Once published it shows the link and a copy button; the full share surface is C8. Story, payment and address are not on this list — they sit behind a header settings icon. Untouched products have a trailing × that hides the row with undo; taken items, שי and vouchers do not. Category chips (`הכול` plus groups that currently have items) cut a long list. Drag to reorder is not built yet | `להוסיף פריט` |
+| C2 | Editor home | The list, the progress line, and while `published_at` is null an unpublished banner with `לפרסם את הרשימה`. This banner is the only place unpublished is ever surfaced (D30). Once published it shows the link and a copy button; the full share surface is C8. Story, payment and address are not on this list — they sit behind a header settings icon. Untouched products have a trailing × that hides the row with undo; taken items and unused שי do not. Category chips (`הכול` plus groups that currently have items) cut a long list. Drag to reorder is not built yet | `להוסיף פריט` |
 | C3 | Add item | Tabs: `מהחנויות` (search the harvested catalog), `משהו אחר` (title, price, category, a link as plain text). Catalog rows have a quiet `לראות באתר {chain}` next to `להוסיף`. `להדביק קישור` with a parsed preview needs the resolver and lands with it | `להוסיף לרשימה` |
 | C4 | Item settings | Quantity with a floor at what guests already hold, couple note, `לאפשר מתנה משותפת` with a hint above ₪400. Controls the couple may not undo are disabled with the reason beside them (D45). Remove is an in-app confirm; items with history deactivate rather than delete. A product with a shop URL has `לראות באתר {chain}` | `לשמור` |
-| C5 | Envelope, vouchers and payment details | Tabs `שי` / `שוברים`. One phone and a display name (prefilled from what they already saved, or the list names), both editable. The שי checkbox is what puts the cash tile on the list; an empty field is not an off switch. Save writes the same number to Bit and PayBox (D50). Vouchers are chain gift cards the guest buys at the shop. Shipping address is on its own screen (D49). No target to set (D28) | `לשמור` |
+| C5 | Bit and PayBox numbers | One phone and a display name (prefilled from what they already saved, or the list names), both editable. The שי checkbox is what puts the cash tile on the list; an empty field is not an off switch. Save writes the same number to Bit and PayBox (D50). No tabs, no chain gift cards. Shipping address is on its own screen (D49). No target to set (D28) | `לשמור` |
 | C6 | Story and cover | Photo, two-line story | `לשמור` |
 | C7 | Preview as guest | Real guest render in a device frame, banner `זו התצוגה שהאורחים רואים` | `חזרה לעריכה` |
 | C8 | Publish and share | The D14 announcement moment. WhatsApp-first, designed link-preview card, editable Hebrew message, QR for the ברית | `לשתף בוואטסאפ` |
@@ -140,7 +139,6 @@ Figma Make defaults to the happy path and to full lists, so every state below ne
 | Envelope with gifts in it | G2, G7 | Collected total and contributor count, no meter and no `מתוך` (D28) | `נאספו עד כה ₪2,150` |
 | Quantity partly fulfilled | G2, G3 | Counter chip, CTA stays live | `נשארו 2 מתוך 4` |
 | Handoff pending | G2, G5 | Guest went out and came back without answering. Dismissing the question keeps the hold; an explicit `לא רכשתי` releases it (D35). The holder's card reads `שמור לך`, not `כבר נתפס` | `עוד באמצע? אפשר לסגור — הפריט נשאר שמור לכם` |
-| Gift card sent | G9, C9 | Neutral chip, never an error color | `השובר נשלח לנועה ואיתי` |
 | Price may differ | G3 | Permanent, quiet, never a warning color. Carries the whole "reality lives at the chain" message now that stock is gone (D26) | `המחיר מתעדכן באתר החנות` |
 | Broken image | G2, G3 | Branded 1:1 placeholder with category glyph and product name. Never a gray box with alt text, never a layout shift | none |
 | Long Hebrew name | G2, G3 | Two-line clamp with reserved min-height, badges wrap and never truncate | `עגלת תאומים משולבת עם סלקל…` |

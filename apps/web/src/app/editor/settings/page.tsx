@@ -18,36 +18,27 @@ export default async function SettingsPage() {
 
   return (
     <EditorShell title={copy.editor.settings.title} back="/editor">
-      <div className="flex flex-1 flex-col gap-5">
-        <section className="flex flex-col gap-2">
-          <h2 className="text-tiny font-medium text-ink-muted">
-            {copy.editor.settings.guestGroup}
-          </h2>
-          <SettingsCard
-            href="/editor/story"
-            title={copy.editor.story.title}
-            hint={copy.editor.settings.storyHint}
-            icon={<StoryIcon />}
-          />
-        </section>
-
-        <section className="flex flex-col gap-2">
-          <h2 className="text-tiny font-medium text-ink-muted">
-            {copy.editor.settings.handoffGroup}
-          </h2>
-          <SettingsCard
-            href="/editor/payment"
-            title={copy.editor.payment.title}
-            hint={copy.editor.settings.paymentHint}
-            icon={<PaymentIcon />}
-          />
-          <SettingsCard
-            href="/editor/address"
-            title={copy.editor.address.title}
-            hint={copy.editor.settings.addressHint}
-            icon={<AddressIcon />}
-          />
-        </section>
+      <div className="flex flex-1 flex-col gap-2">
+        <SettingsCard
+          href="/editor/story"
+          title={copy.editor.story.title}
+          icon={<StoryIcon />}
+        />
+        <SettingsCard
+          href="/editor/gender"
+          title={copy.editor.gender.label}
+          icon={<GenderIcon />}
+        />
+        <SettingsCard
+          href="/editor/payment?from=settings"
+          title={copy.editor.payment.title}
+          icon={<PaymentIcon />}
+        />
+        <SettingsCard
+          href="/editor/address"
+          title={copy.editor.address.title}
+          icon={<AddressIcon />}
+        />
 
         <div className="mt-auto pt-4">
           <form action={signOut}>
@@ -67,24 +58,19 @@ export default async function SettingsPage() {
 function SettingsCard({
   href,
   title,
-  hint,
   icon,
 }: {
   href: string;
   title: string;
-  hint: string;
   icon: ReactNode;
 }) {
   return (
     <Link
       href={href}
-      className="flex items-start gap-3 rounded-card border border-border bg-surface p-4 text-right transition-transform active:scale-[0.99]"
+      className="flex items-center gap-3 rounded-card border border-border bg-surface p-4 text-right transition-transform active:scale-[0.99]"
     >
-      <span className="mt-0.5 shrink-0 text-ink">{icon}</span>
-      <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-        <span className="text-small font-medium text-ink">{title}</span>
-        <span className="text-tiny text-ink-muted">{hint}</span>
-      </span>
+      <span className="shrink-0 text-ink">{icon}</span>
+      <span className="min-w-0 flex-1 text-small font-medium text-ink">{title}</span>
     </Link>
   );
 }
@@ -105,6 +91,15 @@ function StoryIcon() {
         strokeLinejoin="round"
       />
       <circle cx="9" cy="9.25" r="1.15" fill="currentColor" />
+    </svg>
+  );
+}
+
+function GenderIcon() {
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="9.5" cy="12" r="5.25" stroke="currentColor" strokeWidth="1.5" />
+      <circle cx="14.5" cy="12" r="5.25" stroke="currentColor" strokeWidth="1.5" />
     </svg>
   );
 }

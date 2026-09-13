@@ -7,7 +7,7 @@ import { MoneyCard } from "./MoneyCard";
 import { Toast } from "@/components/feedback/Toast";
 import {
   BlessingSheet,
-  CashVoucherSheet,
+  CashSheet,
   ConfirmedSheet,
   ContactRevealSheet,
   GroupGiftSheet,
@@ -62,7 +62,7 @@ type SheetState =
   | { type: "handoff"; itemId: string; reservationId: string | null }
   | { type: "report"; itemId: string; reservationId: string | null }
   | { type: "group"; itemId: string }
-  | { type: "cashVoucher"; itemId: string }
+  | { type: "cash"; itemId: string }
   /** The amount the guest is about to send, carried to the write behind "שלחתי". */
   | { type: "contact"; itemId: string; amountAgorot: number }
   /** Carries the gift, so the name typed here can be attached to it. */
@@ -100,7 +100,7 @@ function matchesFilter(
     case "group":
       return item.groupGiftEnabled;
     case "cash":
-      return item.kind === "fund" || item.kind === "voucher";
+      return item.kind === "fund";
     default:
       return true;
   }
@@ -309,8 +309,8 @@ export function RegistryClient({
       setSheet({ type: "report", itemId: item.id, reservationId: mine });
       return;
     }
-    if (item.kind === "fund" || item.kind === "voucher") {
-      setSheet({ type: "cashVoucher", itemId: item.id });
+    if (item.kind === "fund") {
+      setSheet({ type: "cash", itemId: item.id });
     } else if (item.claimState !== "available") {
       setSheet({ type: "taken", itemId: item.id, raceLost: false });
     } else if (item.groupGiftEnabled) {
@@ -655,27 +655,18 @@ export function RegistryClient({
           );
         })()}
 
-      {sheet?.type === "cashVoucher" &&
+      {sheet?.type === "cash" &&
         (() => {
           const item = byId(sheet.itemId);
           if (!item) return null;
           return (
-            <CashVoucherSheet
+            <CashSheet
               item={item}
               hasBit={registry.hasBit}
               hasPaybox={registry.hasPaybox}
               onClose={closeSheet}
               onSend={(agorot) => {
-                // A voucher is bought at the chain, so there is no amount for us
-                // to record - only the thank-you on the way back.
-                if (item.kind === "voucher") {
-                  if (item.canonicalUrl) {
-                    window.open(item.canonicalUrl, "_blank", "noopener,noreferrer");
-                  }
-                  setSheet({ type: "blessing" });
-                  return;
-                }
-                if (agorot !== null) void revealHandle(item, agorot);
+                void revealHandle(item, agorot);
               }}
             />
           );
@@ -732,7 +723,7 @@ export function RegistryClient({
           onClose={closeSheet}
           onFundInstead={() =>
             firstFund
-              ? setSheet({ type: "cashVoucher", itemId: firstFund.id })
+              ? setSheet({ type: "cash", itemId: firstFund.id })
               : closeSheet()
           }
         />

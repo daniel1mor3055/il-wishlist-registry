@@ -1,26 +1,37 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { patchRegistry } from "@/app/editor/actions";
+import { addEnvelope, patchRegistry } from "@/app/editor/actions";
 import { Field, FormError, inputClass } from "@/components/editor/EditorShell";
 import { PrimaryButton } from "@/components/primitives/Buttons";
 import { copy } from "@/lib/copy";
 
 /**
- * The number D13 reveals. One Israeli mobile fills both Bit and PayBox.
- * An empty field is not an off switch: the cash tile lives on editor home.
+ * The number D13 reveals. One Israeli mobile fills both Bit and PayBox (D50).
+ *
+ * Add-without-a-number requires a phone, then creates the חיבוק tile.
+ * Settings can still save an empty field; that is not an off switch for the
+ * tile, which lives on editor home.
  */
 export function PaymentForm({
   bitHandle,
   payboxHandle,
   paymentDisplayName,
   coupleNames,
+  requireNumber = false,
+  needsEnvelope = false,
+  returnTo = null,
 }: {
   bitHandle: string | null;
   payboxHandle: string | null;
   paymentDisplayName: string | null;
   coupleNames: string;
+  requireNumber?: boolean;
+  needsEnvelope?: boolean;
+  returnTo?: string | null;
 }) {
+  const router = useRouter();
   const [phone, setPhone] = useState(bitHandle || payboxHandle || "");
   const [displayName, setDisplayName] = useState(paymentDisplayName || coupleNames);
   const [error, setError] = useState<string | null>(null);
@@ -31,14 +42,32 @@ export function PaymentForm({
     setError(null);
     setSaved(false);
     const handle = phone.trim() || null;
+    if (requireNumber && !handle) {
+      setError(copy.editor.payment.numberRequired);
+      return;
+    }
     startTransition(async () => {
       const result = await patchRegistry({
         bitHandle: handle,
         payboxHandle: handle,
         paymentDisplayName: displayName.trim() || null,
       });
-      if (result.ok) setSaved(true);
-      else setError(result.error);
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+      if (needsEnvelope) {
+        const added = await addEnvelope();
+        if (!added.ok) {
+          setError(added.error);
+          return;
+        }
+      }
+      if (returnTo) {
+        router.push(returnTo);
+        return;
+      }
+      setSaved(true);
     });
   }
 

@@ -115,6 +115,7 @@ export async function patchRegistry(patch: RegistryPatchInput): Promise<ActionRe
   revalidatePath("/editor/address");
   revalidatePath("/editor/payment");
   revalidatePath("/editor/story");
+  revalidatePath("/editor/gender");
   revalidatePath("/editor/preview");
   return { ok: true, data: undefined };
 }
@@ -131,20 +132,6 @@ export async function publishRegistry(): Promise<ActionResult> {
 export async function addEnvelope(): Promise<ActionResult> {
   const result = await ownerFetch<OwnerItem>("/me/registry/envelope", { method: "POST" });
   if (!result.ok) return failed(result.code);
-  revalidatePath("/editor");
-  revalidatePath("/editor/payment");
-  return { ok: true, data: undefined };
-}
-
-export async function addVoucher(chainSlug: string): Promise<ActionResult> {
-  const result = await ownerFetch<OwnerItem>("/me/registry/vouchers", {
-    method: "POST",
-    body: JSON.stringify({ chainSlug }),
-  });
-  if (!result.ok) {
-    if (result.status === 401) redirect("/editor/enter");
-    return failed(result.code);
-  }
   revalidatePath("/editor");
   revalidatePath("/editor/payment");
   return { ok: true, data: undefined };
