@@ -4,20 +4,14 @@ import { MoneyCard } from "@/components/registry/MoneyCard";
 import { getPublicRegistry } from "@/lib/api";
 import { MAIN_SLUG } from "@/app/page";
 import type { PublicItem } from "@/lib/types";
+import { StateSheet, type GalleryOverlay } from "./SheetFrames";
 
 /**
- * The state gallery.
+ * The state gallery. Dev-only checklist for PRD section 7.
  *
- * PRD section 7 lists sixteen states, and Figma Make defaults to the happy
- * path, so every one needs its own frame. This page is the review checklist:
- * a missing state shows up as a hole rather than as an omission nobody noticed.
- *
- * It is also the visual comparison surface. Registry-level states render as
- * real routes inside a 390x844 frame, which is a true side-by-side against the
- * Make render without the app itself having to be a device mockup.
- *
- * Item-level states are derived from the seeded demo registry rather than from
- * hand-written props, so a card here is a card built from a real payload.
+ * Registry-level states render as the real route inside a 390×844 frame.
+ * Item cards come from the seeded registry. Sheets that are not a route
+ * render the real components in that same frame.
  */
 
 type Status = "c1" | "c3" | "c5";
@@ -31,7 +25,6 @@ const STATUS_LABELS: Record<Status, string> = {
 type FrameState = {
   id: string;
   prd: string;
-  hebrew: string;
   status: Status;
   slug: string;
 };
@@ -41,35 +34,30 @@ const FRAME_STATES: FrameState[] = [
   {
     id: "published",
     prd: "G1, G2 — happy path",
-    hebrew: "רשימת הלידה של נועה ואיתי",
     status: "c1",
     slug: "noa-itai-k4m2xq8vp3wt",
   },
   {
     id: "empty",
     prd: "G2 — empty registry",
-    hebrew: "נועה ואיתי עוד מכינים את הרשימה",
     status: "c1",
     slug: "empty-registry-demo",
   },
   {
     id: "single",
     prd: "G2 — single item",
-    hebrew: "בינתיים יש פריט אחד ברשימה",
     status: "c1",
     slug: "single-item-demo",
   },
   {
     id: "fully-claimed",
     prd: "G2 — fully claimed",
-    hebrew: "כל הפריטים ברשימה נתפסו. אפשר עוד לתת שי",
     status: "c1",
     slug: "fully-claimed-demo",
   },
   {
     id: "closed",
     prd: "G10 — closed registry",
-    hebrew: "הרשימה נסגרה. תודה לכל מי שהשתתף",
     status: "c1",
     slug: "closed-demo",
   },
@@ -77,7 +65,6 @@ const FRAME_STATES: FrameState[] = [
     id: "not-found",
     // Also what an unpublished registry looks like, deliberately (D30).
     prd: "G10 — not found",
-    hebrew: "הרשימה לא נמצאה. אולי הקישור לא הועתק במלואו",
     status: "c1",
     slug: "no-such-registry",
   },
@@ -86,107 +73,192 @@ const FRAME_STATES: FrameState[] = [
 type CardState = {
   id: string;
   prd: string;
-  hebrew: string;
   status: Status;
   item: PublicItem;
   heldByYou?: boolean;
 };
 
-/**
- * Item-level states, taken from the seeded demo registry. A state with no item
- * behind it throws by name, so a seed that stops covering a state fails loudly
- * instead of quietly dropping a frame from the review.
- */
-function cardStates(items: PublicItem[]): CardState[] {
+type SheetEntry = GalleryOverlay & {
+  id: string;
+  prd: string;
+  status: Status;
+};
+
+type GalleryItems = {
+  cards: CardState[];
+  sheets: SheetEntry[];
+};
+
+// Throws by name when the seed stops covering a state, so a frame cannot vanish quietly.
+function galleryStates(items: PublicItem[], coupleNames: string): GalleryItems {
   const find = (predicate: (item: PublicItem) => boolean, label: string): PublicItem => {
     const found = items.find(predicate);
     if (!found) throw new Error(`Seed has no item for gallery state: ${label}`);
     return found;
   };
 
-  const groupGift = find((i) => i.groupGiftEnabled && i.kind === "product", "group gift");
-  const takenItem = find((i) => i.claimState !== "available", "taken item");
-  const partialQty = find((i) => i.quantityWanted > 1, "partial quantity");
-  const envelope = find((i) => i.kind === "fund", "cash envelope");
-  const longName = items
-    .filter((i) => i.kind === "product")
-    .reduce((longest, i) => (i.title.length > longest.title.length ? i : longest));
+  const groupGift = find(
+    (i) =>
+      i.kind === "product" &&
+      i.groupGiftEnabled &&
+      i.targetAgorot !== null &&
+      i.contributedAgorot > 0 &&
+      i.contributedAgorot < i.targetAgorot,
+    "group gift",
+  );
+  const takenItem = find(
+    (i) => i.kind === "product" && i.claimState !== "available",
+    "taken item",
+  );
+  const heldItem = find(
+    (i) => i.kind === "product" && i.claimState === "reserved",
+    "held item",
+  );
+  const partialQty = find(
+    (i) =>
+      i.kind === "product" &&
+      i.quantityWanted > 1 &&
+      i.quantityClaimed > 0 &&
+      i.quantityClaimed < i.quantityWanted,
+    "partial quantity",
+  );
+  const envelope = find(
+    (i) => i.kind === "fund" && i.contributorCount > 0 && i.contributedAgorot > 0,
+    "envelope with gifts",
+  );
+  const priceItem = find(
+    (i) =>
+      i.kind === "product" &&
+      i.priceAgorot !== null &&
+      i.claimState === "available" &&
+      !i.groupGiftEnabled &&
+      i.quantityWanted === 1 &&
+      !i.note &&
+      !i.sourceTitle,
+    "price disclaimer",
+  );
+  const products = items.filter((i) => i.kind === "product");
+  if (products.length === 0) {
+    throw new Error("Seed has no item for gallery state: long name");
+  }
+  const longName = products.reduce((longest, i) =>
+    i.title.length > longest.title.length ? i : longest,
+  );
+  const targetAgorot = groupGift.targetAgorot;
+  if (targetAgorot === null) {
+    throw new Error("Seed has no item for gallery state: group gift");
+  }
+  const hasFund = items.some((i) => i.kind === "fund");
 
-  return [
+  const cards: CardState[] = [
     {
       id: "group-partial",
-      prd: "G2, G6 — group gift partly funded",
-      hebrew: "נותרו ₪X מתוך ₪Y",
+      prd: "G3, G6 — group gift partly funded",
       status: "c1",
       item: groupGift,
     },
     {
-      id: "group-complete",
-      prd: "G6 — group gift complete",
-      hebrew: "המתנה הושלמה. תודה לכל מי שהשתתף",
-      status: "c1",
-      item: {
-        ...groupGift,
-        contributedAgorot: groupGift.targetAgorot ?? 0,
-        contributorCount: 14,
-      },
-    },
-    {
       id: "taken",
       prd: "G2, G3 — reserved by someone else",
-      hebrew: "כבר נתפס",
       status: "c1",
       item: takenItem,
     },
     {
       id: "held-by-you",
       prd: "G2, G5 — held by you",
-      hebrew: "שמור לך",
       status: "c3",
-      item: takenItem,
+      item: heldItem,
       heldByYou: true,
     },
     {
       id: "partial-qty",
       prd: "G2, G3 — quantity partly fulfilled",
-      hebrew: "נשארו 2 מתוך 4",
       status: "c1",
       item: partialQty,
     },
     {
       id: "long-name",
       prd: "G2, G3 — long Hebrew name",
-      hebrew: "two-line clamp with reserved height",
       status: "c1",
       item: longName,
     },
     {
       id: "broken-image",
       prd: "G2, G3 — broken image",
-      hebrew: "branded 1:1 placeholder, category glyph, no layout shift",
       status: "c1",
       item: { ...groupGift, imageUrl: "https://cdn.shopify.com/does-not-exist.jpg" },
     },
     {
       id: "envelope",
-      prd: "G7 — cash envelope tile",
-      hebrew: "כל סכום, ישירות אלינו בביט או בפייבוקס. בלי יעד ובלי מדחום",
+      prd: "G2, G7 — envelope with gifts",
       status: "c1",
       item: envelope,
     },
   ];
+
+  const sheets: SheetEntry[] = [
+    {
+      id: "taken-sheet",
+      prd: "G2, G3 — reserved by someone else",
+      status: "c3",
+      kind: "taken",
+      coupleNames,
+      raceLost: false,
+      hasFund,
+    },
+    {
+      id: "group-partial-sheet",
+      prd: "G3, G6 — group gift partly funded",
+      status: "c1",
+      kind: "group",
+      item: groupGift,
+    },
+    {
+      id: "group-complete",
+      prd: "G6 — group gift complete",
+      status: "c1",
+      kind: "group",
+      item: {
+        ...groupGift,
+        contributedAgorot: targetAgorot,
+      },
+    },
+    {
+      id: "handoff-pending",
+      prd: "G2, G5 — handoff pending",
+      status: "c3",
+      kind: "report",
+      item: heldItem,
+    },
+    {
+      id: "price-may-differ",
+      prd: "G3 — price may differ",
+      status: "c1",
+      kind: "detail",
+      item: priceItem,
+    },
+    {
+      id: "reserve-race",
+      prd: "G3, G4 — reserve race",
+      status: "c3",
+      kind: "taken",
+      coupleNames,
+      raceLost: true,
+      hasFund,
+    },
+  ];
+
+  return { cards, sheets };
 }
 
-/** States that need the guest write loop and therefore land later. */
-const PENDING_STATES: Array<{ prd: string; hebrew: string; status: Status }> = [
+const UNRENDERED_STATES: Array<{
+  id: string;
+  prd: string;
+  status: Status;
+}> = [
   {
-    prd: "G4 — reserve race",
-    hebrew: "בזמן שמילאת, אורח אחר לקח את הפריט",
-    status: "c3",
-  },
-  {
+    id: "offline",
     prd: "G2 — offline while browsing",
-    hebrew: "משהו נתקע. לנסות שוב?",
     status: "c3",
   },
 ];
@@ -201,7 +273,7 @@ function StatusChip({ status }: { status: Status }) {
   );
 }
 
-function Label({ prd, hebrew, status }: { prd: string; hebrew: string; status: Status }) {
+function Label({ prd, status }: { prd: string; status: Status }) {
   return (
     <div className="flex min-w-0 flex-col gap-1 pb-2">
       <div className="flex flex-wrap items-center gap-2">
@@ -212,7 +284,6 @@ function Label({ prd, hebrew, status }: { prd: string; hebrew: string; status: S
           {prd}
         </code>
       </div>
-      <p className="text-micro break-words text-ink-muted">{hebrew}</p>
     </div>
   );
 }
@@ -224,18 +295,15 @@ export default async function StateGallery() {
   const main = await getPublicRegistry(MAIN_SLUG);
   if (!main) notFound();
 
-  const CARD_STATES = cardStates(main.items);
-  const doneCount = FRAME_STATES.length + CARD_STATES.length;
-  const total = doneCount + PENDING_STATES.length;
+  const { cards, sheets } = galleryStates(main.items, main.coupleNames);
 
   return (
     <main className="mx-auto flex w-full max-w-[1400px] flex-col gap-8 px-6 py-10">
       <header className="flex flex-col gap-2">
         <h1 className="text-h1 font-bold text-ink">גלריית המצבים</h1>
         <p className="text-small text-ink-muted">
-          PRD section 7. <span className="ltr-token">{doneCount}</span> מתוך{" "}
-          <span className="ltr-token">{total}</span> מצבים ממומשים. השאר דורשים את לופ
-          הכתיבה של האורח.
+          PRD section 7. כל מצב ששרד אחרי ההחלטות מוצג ברכיב האמיתי, והתווית נושאת את מזהה
+          השורה. גלישה בלי רשת רשומה בסוף — אין רכיב שמצייר שורת ניסיון חוזר מעל הפריטים.
         </p>
         <p className="text-small text-ink-muted">
           המסגרת היא <span className="ltr-token">390×844</span> לצורך השוואה מול ה־Figma
@@ -246,16 +314,32 @@ export default async function StateGallery() {
       <section id="cards" className="flex flex-col gap-4 scroll-mt-6">
         <h2 className="text-h2 font-bold text-ink">מצבים ברמת הפריט</h2>
         <div className="flex flex-wrap gap-6">
-          {CARD_STATES.map((state) => (
+          {cards.map((state) => (
             <div key={state.id} className="flex w-[200px] flex-col">
-              <Label prd={state.prd} hebrew={state.hebrew} status={state.status} />
+              <Label prd={state.prd} status={state.status} />
               <div className="grid grid-cols-1">
                 {state.item.kind === "product" ? (
                   <ProductCard item={state.item} heldByYou={state.heldByYou} />
                 ) : (
-                  <MoneyCard item={state.item} />
+                  <MoneyCard
+                    item={state.item}
+                    hasBit={main.hasBit}
+                    hasPaybox={main.hasPaybox}
+                  />
                 )}
               </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="sheets" className="flex flex-col gap-4 scroll-mt-6">
+        <h2 className="text-h2 font-bold text-ink">מצבים בגיליון</h2>
+        <div className="flex flex-wrap gap-6">
+          {sheets.map((state) => (
+            <div key={state.id} className="flex flex-col">
+              <Label prd={state.prd} status={state.status} />
+              <StateSheet overlay={state} />
             </div>
           ))}
         </div>
@@ -266,7 +350,7 @@ export default async function StateGallery() {
         <div className="flex flex-wrap gap-6">
           {FRAME_STATES.map((state) => (
             <div key={state.id} className="flex flex-col">
-              <Label prd={state.prd} hebrew={state.hebrew} status={state.status} />
+              <Label prd={state.prd} status={state.status} />
               <div className="h-[844px] w-[390px] overflow-hidden rounded-[12px] border border-border bg-bg shadow-sm">
                 <iframe
                   src={`/r/${state.slug}`}
@@ -281,21 +365,20 @@ export default async function StateGallery() {
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-h2 font-bold text-ink">מצבים שממתינים לצ׳קפוינט הבא</h2>
+        <h2 className="text-h2 font-bold text-ink">מצב בלי רכיב במוצר</h2>
         <p className="text-small text-ink-muted">
-          רשומים כאן במפורש כדי שהחור יהיה גלוי, ולא ישכח.
+          רשום כאן כדי שהחור יישאר גלוי. הגלריה לא מציירת את המצב בעצמה.
         </p>
         <div className="flex flex-col gap-2">
-          {PENDING_STATES.map((state) => (
+          {UNRENDERED_STATES.map((state) => (
             <div
-              key={state.prd}
+              key={state.id}
               className="flex items-center gap-3 rounded-card border border-dashed border-border bg-surface px-4 py-3"
             >
               <StatusChip status={state.status} />
               <code className="ltr-token text-micro font-medium text-ink">
                 {state.prd}
               </code>
-              <span className="text-micro text-ink-muted">{state.hebrew}</span>
             </div>
           ))}
         </div>
