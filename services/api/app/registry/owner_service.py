@@ -258,6 +258,25 @@ def publish_registry(session: Session, *, couple: Couple) -> OwnerRegistry:
     return to_owner_registry(registry)
 
 
+def close_registry(session: Session, *, couple: Couple) -> OwnerRegistry:
+    """Stamp closed_at once on a published list; a second close keeps the first stamp (D56)."""
+    registry = _load(session, couple)
+    if registry.published_at is None:
+        raise OwnerError("registry_not_published", 409)
+    if registry.closed_at is None:
+        registry.closed_at = datetime.now(UTC)
+    session.commit()
+    return to_owner_registry(registry)
+
+
+def reopen_registry(session: Session, *, couple: Couple) -> OwnerRegistry:
+    """Clear closed_at. An open list, published or not, is already the result (D56)."""
+    registry = _load(session, couple)
+    registry.closed_at = None
+    session.commit()
+    return to_owner_registry(registry)
+
+
 def add_catalog_item(session: Session, *, couple: Couple, body: AddCatalogItemRequest) -> OwnerItem:
     registry = _load(session, couple)
     _guard_capacity(registry)

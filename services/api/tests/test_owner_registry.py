@@ -15,6 +15,8 @@ that leaks a payment handle into the guest page, so the golden-key test in
 
 from __future__ import annotations
 
+import uuid
+
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import select
@@ -181,6 +183,113 @@ def test_an_empty_list_cannot_be_published(client: TestClient, owner: dict[str, 
 
     assert response.status_code == 409
     assert response.json()["detail"]["code"] == "registry_empty"
+
+
+def reserve(client: TestClient, registry: Registry, item: RegistryItem):
+    return client.post(
+        f"/api/v1/public/registries/{registry.slug}/items/{item.id}/reservations",
+        headers={"X-Guest-Id": str(uuid.uuid4()), "Idempotency-Key": uuid.uuid4().hex},
+    )
+
+
+def test_an_unpublished_list_cannot_be_closed(client: TestClient, owner: dict[str, str]) -> None:
+    """D56: closing applies only once the list is published."""
+    client.post(f"{ME}/registry", headers=owner, json={"coupleNames": "Noa and Itai"})
+
+    response = client.post(f"{ME}/registry/close", headers=owner)
+
+    assert response.status_code == 409
+    assert response.json()["detail"]["code"] == "registry_not_published"
+
+
+def test_closing_a_published_list_stops_new_holds(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry], session: Session
+) -> None:
+    """D56 stamps closed_at; D34 then refuses a new hold."""
+    headers, registry = owner_with_list
+    item = add_product(session, registry)
+
+    closed = client.post(f"{ME}/registry/close", headers=headers)
+
+    assert closed.status_code == 200
+    assert closed.json()["publishedAt"] is not None
+    assert closed.json()["closedAt"] is not None
+    public = client.get(f"/api/v1/public/registries/{registry.slug}").json()
+    assert public["lifecycle"] == "closed"
+    held = reserve(client, registry, item)
+    assert held.status_code == 409
+    assert held.json()["detail"]["code"] == "registry_closed"
+
+
+def test_closing_twice_keeps_the_first_stamp(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry]
+) -> None:
+    """D56: closing again does not re-stamp closed_at."""
+    headers, _registry = owner_with_list
+
+    first = client.post(f"{ME}/registry/close", headers=headers)
+    second = client.post(f"{ME}/registry/close", headers=headers)
+
+    assert first.status_code == second.status_code == 200
+    assert first.json()["closedAt"] is not None
+    assert first.json()["closedAt"] == second.json()["closedAt"]
+
+
+def test_reopening_lets_guests_hold_again(
+    client: TestClient, owner_with_list: tuple[dict[str, str], Registry], session: Session
+) -> None:
+    """D56 clears closed_at so a new hold is accepted again (D34)."""
+    headers, registry = owner_with_list
+    item = add_product(session, registry)
+    client.post(f"{ME}/registry/close", headers=headers)
+
+    reopened = client.post(f"{ME}/registry/reopen", headers=headers)
+
+    assert reopened.status_code == 200
+    assert reopened.json()["closedAt"] is None
+    public = client.get(f"/api/v1/public/registries/{registry.slug}").json()
+    assert public["lifecycle"] == "published"
+    assert reserve(client, registry, item).status_code == 201
+
+
+def test_reopening_an_unpublished_list_just_returns(
+    client: TestClient, owner: dict[str, str]
+) -> None:
+    """D56: an unpublished list has nothing to reopen, and that is not an error."""
+    client.post(f"{ME}/registry", headers=owner, json={"coupleNames": "Noa and Itai"})
+
+    response = client.post(f"{ME}/registry/reopen", headers=owner)
+
+    assert response.status_code == 200
+    assert response.json()["publishedAt"] is None
+    assert response.json()["closedAt"] is None
+
+
+def test_another_couple_cannot_close_this_list(client: TestClient, session: Session) -> None:
+    """D56: /me only ever reaches the signed-in couple's own list."""
+    couple_a = make_couple(session)
+    registry_a = make_registry(session, couple=couple_a)
+    couple_b = make_couple(session)
+    registry_b = make_registry(session, couple=couple_b)
+    slug_a, slug_b = registry_a.slug, registry_b.slug
+    id_a, id_b = registry_a.id, registry_b.id
+    headers_b = {"X-Session-Token": sign_in(session, couple_b)}
+
+    closed = client.post(f"{ME}/registry/close", headers=headers_b)
+
+    assert closed.status_code == 200
+    assert closed.json()["slug"] == slug_b
+    assert closed.json()["closedAt"] is not None
+    session.expire_all()
+    assert session.get(Registry, id_a).closed_at is None
+    assert session.get(Registry, id_b).closed_at is not None
+    assert client.get(f"/api/v1/public/registries/{slug_a}").json()["lifecycle"] == "published"
+    assert client.get(f"/api/v1/public/registries/{slug_b}").json()["lifecycle"] == "closed"
+
+    stranger = {"X-Session-Token": sign_in(session, make_couple(session))}
+    missing = client.post(f"{ME}/registry/close", headers=stranger)
+    assert missing.status_code == 404
+    assert missing.json()["detail"]["code"] == "no_registry"
 
 
 def test_adding_from_the_catalog_copies_the_fields(

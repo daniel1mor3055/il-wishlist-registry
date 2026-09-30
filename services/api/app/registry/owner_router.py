@@ -4,6 +4,8 @@
     POST   /me/registry                 the create wizard
     PATCH  /me/registry                 names, story, city, shipping address, payment details
     POST   /me/registry/publish         make the link work
+    POST   /me/registry/close           stop new gifts, keep the first stamp
+    POST   /me/registry/reopen          clear the close stamp
     POST   /me/registry/items/catalog   add from the seeded catalog
     POST   /me/registry/items/manual    add something the catalog lacks
     POST   /me/registry/envelope        add the envelope, if the wizard skipped it
@@ -33,12 +35,14 @@ from app.registry.owner_service import (
     add_catalog_item,
     add_envelope,
     add_manual_item,
+    close_registry,
     create_registry,
     get_registry,
     patch_item,
     patch_registry,
     publish_registry,
     remove_item,
+    reopen_registry,
 )
 
 router = APIRouter(prefix="/api/v1/me", tags=["editor"])
@@ -79,6 +83,20 @@ def update_registry(
 )
 def publish(couple: CurrentCouple, session: DbSessionDep) -> OwnerRegistry:
     return publish_registry(session, couple=couple)
+
+
+@router.post(
+    "/registry/close",
+    response_model=OwnerRegistry,
+    responses={409: {"description": "The list is not published yet"}},
+)
+def close(couple: CurrentCouple, session: DbSessionDep) -> OwnerRegistry:
+    return close_registry(session, couple=couple)
+
+
+@router.post("/registry/reopen", response_model=OwnerRegistry)
+def reopen(couple: CurrentCouple, session: DbSessionDep) -> OwnerRegistry:
+    return reopen_registry(session, couple=couple)
 
 
 @router.post(
