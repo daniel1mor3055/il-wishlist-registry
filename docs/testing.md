@@ -24,7 +24,7 @@ spec is a bug.
 
 Live in `services/api/tests/`. Pytest, one module per product surface, run
 inside the API container so they see the same Postgres the app uses. Each test
-is rolled back (except the two race files, which commit for real and clean up).
+is rolled back (except the three race files, which commit for real and clean up).
 
 When you lock a behaviour in `docs/decisions.md`, the test that would have
 failed before the lock belongs next to the other tests for that surface:
@@ -41,6 +41,11 @@ failed before the lock belongs next to the other tests for that surface:
 | Magic link, unpublished looks like missing (D30, D42, D43) | `test_auth.py` |
 | Couple editor, D45 locks | `test_owner_registry.py` |
 | Catalog search | `test_catalog_search.py` |
+| Tracker read, isolation per couple, released excluded, guest id never exposed (D52) | `test_tracker.py` |
+| Couple release and mark-bought, no-ops, 409 `gift_state_changed`, 404 for another couple's gift, `resolved_by` for guest and couple (D16, D53) | `test_couple_corrections.py` |
+| Committed races: couple release vs guest release, vs report-yes, vs report-no on a purchased unit; quantity 2 so the `quantity_claimed > 0` guard cannot mask a double decrement (D53) | `test_couple_release_race.py` |
+| Seeded ledgers reconcile with counters (D57) | `test_seed_ledger.py` |
+| Close and reopen: unpublished cannot close, first stamp kept, reopen lets guests hold, unpublished reopen returns, another couple's close leaves this list alone (D56) | `test_owner_registry.py` |
 
 Do not put Hebrew in the API tests. The API returns codes; the web owns words.
 
@@ -56,6 +61,7 @@ cannot make a spec pass by accident.
 | `c3-guest-hold.spec.mjs` | C3 | Handoff X releases (D33). Report ESC keeps the hold and shows `שמור לך`, not `כבר נתפס` (D35) |
 | `c4-guest-money.spec.mjs` | C4 | Envelope opens; Bit reveal is a second request (D13) |
 | `c6-editor.spec.mjs` | C6 | Payment/story/share screens. Preview is display-only. Unpublished `/r/{slug}` stays 404 (D30). Bit with no number is Hebrew, not `משהו נתקע` |
+| `c7-couple-ledger.spec.mjs` | C7 | Unsigned tracker sends the couple to the door. Tracker read-only on the demo. Release, mark-bought then release. An open guest page drops a released hold (D16, D53). Close and reopen (D56) |
 
 First time on a machine:
 
@@ -70,9 +76,9 @@ npm run dev          # or leave it, Playwright will start it
 npm run test:e2e
 ```
 
-Specs that write (C3 holds, C6 new couples) are serial. C3 uses
-`single-item-demo` so it cannot pass against the wrong card. C6 editor specs
-need Mailpit: they sign in through a real magic link.
+Specs that write (C3 holds, C6 new couples, C7 ledger) are serial. C3 uses
+`single-item-demo` so it cannot pass against the wrong card. C6 and C7 editor
+specs need Mailpit: they sign in through a real magic link.
 
 ## Adding a test as you implement
 
