@@ -1,5 +1,6 @@
 "use client";
 
+import { useId } from "react";
 import { ItemImage } from "@/components/primitives/ItemImage";
 import { Meter } from "@/components/primitives/Meter";
 import { Pill, ShopChip } from "@/components/primitives/Badges";
@@ -33,6 +34,8 @@ export function ProductCard({
   const remainingQty = item.quantityWanted - item.quantityClaimed;
   const showQty = item.quantityWanted > 1 && remainingQty > 0;
   const isGroup = item.groupGiftEnabled && item.targetAgorot !== null;
+  const progressId = useId();
+  const aspect = featured ? "aspect-[16/10]" : "aspect-square";
 
   return (
     <button
@@ -46,24 +49,25 @@ export function ProductCard({
       // item while the page still shows it as free.
       data-item-id={item.id}
       className={`flex flex-col overflow-hidden rounded-card border border-border bg-surface text-right transition-transform active:scale-[0.98] ${
-        taken ? "opacity-70" : ""
-      } ${featured ? "col-span-2" : ""}`}
+        featured ? "col-span-2" : ""
+      }`}
     >
-      <div
-        className={`relative w-full bg-image-bg ${featured ? "aspect-[16/10]" : "aspect-square"}`}
-      >
-        <ItemImage
-          src={item.imageUrl}
-          alt={item.title}
-          category={item.category}
-          title={item.title}
-          grayscale={taken}
-          sizes={
-            featured
-              ? "(max-width: 640px) 100vw, 480px"
-              : "(max-width: 640px) 50vw, 240px"
-          }
-        />
+      <div className={`relative w-full bg-image-bg ${aspect}`}>
+        {/* Photo fades here; the status pill is a sibling, so the wash does not reach it. */}
+        <div className={`absolute inset-0 ${taken ? "opacity-70" : ""}`}>
+          <ItemImage
+            src={item.imageUrl}
+            alt={item.title}
+            category={item.category}
+            title={item.title}
+            grayscale={taken}
+            sizes={
+              featured
+                ? "(max-width: 640px) 100vw, 480px"
+                : "(max-width: 640px) 50vw, 240px"
+            }
+          />
+        </div>
         {held ? (
           <span className="absolute start-2 top-2">
             <Pill tone="primary">{copy.item.heldByYou}</Pill>
@@ -83,8 +87,8 @@ export function ProductCard({
         {/* Reserved min-height: Hebrew does not hyphenate, so the grid uses a
             two-line clamp with fixed height rather than a single-line ellipsis. */}
         <p
-          className={`line-clamp-2 min-h-[48px] text-small font-medium ${
-            taken ? "text-muted" : "text-ink"
+          className={`line-clamp-2 min-h-[48px] text-small font-medium text-ink ${
+            taken ? "opacity-70" : ""
           }`}
         >
           {item.title}
@@ -96,8 +100,11 @@ export function ProductCard({
 
         {isGroup && (
           <div className="flex flex-col gap-1.5">
-            <Meter percent={fundedPercent(item.contributedAgorot, item.targetAgorot)} />
-            <p className="text-tiny font-medium text-ink">
+            <Meter
+              percent={fundedPercent(item.contributedAgorot, item.targetAgorot)}
+              labelledBy={progressId}
+            />
+            <p id={progressId} className="text-tiny font-medium text-ink">
               נותרו{" "}
               <InlineAmount
                 agorot={remainingAgorot(item.contributedAgorot, item.targetAgorot)}
@@ -114,7 +121,11 @@ export function ProductCard({
           <div className="flex flex-wrap justify-start gap-1.5">
             {item.chainNameHe && <ShopChip name={item.chainNameHe} />}
           </div>
-          {item.priceAgorot !== null && <Price agorot={item.priceAgorot} muted={taken} />}
+          {item.priceAgorot !== null && (
+            <span className={taken ? "opacity-70" : undefined}>
+              <Price agorot={item.priceAgorot} />
+            </span>
+          )}
         </div>
       </div>
     </button>

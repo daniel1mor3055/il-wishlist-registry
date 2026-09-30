@@ -1,3 +1,4 @@
+import { useId } from "react";
 import Image from "next/image";
 import { Meter } from "@/components/primitives/Meter";
 import { copy } from "@/lib/copy";
@@ -9,6 +10,7 @@ import type { PublicRegistry } from "@/lib/types";
  * WhatsApp link, so nothing here waits on the client.
  */
 export function Hero({ registry }: { registry: PublicRegistry }) {
+  const progressId = useId();
   const percent =
     registry.itemsTotal > 0 ? (registry.itemsClaimed / registry.itemsTotal) * 100 : 0;
   const cover = coverSrc(registry.coverImageUrl);
@@ -40,8 +42,8 @@ export function Hero({ registry }: { registry: PublicRegistry }) {
 
         {registry.itemsTotal > 0 && (
           <div className="flex flex-col gap-1.5">
-            <Meter percent={percent} />
-            <p className="text-small text-ink-muted">
+            <Meter percent={percent} labelledBy={progressId} />
+            <p id={progressId} className="text-small text-ink-muted">
               {copy.hero.progress(registry.itemsClaimed, registry.itemsTotal)}
             </p>
           </div>

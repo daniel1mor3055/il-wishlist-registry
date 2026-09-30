@@ -8,17 +8,13 @@ import { formatAgorot } from "@/lib/money";
 export function Price({
   agorot,
   size = "body",
-  muted = false,
 }: {
   agorot: number;
   size?: "body" | "h3" | "h2";
-  muted?: boolean;
 }) {
   const sizeClass = size === "h2" ? "text-h2" : size === "h3" ? "text-h3" : "text-body";
   return (
-    <span
-      className={`ltr-token shrink-0 font-bold ${sizeClass} ${muted ? "text-muted" : "text-ink"}`}
-    >
+    <span className={`ltr-token shrink-0 font-bold text-ink ${sizeClass}`}>
       {formatAgorot(agorot)}
     </span>
   );

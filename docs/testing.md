@@ -63,6 +63,7 @@ cannot make a spec pass by accident.
 | `c5-editor.spec.mjs` | C5 | Wizard: names, due date, skippable address, unpublished banner (D30). Catalog add shows the price. Untouched quantity and remove; a guest hold locks the floor and the home × (D45). Publish is disabled while the home list has no visible items (after hiding the default חיבוק), then `/r/{slug}` works and was 404 before (D30) |
 | `c6-editor.spec.mjs` | C6 | Payment/story/share screens. Preview is display-only. Unpublished `/r/{slug}` stays 404 (D30). Bit with no number is Hebrew, not `משהו נתקע` |
 | `c7-couple-ledger.spec.mjs` | C7 | Unsigned tracker sends the couple to the door. Tracker read-only on the demo. Release, mark-bought then release. An open guest page drops a released hold (D16, D53). Close and reopen (D56) |
+| `a11y.spec.mjs` | C8 | Published guest list and signed-in editor home: serious and critical WCAG 2.0/2.1 A and AA violations (moderate and minor ignored) |
 
 First time on a machine:
 
@@ -78,8 +79,8 @@ npm run test:e2e
 ```
 
 Specs that write (C3 holds, C6 new couples, C7 ledger) are serial. C3 uses
-`single-item-demo` so it cannot pass against the wrong card. C6 and C7 editor
-specs need Mailpit: they sign in through a real magic link.
+`single-item-demo` so it cannot pass against the wrong card. C5, C6, C7, and
+the a11y spec need Mailpit: they sign in through a real magic link.
 
 ## Adding a test as you implement
 

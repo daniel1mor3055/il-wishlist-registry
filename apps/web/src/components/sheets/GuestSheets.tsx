@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Sheet, Modal, CheckMark } from "./SheetShell";
 import { ItemImage } from "@/components/primitives/ItemImage";
 import { Meter } from "@/components/primitives/Meter";
@@ -307,6 +307,7 @@ export function GroupGiftSheet({
   onContribute: (agorot: number) => void;
 }) {
   const [amount, setAmount] = useState<number | null>(null);
+  const progressId = useId();
   const remaining = remainingAgorot(item.contributedAgorot, item.targetAgorot);
   const complete = isFundComplete(item.contributedAgorot, item.targetAgorot);
 
@@ -350,11 +351,14 @@ export function GroupGiftSheet({
           <Meter
             percent={fundedPercent(item.contributedAgorot, item.targetAgorot)}
             tone={complete ? "success" : "accent"}
+            labelledBy={progressId}
           />
           {complete ? (
-            <p className="text-h3 font-bold text-success">{copy.group.complete}</p>
+            <p id={progressId} className="text-h3 font-bold text-success">
+              {copy.group.complete}
+            </p>
           ) : (
-            <p className="text-h3 font-bold text-ink">
+            <p id={progressId} className="text-h3 font-bold text-ink">
               נותרו <InlineAmount agorot={remaining} /> מתוך{" "}
               <InlineAmount agorot={item.targetAgorot!} />
             </p>

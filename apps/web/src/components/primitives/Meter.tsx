@@ -1,3 +1,5 @@
+import { copy } from "@/lib/copy";
+
 /**
  * A funding or progress meter.
  *
@@ -9,9 +11,11 @@
 export function Meter({
   percent,
   tone = "accent",
+  labelledBy,
 }: {
   percent: number;
   tone?: "accent" | "success";
+  labelledBy?: string;
 }) {
   const clamped = Math.max(0, Math.min(100, percent));
   return (
@@ -21,6 +25,8 @@ export function Meter({
       aria-valuenow={Math.round(clamped)}
       aria-valuemin={0}
       aria-valuemax={100}
+      aria-label={labelledBy ? undefined : copy.meter.name}
+      aria-labelledby={labelledBy}
     >
       <div
         className={`absolute inset-y-0 start-0 rounded-full ${

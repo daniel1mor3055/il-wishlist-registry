@@ -122,6 +122,11 @@ export const copy = {
     stillDeciding: "עוד באמצע? אפשר לסגור — הפריט נשאר שמור לכם",
   },
 
+  /** Shared meter, when no amount line sits next to the bar. */
+  meter: {
+    name: "כמה כבר נאסף",
+  },
+
   /** G6 group gift. */
   group: {
     title: "השתתפות במתנה",
