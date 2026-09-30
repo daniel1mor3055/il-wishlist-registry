@@ -63,6 +63,7 @@ stateDiagram-v2
   [*] --> Unpublished
   Unpublished --> Published: couple publishes at the announcement
   Published --> Closed: couple closes, or auto-archive
+  Closed --> Published: couple reopens
   Closed --> [*]
 ```
 
@@ -72,7 +73,7 @@ Two states are guest-facing, and they are two timestamps rather than a state mac
 |---|---|---|
 | Unpublished | Not found, identical to a wrong slug (D30) | Editor-only. The couple builds here during pregnancy; `published_at` is null |
 | Published (`פורסמה`) | Full registry, items framed `נשלח אחרי הלידה` | Published with the birth announcement, which per D14 *is* the birth announcement |
-| Closed (`נסגרה`) | Read-only thank-you summary, no giving | A stale open registry full of taken items is a trust event for a late guest |
+| Closed (`נסגרה`) | Read-only thank-you summary, no giving | The couple can reopen it (D56). A stale open registry full of taken items is a trust event for a late guest |
 
 There is no post-birth variant (D29). The list published at the announcement is the list, start to finish.
 
@@ -110,8 +111,8 @@ Emotional register: guest surfaces read like a message from friends. First perso
 | C6 | Story and cover | Photo, two-line story | `לשמור` |
 | C7 | Preview as guest | Real guest render in a device frame, banner `זו התצוגה שהאורחים רואים` | `חזרה לעריכה` |
 | C8 | Publish and share | The D14 announcement moment. WhatsApp-first, designed link-preview card, editable Hebrew message, QR for the ברית | `לשתף בוואטסאפ` |
-| C9 | Gift tracker | Table: פריט / מי / מתי / סטטוס / תודה. Chips `נתפס`, `נרכש`, `התקבל`. Per-guest amounts appear here and nowhere else (D15). Release and correct controls (D16) | `לומר תודה` |
-| C10 | Settings and lifecycle | Header gear on editor home. Story, Bit/PayBox, shipping address, sign out. `לסגור את הרשימה`, visibility and delete land here later | — |
+| C9 | Gift tracker | Sections for holds without an answer (with how long ago, `להחזיר לרשימה` and `לסמן שנרכש`), purchased items, `שי` and group-gift money with per-guest amounts (D15, D54), and blessings (D17). Guest names appear here and nowhere else in the editor. Release and correct per D16/D53. No thank-you column (D55) | `להחזיר לרשימה` |
+| C10 | Settings and lifecycle | Settings are grouped (`מה שהאורחים רואים`, `כשאורח נותן מתנה`, `הרשימה`), each card with a one-line hint; `לסגור את הרשימה` and reopening live here (D56); visibility and delete still land later | — |
 
 ### 6.3 Surface 3: retailer widget (prototype only, D18)
 

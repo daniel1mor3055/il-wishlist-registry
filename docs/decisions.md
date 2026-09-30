@@ -148,6 +148,21 @@ Taken after C6. Shop cards were a leftover of D4/D5's Babylist-shaped hybrid. Th
 |---|---|---|---|
 | D51 | No shop cards | Item kinds are `product` and `fund` only. There is no chain gift-card tile, no guest outbound to a merchant card page, and no couple picker for שילב / מוצצים / עגליס / בייבי סטאר cards. Guests who give money use Bit/Paybox (D13, D50). The guest cash filter is `שי`. Supersedes the gift-card half of D4 and D5. | LOCKED |
 
+## Locked, round eleven (the couple's ledger)
+
+Taken with the human while planning C7: the tracker, D16's corrections, and closing the list.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D52 | The tracker is a gifting read | `GET /me/registry/gifts`, owned by the gifting module. One row per held or purchased reservation and one per contribution; released reservations are not listed. The guest cookie id never leaves the API. A blessing attaches to the gift it came with by guest and item; a blessing with a message that matches no listed gift is listed on its own; a name-only blessing is not listed on its own. Gifts on hidden items still appear. `GET /me/registry` keeps hiding giver data. | LOCKED |
+| D53 | Couple corrections, and every reservation transition is conditional | Implements D16. The couple may move held to released, held to purchased, and purchased to released. Every reservation state change, guest or couple, is a conditional `UPDATE` on the current state, and the item counter moves only when that `UPDATE` returned a row, so a couple release and a guest release racing on one hold decrement once. `resolved_by` (`guest` or `couple`) records who made the last transition. | LOCKED |
+| D54 | Contributions are immutable | The couple sees what guests reported. There is no void, edit or delete. A group gift can show money that never arrived, and that is accepted: correcting it would mean the product arbitrating whether a transfer happened, which D11 says it never sees. Supersedes the council's `voided_at` and corrections-as-rows. | LOCKED |
+| D55 | No thank-you feature | The G9 confirmation already thanks the guest, and the couple thanks people themselves. No `thanked_at`, no composer, no `תודה` column and no `ממתין לתודה` filter. Supersedes PRD ed-C9's thank-you column and CTA, the UX brief's C10 composer and the council's `thanked_at`. | LOCKED |
+| D56 | Closing is reversible | `POST /me/registry/close` stamps `closed_at` on a published list and keeps the first stamp; `POST /me/registry/reopen` clears it. D34 is unchanged: a closed list refuses new holds and money and still accepts reports, blessings and the couple's corrections. Supersedes the one-way Closed state in PRD section 5. | LOCKED |
+| D57 | Demo registries carry a ledger that reconciles | Every claimed unit in the seed has a reservation row and every contributed agora a contribution row. The demo composer derives the counters from the ledger, and a test runs the seed and reconciles them. | LOCKED |
+
+Resolved open questions: **O2** is closed by D55.
+
 ## Target retailers
 
 Design content should look like these chains. None of them is integrated in this phase; all catalog data is mock.
