@@ -185,9 +185,12 @@ export function RegistryClient({
      G4 before the hold id exists. A finished release must not leave a flag
      here, or the next tap "succeeds" and then immediately hands the unit back. */
   const pendingRelease = useRef(new Set<string>());
+  const seq = useRef(0);
+  const rememberedSeq = useRef(new Map<string, number>());
 
   const rememberHold = (itemId: string, reservationId: string) => {
     pendingRelease.current.delete(itemId);
+    rememberedSeq.current.set(itemId, ++seq.current);
     setHolds((current) => {
       if (current[itemId] === reservationId) return current;
       const next = { ...current, [itemId]: reservationId };
@@ -196,6 +199,7 @@ export function RegistryClient({
     });
   };
   const forgetHold = (itemId: string) => {
+    rememberedSeq.current.delete(itemId);
     setHolds((current) => {
       if (!(itemId in current)) return current;
       const next = { ...current };
@@ -261,6 +265,7 @@ export function RegistryClient({
   useEffect(() => {
     if (preview) return;
     let cancelled = false;
+    const sentSeq = seq.current;
     void fetchMyHolds(registry.slug).then((result) => {
       if (cancelled || !result.ok) return;
       setHolds((current) => {
@@ -269,11 +274,10 @@ export function RegistryClient({
           if (pendingRelease.current.has(hold.itemId)) continue;
           next[hold.itemId] = hold.reservationId;
         }
-        // A hold placed after this GET left the browser would be missing
-        // from the response. Keep ours unless we already handed it back.
+        // Keep a local hold the response omits only if it was remembered after this GET left.
         for (const [itemId, reservationId] of Object.entries(current)) {
-          if (pendingRelease.current.has(itemId)) continue;
-          if (!(itemId in next)) next[itemId] = reservationId;
+          if (pendingRelease.current.has(itemId) || itemId in next) continue;
+          if ((rememberedSeq.current.get(itemId) ?? 0) > sentSeq) next[itemId] = reservationId;
         }
         return next;
       });

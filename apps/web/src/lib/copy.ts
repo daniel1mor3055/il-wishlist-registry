@@ -388,6 +388,48 @@ export const copy = {
         "מדפיסים ומשאירים ליד המתנות, כדי שאורחים יפתחו את הרשימה בלי להעתיק קישור.",
     },
 
+    /* ed-C9. Names and amounts the guest page never carries (D15, D52). */
+    tracker: {
+      title: "מעקב מתנות",
+      entryTitle: "מעקב מתנות",
+      entryHint: "מי שמר, מי קנה ומי שלח שי",
+      heldTitle: "שמורים, עוד בלי תשובה",
+      heldHint:
+        "אורח שמר את הפריט ועוד לא סיפר אם קנה. אם זה נתקע, אפשר להחזיר אותו לרשימה.",
+      purchasedTitle: "נרכשו",
+      moneyTitle: "שי ומתנות משותפות",
+      moneyHint: "לפי מה שהאורחים סיפרו. הכסף עבר אליכם ישירות בביט או בפייבוקס.",
+      fundItem: "שי בביט / פייבוקס",
+      blessingsTitle: "ברכות",
+      noName: "בלי שם",
+      statusHeld: "נתפס",
+      statusPurchased: "נרכש",
+      markedByYou: "סימנתם בעצמכם",
+      hiddenItem: "מוסתר מהאורחים",
+      forItem: (title: string) => `על ${title}`,
+      age: (days: number) =>
+        days <= 0
+          ? "היום"
+          : days === 1
+            ? "אתמול"
+            : days === 2
+              ? "לפני יומיים"
+              : `לפני ${days} ימים`,
+      release: "להחזיר לרשימה",
+      markPurchased: "לסמן שנרכש",
+      releaseHeldBody:
+        "הפריט יחזור להיות פנוי, ואורחים אחרים יוכלו לקחת אותו. האורח לא יקבל על זה הודעה.",
+      releasePurchasedBody:
+        "הפריט יחזור להיות פנוי. אם מישהו כבר קנה אותו, אורח אחר עלול לקנות אותו שוב.",
+      releaseConfirm: "כן, להחזיר לרשימה",
+      cancel: "ביטול",
+      working: "רגע…",
+      empty: "עוד אין מתנות. כשאורחים ישמרו פריט או ישלחו שי, זה יופיע כאן.",
+      unpublished: "הרשימה עוד לא פורסמה, אז עוד אין כאן מתנות.",
+      stateChanged: "המצב של המתנה השתנה בינתיים. המסך עודכן.",
+      notFound: "המתנה הזאת כבר לא ברשימה.",
+    },
+
     /* ed-C3, adding. */
     add: {
       title: "להוסיף פריט",
@@ -472,6 +514,8 @@ export const ERROR_COPY: Record<string, string> = {
   group_gift_needs_price: copy.editor.itemSettings.groupGiftNeedsPrice,
   group_gift_needs_single_unit: copy.editor.itemSettings.groupGiftNeedsSingle,
   registry_empty: copy.editor.home.emptyTitle,
+  gift_state_changed: copy.editor.tracker.stateChanged,
+  gift_not_found: copy.editor.tracker.notFound,
 };
 
 export function errorCopy(code: string | undefined): string {

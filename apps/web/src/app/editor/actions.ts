@@ -197,3 +197,34 @@ export async function removeItem(itemId: string): Promise<ActionResult> {
   revalidatePath("/editor/payment");
   return { ok: true, data: undefined };
 }
+
+/* ---------- gifts ---------- */
+
+async function postReservation(
+  reservationId: string,
+  action: "release" | "purchased",
+): Promise<ActionResult> {
+  const result = await ownerFetch<void>(
+    `/me/registry/gifts/reservations/${encodeURIComponent(reservationId)}/${action}`,
+    { method: "POST" },
+  );
+  if (!result.ok) {
+    if (result.status === 401) redirect("/editor/enter");
+    if (result.code === "gift_state_changed" || result.code === "gift_not_found") {
+      revalidatePath("/editor/tracker");
+      revalidatePath("/editor");
+    }
+    return failed(result.code);
+  }
+  revalidatePath("/editor/tracker");
+  revalidatePath("/editor");
+  return { ok: true, data: undefined };
+}
+
+export async function releaseGift(reservationId: string): Promise<ActionResult> {
+  return postReservation(reservationId, "release");
+}
+
+export async function markGiftPurchased(reservationId: string): Promise<ActionResult> {
+  return postReservation(reservationId, "purchased");
+}

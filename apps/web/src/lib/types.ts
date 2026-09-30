@@ -9,9 +9,9 @@
  * the golden-key test in `services/api/tests/test_public_read.py`, which
  * asserts the exact key set the API emits.
  *
- * Nothing here may ever carry a giver's identity or a per-guest amount
- * (D8, D15), or a blessing (D17). The payload is server-rendered into the page
- * source, so anything present here is readable by anyone holding the link.
+ * Nothing in the public types may ever carry a giver's identity or a per-guest
+ * amount (D8, D15), or a blessing (D17). That payload is server-rendered into
+ * the page source, so anything on it is readable by anyone holding the link.
  */
 
 /**
@@ -165,8 +165,8 @@ export interface ShippingAddress {
  * these carry what only the couple may. They reach the browser exclusively
  * through server components under `/editor`, never through `/bff`.
  *
- * Still absent: who gave what. Giver names and blessings belong to the gift
- * tracker, so loading the editor cannot leak them by accident.
+ * Giver names are not on the registry. They are on the tracker types below,
+ * and only `/editor/tracker` may pass them to a client component.
  */
 export interface OwnerItem {
   id: string;
@@ -228,6 +228,52 @@ export interface OwnerRegistry {
   itemsTotal: number;
   itemsClaimed: number;
   items: OwnerItem[];
+}
+
+/** GET /me/registry/gifts. Giver names live only here (D52); no thanked flag (D55). */
+export interface TrackerItem {
+  id: string;
+  title: string;
+  kind: ItemKind;
+  imageUrl: string | null;
+  category: Category | null;
+  isActive: boolean;
+}
+
+export interface TrackerReservation {
+  id: string;
+  item: TrackerItem;
+  state: "held" | "purchased";
+  giverName: string | null;
+  createdAt: string;
+  reportedAt: string | null;
+  resolvedBy: "guest" | "couple" | null;
+  blessing: string | null;
+}
+
+export interface TrackerContribution {
+  id: string;
+  item: TrackerItem;
+  giverName: string | null;
+  amountAgorot: number;
+  createdAt: string;
+  blessing: string | null;
+}
+
+export interface TrackerBlessing {
+  id: string;
+  giverName: string | null;
+  message: string;
+  createdAt: string;
+  item: TrackerItem | null;
+}
+
+export interface GiftTracker {
+  /** Oldest first. */
+  held: TrackerReservation[];
+  purchased: TrackerReservation[];
+  contributions: TrackerContribution[];
+  blessings: TrackerBlessing[];
 }
 
 /** One row of catalog search, as the add-item screen renders it. */

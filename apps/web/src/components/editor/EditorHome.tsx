@@ -162,7 +162,10 @@ export function EditorHome({ registry }: { registry: EditorHomeView }) {
       </div>
 
       {published ? (
-        <ShareCard slug={registry.slug} />
+        <>
+          <ShareCard slug={registry.slug} />
+          <TrackerEntry />
+        </>
       ) : (
         <PublishCard itemCount={active.length} />
       )}
@@ -391,6 +394,18 @@ function PublishCard({ itemCount }: { itemCount: number }) {
         {pending ? copy.editor.home.publishing : copy.editor.home.publish}
       </PrimaryButton>
     </div>
+  );
+}
+
+function TrackerEntry() {
+  return (
+    <Link
+      href="/editor/tracker"
+      className="flex flex-col gap-1 rounded-card border border-border bg-surface p-4 text-right transition-transform active:scale-[0.99]"
+    >
+      <span className="text-small font-medium text-ink">{copy.editor.tracker.entryTitle}</span>
+      <span className="text-tiny text-ink-muted">{copy.editor.tracker.entryHint}</span>
+    </Link>
   );
 }
 
