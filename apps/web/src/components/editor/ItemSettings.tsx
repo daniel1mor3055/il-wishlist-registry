@@ -250,7 +250,12 @@ function Stepper({
       >
         −
       </StepButton>
-      <span className="w-8 text-center text-body font-medium text-ink">{value}</span>
+      <span
+        data-testid="quantity-value"
+        className="w-8 text-center text-body font-medium text-ink"
+      >
+        {value}
+      </span>
       <StepButton
         label="עוד"
         disabled={value >= max}

@@ -60,6 +60,7 @@ cannot make a spec pass by accident.
 | `c1-guest-read.spec.mjs` | C1 / C2 | Published page, empty, fully claimed, not-found (D30) |
 | `c3-guest-hold.spec.mjs` | C3 | Handoff X releases (D33). Report ESC keeps the hold and shows `שמור לך`, not `כבר נתפס` (D35) |
 | `c4-guest-money.spec.mjs` | C4 | Envelope opens; Bit reveal is a second request (D13) |
+| `c5-editor.spec.mjs` | C5 | Wizard: names, due date, skippable address, unpublished banner (D30). Catalog add shows the price. Untouched quantity and remove; a guest hold locks the floor and the home × (D45). Publish is disabled while the home list has no visible items (after hiding the default חיבוק), then `/r/{slug}` works and was 404 before (D30) |
 | `c6-editor.spec.mjs` | C6 | Payment/story/share screens. Preview is display-only. Unpublished `/r/{slug}` stays 404 (D30). Bit with no number is Hebrew, not `משהו נתקע` |
 | `c7-couple-ledger.spec.mjs` | C7 | Unsigned tracker sends the couple to the door. Tracker read-only on the demo. Release, mark-bought then release. An open guest page drops a released hold (D16, D53). Close and reopen (D56) |
 
