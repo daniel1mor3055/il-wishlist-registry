@@ -3,7 +3,12 @@
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
 import { addCatalogItem, addManualItem } from "@/app/editor/actions";
-import { Field, FormError, inputClass, ViewOnSiteLink } from "@/components/editor/EditorShell";
+import {
+  Field,
+  FormError,
+  inputClass,
+  ViewOnSiteLink,
+} from "@/components/editor/EditorShell";
 import { PrimaryButton } from "@/components/primitives/Buttons";
 import { ItemImage } from "@/components/primitives/ItemImage";
 import { Price } from "@/components/primitives/Price";

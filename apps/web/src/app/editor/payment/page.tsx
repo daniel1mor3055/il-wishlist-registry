@@ -39,9 +39,7 @@ export default async function PaymentPage({ searchParams }: Props) {
         payboxHandle={payboxHandle}
         paymentDisplayName={paymentDisplayName}
         coupleNames={coupleNames}
-        requireNumber={
-          isSetup || (!fromSettings && !bitHandle && !payboxHandle)
-        }
+        requireNumber={isSetup || (!fromSettings && !bitHandle && !payboxHandle)}
         needsEnvelope={isSetup && !hasFund}
         returnTo={fromSettings ? null : "/editor"}
       />

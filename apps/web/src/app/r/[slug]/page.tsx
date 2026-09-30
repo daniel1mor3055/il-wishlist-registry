@@ -78,7 +78,10 @@ export default async function RegistryPage({ params }: Props) {
   }
 
   return (
-    <main data-theme={theme} className="paper-wash mx-auto flex min-h-dvh w-full max-w-[430px] flex-col">
+    <main
+      data-theme={theme}
+      className="paper-wash mx-auto flex min-h-dvh w-full max-w-[430px] flex-col"
+    >
       <Hero registry={registry} />
       <HowItWorks />
 

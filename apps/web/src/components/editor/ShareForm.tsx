@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import QRCode from "qrcode";
 import { Field, inputClass } from "@/components/editor/EditorShell";
 import { PrimaryButton, SecondaryButton } from "@/components/primitives/Buttons";
@@ -19,6 +19,18 @@ function whatsappHref(message: string) {
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
 }
 
+function subscribeOrigin() {
+  return () => {};
+}
+
+function getOriginSnapshot() {
+  return window.location.origin;
+}
+
+function getOriginServerSnapshot() {
+  return "";
+}
+
 /**
  * Post-publish share kit. The preview card is a WhatsApp-shaped mock of the
  * names, story and cover — not a live crawler of the guest page's OG tags.
@@ -34,21 +46,20 @@ export function ShareForm({
   story: string;
   coverImageUrl: string | null;
 }) {
-  const [origin, setOrigin] = useState("");
-  const [message, setMessage] = useState("");
+  const origin = useSyncExternalStore(
+    subscribeOrigin,
+    getOriginSnapshot,
+    getOriginServerSnapshot,
+  );
+  const [message, setMessage] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [qrSrc, setQrSrc] = useState<string | null>(null);
 
   const path = guestPath(slug);
   const absolute = origin ? `${origin}${path}` : "";
+  const displayedMessage = message ?? (absolute ? defaultMessage(absolute) : "");
   const ready = absolute.startsWith("http");
   const hostname = origin ? new URL(origin).host : "";
-
-  useEffect(() => {
-    const next = window.location.origin;
-    setOrigin(next);
-    setMessage(defaultMessage(`${next}${path}`));
-  }, [path]);
 
   useEffect(() => {
     if (!ready) return;
@@ -71,7 +82,7 @@ export function ShareForm({
 
       <Field label={copy.editor.share.messageLabel}>
         <textarea
-          value={message}
+          value={displayedMessage}
           onChange={(event) => setMessage(event.target.value)}
           rows={4}
           className={`${inputClass} resize-none`}
@@ -106,9 +117,9 @@ export function ShareForm({
 
       <div className="mt-auto flex flex-col gap-2 pt-4">
         <PrimaryButton
-          disabled={!ready || !message.trim()}
+          disabled={!ready || !displayedMessage.trim()}
           onClick={() => {
-            window.open(whatsappHref(message), "_blank", "noopener,noreferrer");
+            window.open(whatsappHref(displayedMessage), "_blank", "noopener,noreferrer");
           }}
         >
           {copy.editor.share.whatsapp}

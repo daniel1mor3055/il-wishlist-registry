@@ -3,7 +3,12 @@
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 import { patchItem, removeItem } from "@/app/editor/actions";
-import { Field, FormError, inputClass, ViewOnSiteLink } from "@/components/editor/EditorShell";
+import {
+  Field,
+  FormError,
+  inputClass,
+  ViewOnSiteLink,
+} from "@/components/editor/EditorShell";
 import { PrimaryButton } from "@/components/primitives/Buttons";
 import { GROUP_GIFT_HINT_AGOROT, copy } from "@/lib/copy";
 import { formatAgorot } from "@/lib/money";
@@ -63,11 +68,7 @@ export function ItemSettings({ item }: { item: OwnerItem }) {
       </Field>
 
       {isProduct && item.canonicalUrl && (
-        <ViewOnSiteLink
-          href={item.canonicalUrl}
-          chain={item.chainNameHe}
-          size="small"
-        />
+        <ViewOnSiteLink href={item.canonicalUrl} chain={item.chainNameHe} size="small" />
       )}
 
       <Field

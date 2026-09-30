@@ -50,7 +50,13 @@ const EDITOR_HEADER_PX = 61;
  */
 export type EditorHomeView = Pick<
   OwnerRegistry,
-  "slug" | "coupleNames" | "publishedAt" | "closedAt" | "itemsTotal" | "itemsClaimed" | "items"
+  | "slug"
+  | "coupleNames"
+  | "publishedAt"
+  | "closedAt"
+  | "itemsTotal"
+  | "itemsClaimed"
+  | "items"
 > & {
   /** Presence only. The numbers themselves stay off this screen (D13). */
   hasBit: boolean;
@@ -336,9 +342,7 @@ function ItemRow({
         <span className="flex min-w-0 flex-1 flex-col gap-1">
           <span className="line-clamp-1 text-small font-medium text-ink">{title}</span>
           <span className="flex flex-wrap items-center gap-1.5">
-            {needsNumber && (
-              <Pill tone="muted">{copy.editor.home.fundNeedsNumber}</Pill>
-            )}
+            {needsNumber && <Pill tone="muted">{copy.editor.home.fundNeedsNumber}</Pill>}
             {item.priceAgorot !== null && (
               <span className="text-tiny text-ink-muted">
                 <span className="ltr-token">{formatAgorot(item.priceAgorot)}</span>
@@ -443,7 +447,9 @@ function TrackerEntry() {
       href="/editor/tracker"
       className="flex flex-col gap-1 rounded-card border border-border bg-surface p-4 text-right transition-transform active:scale-[0.99]"
     >
-      <span className="text-small font-medium text-ink">{copy.editor.tracker.entryTitle}</span>
+      <span className="text-small font-medium text-ink">
+        {copy.editor.tracker.entryTitle}
+      </span>
       <span className="text-tiny text-ink-muted">{copy.editor.tracker.entryHint}</span>
     </Link>
   );

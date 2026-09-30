@@ -475,7 +475,10 @@ export function ContactRevealSheet({
       labelledBy="contact-title"
       cta={
         <div className="flex flex-col items-center gap-2">
-          <PrimaryButton onClick={onSent} disabled={!handle || rails.length === 0 || pending}>
+          <PrimaryButton
+            onClick={onSent}
+            disabled={!handle || rails.length === 0 || pending}
+          >
             {copy.contact.sent}
           </PrimaryButton>
           <TextButton onClick={onClose}>{copy.contact.notSent}</TextButton>
@@ -494,7 +497,9 @@ export function ContactRevealSheet({
           rails.map((rail) => (
             <div key={rail.method} className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between rounded-btn border border-border bg-panel px-4 py-3.5">
-                <span className="ltr-token text-h3 font-bold text-ink">{rail.handle}</span>
+                <span className="ltr-token text-h3 font-bold text-ink">
+                  {rail.handle}
+                </span>
                 <button
                   type="button"
                   onClick={() => onCopy(rail.handle)}

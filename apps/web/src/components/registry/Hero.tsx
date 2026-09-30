@@ -35,9 +35,7 @@ export function Hero({ registry }: { registry: PublicRegistry }) {
             {copy.hero.titleFor(registry.coupleNames)}
           </h1>
           <p className="text-body text-ink">{registry.story}</p>
-          {registry.city && (
-            <p className="text-small text-ink-muted">{registry.city}</p>
-          )}
+          {registry.city && <p className="text-small text-ink-muted">{registry.city}</p>}
         </div>
 
         {registry.itemsTotal > 0 && (

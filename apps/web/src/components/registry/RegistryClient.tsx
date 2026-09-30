@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { ProductCard } from "./ProductCard";
 import { MoneyCard } from "./MoneyCard";
@@ -72,11 +72,7 @@ type SheetState =
   | { type: "taken"; itemId: string; raceLost: boolean }
   | null;
 
-function matchesFilter(
-  item: PublicItem,
-  filter: FilterId,
-  heldByYou: boolean,
-): boolean {
+function matchesFilter(item: PublicItem, filter: FilterId, heldByYou: boolean): boolean {
   const price = item.priceAgorot;
   switch (filter) {
     case "all":
@@ -248,8 +244,10 @@ export function RegistryClient({
 
   useEffect(() => {
     if (preview) return;
+    /* eslint-disable react-hooks/set-state-in-effect -- sessionStorage is read after hydration so the server and first client render match */
     setHolds(readCachedHolds(registry.slug));
     setHoldsCacheReady(true);
+    /* eslint-enable react-hooks/set-state-in-effect */
   }, [registry.slug, preview]);
 
   useEffect(() => {
@@ -277,7 +275,8 @@ export function RegistryClient({
         // Keep a local hold the response omits only if it was remembered after this GET left.
         for (const [itemId, reservationId] of Object.entries(current)) {
           if (pendingRelease.current.has(itemId) || itemId in next) continue;
-          if ((rememberedSeq.current.get(itemId) ?? 0) > sentSeq) next[itemId] = reservationId;
+          if ((rememberedSeq.current.get(itemId) ?? 0) > sentSeq)
+            next[itemId] = reservationId;
         }
         return next;
       });
@@ -503,6 +502,120 @@ export function RegistryClient({
 
   const singleItem = items.length === 1 ? items[0] : null;
 
+  let detailSheet: ReactNode = null;
+  if (sheet?.type === "detail") {
+    const item = byId(sheet.itemId);
+    if (item) {
+      detailSheet = (
+        <ItemDetailSheet
+          item={item}
+          onClose={closeSheet}
+          onReserve={() => void reserve(item)}
+        />
+      );
+    }
+  }
+
+  let handoffSheet: ReactNode = null;
+  if (sheet?.type === "handoff") {
+    const item = byId(sheet.itemId);
+    if (item) {
+      const { itemId, reservationId } = sheet;
+      handoffSheet = (
+        <HandoffSheet
+          item={item}
+          coupleNames={registry.coupleNames}
+          slug={registry.slug}
+          hasShippingAddress={registry.hasShippingAddress}
+          pending={reservationId === null}
+          onClose={() => void abandonHold(itemId, reservationId)}
+          onContinue={() => continueToChain(itemId, reservationId)}
+        />
+      );
+    }
+  }
+
+  let reportSheet: ReactNode = null;
+  if (sheet?.type === "report") {
+    const { itemId, reservationId } = sheet;
+    reportSheet = (
+      <ReportModal
+        pending={reporting}
+        // Dismissing the question is not an answer, and it keeps the hold.
+        onClose={closeSheet}
+        onPurchased={() => void report(itemId, reservationId, true)}
+        onNotPurchased={() => void report(itemId, reservationId, false)}
+      />
+    );
+  }
+
+  let groupSheet: ReactNode = null;
+  if (sheet?.type === "group") {
+    const item = byId(sheet.itemId);
+    if (item) {
+      groupSheet = (
+        <GroupGiftSheet
+          item={item}
+          onClose={closeSheet}
+          onContribute={(agorot) => void revealHandle(item, agorot)}
+        />
+      );
+    }
+  }
+
+  let cashSheet: ReactNode = null;
+  if (sheet?.type === "cash") {
+    const item = byId(sheet.itemId);
+    if (item) {
+      cashSheet = (
+        <CashSheet
+          item={item}
+          hasBit={registry.hasBit}
+          hasPaybox={registry.hasPaybox}
+          onClose={closeSheet}
+          onSend={(agorot) => {
+            void revealHandle(item, agorot);
+          }}
+        />
+      );
+    }
+  }
+
+  let contactSheet: ReactNode = null;
+  if (sheet?.type === "contact") {
+    const { itemId, amountAgorot } = sheet;
+    contactSheet = (
+      <ContactRevealSheet
+        coupleNames={registry.coupleNames}
+        handle={handle}
+        amountAgorot={amountAgorot}
+        pending={sending}
+        onClose={closeSheet}
+        onSent={() => void recordContribution(itemId, amountAgorot)}
+        onCopy={(digits) => {
+          void navigator.clipboard?.writeText(digits);
+          showToast(copy.contact.copied);
+        }}
+      />
+    );
+  }
+
+  let blessingSheet: ReactNode = null;
+  if (sheet?.type === "blessing") {
+    const { reservationId, contributionId } = sheet;
+    blessingSheet = (
+      <BlessingSheet
+        coupleNames={registry.coupleNames}
+        giverName={giverName}
+        onGiverNameChange={setGiverName}
+        onClose={closeSheet}
+        onSubmit={(message) =>
+          void finishGift({ reservationId, contributionId }, message)
+        }
+      />
+    );
+  }
+
   return (
     <>
       <div className="mt-6">
@@ -601,115 +714,13 @@ export function RegistryClient({
 
       {/* ---------- sheets ---------- */}
 
-      {sheet?.type === "detail" &&
-        (() => {
-          const item = byId(sheet.itemId);
-          if (!item) return null;
-          return (
-            <ItemDetailSheet
-              item={item}
-              onClose={closeSheet}
-              onReserve={() => void reserve(item)}
-            />
-          );
-        })()}
-
-      {sheet?.type === "handoff" &&
-        (() => {
-          const item = byId(sheet.itemId);
-          if (!item) return null;
-          const { itemId, reservationId } = sheet;
-          return (
-            <HandoffSheet
-              item={item}
-              coupleNames={registry.coupleNames}
-              slug={registry.slug}
-              hasShippingAddress={registry.hasShippingAddress}
-              pending={reservationId === null}
-              onClose={() => void abandonHold(itemId, reservationId)}
-              onContinue={() => continueToChain(itemId, reservationId)}
-            />
-          );
-        })()}
-
-      {sheet?.type === "report" &&
-        (() => {
-          const { itemId, reservationId } = sheet;
-          return (
-            <ReportModal
-              pending={reporting}
-              // Dismissing the question is not an answer, and it keeps the hold.
-              onClose={closeSheet}
-              onPurchased={() => void report(itemId, reservationId, true)}
-              onNotPurchased={() => void report(itemId, reservationId, false)}
-            />
-          );
-        })()}
-
-      {sheet?.type === "group" &&
-        (() => {
-          const item = byId(sheet.itemId);
-          if (!item) return null;
-          return (
-            <GroupGiftSheet
-              item={item}
-              onClose={closeSheet}
-              onContribute={(agorot) => void revealHandle(item, agorot)}
-            />
-          );
-        })()}
-
-      {sheet?.type === "cash" &&
-        (() => {
-          const item = byId(sheet.itemId);
-          if (!item) return null;
-          return (
-            <CashSheet
-              item={item}
-              hasBit={registry.hasBit}
-              hasPaybox={registry.hasPaybox}
-              onClose={closeSheet}
-              onSend={(agorot) => {
-                void revealHandle(item, agorot);
-              }}
-            />
-          );
-        })()}
-
-      {sheet?.type === "contact" &&
-        (() => {
-          const { itemId, amountAgorot } = sheet;
-          return (
-            <ContactRevealSheet
-              coupleNames={registry.coupleNames}
-              handle={handle}
-              amountAgorot={amountAgorot}
-              pending={sending}
-              onClose={closeSheet}
-              onSent={() => void recordContribution(itemId, amountAgorot)}
-              onCopy={(digits) => {
-                void navigator.clipboard?.writeText(digits);
-                showToast(copy.contact.copied);
-              }}
-            />
-          );
-        })()}
-
-      {sheet?.type === "blessing" &&
-        (() => {
-          const { reservationId, contributionId } = sheet;
-          return (
-            <BlessingSheet
-              coupleNames={registry.coupleNames}
-              giverName={giverName}
-              onGiverNameChange={setGiverName}
-              onClose={closeSheet}
-              onSubmit={(message) =>
-                void finishGift({ reservationId, contributionId }, message)
-              }
-            />
-          );
-        })()}
+      {detailSheet}
+      {handoffSheet}
+      {reportSheet}
+      {groupSheet}
+      {cashSheet}
+      {contactSheet}
+      {blessingSheet}
 
       {sheet?.type === "confirmed" && (
         <ConfirmedSheet
@@ -726,9 +737,7 @@ export function RegistryClient({
           raceLost={sheet.raceLost}
           onClose={closeSheet}
           onFundInstead={() =>
-            firstFund
-              ? setSheet({ type: "cash", itemId: firstFund.id })
-              : closeSheet()
+            firstFund ? setSheet({ type: "cash", itemId: firstFund.id }) : closeSheet()
           }
         />
       )}

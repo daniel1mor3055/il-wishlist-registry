@@ -10,3 +10,4 @@ package-lock.json
 # formatter; README stays formatted because it is mostly structure.
 docs/
 .cursor/
+CLAUDE.md

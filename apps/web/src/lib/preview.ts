@@ -21,9 +21,15 @@ export function ownerToPublicRegistry(owner: OwnerRegistry): PublicRegistry {
     hasShippingAddress: Boolean((owner.shippingStreet ?? "").trim()),
     hasBit: Boolean((owner.bitHandle ?? "").trim()),
     hasPaybox: Boolean((owner.payboxHandle ?? "").trim()),
-    items: owner.items.filter((item) => item.isActive).map((item) =>
-      toPublicItem(item, Boolean((owner.bitHandle ?? "").trim()), Boolean((owner.payboxHandle ?? "").trim())),
-    ),
+    items: owner.items
+      .filter((item) => item.isActive)
+      .map((item) =>
+        toPublicItem(
+          item,
+          Boolean((owner.bitHandle ?? "").trim()),
+          Boolean((owner.payboxHandle ?? "").trim()),
+        ),
+      ),
   };
 }
 

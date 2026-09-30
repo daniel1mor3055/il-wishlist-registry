@@ -11,17 +11,11 @@ type OgTags = {
 function meta(html: string, property: string): string | null {
   const escaped = property.replace(":", "\\:");
   const named = html.match(
-    new RegExp(
-      `<meta[^>]+property=["']${escaped}["'][^>]*content=["']([^"']*)["']`,
-      "i",
-    ),
+    new RegExp(`<meta[^>]+property=["']${escaped}["'][^>]*content=["']([^"']*)["']`, "i"),
   );
   if (named?.[1]) return named[1];
   const reversed = html.match(
-    new RegExp(
-      `<meta[^>]+content=["']([^"']*)["'][^>]*property=["']${escaped}["']`,
-      "i",
-    ),
+    new RegExp(`<meta[^>]+content=["']([^"']*)["'][^>]*property=["']${escaped}["']`, "i"),
   );
   return reversed?.[1] ?? null;
 }
@@ -35,22 +29,21 @@ export function OgInspector({ slug }: { slug: string }) {
 
   useEffect(() => {
     let cancelled = false;
-    void fetch(`/r/${slug}`)
-      .then(async (response) => {
-        const html = await response.text();
-        if (cancelled) return;
-        if (!response.ok) {
-          setMissing(true);
-          setTags(null);
-          return;
-        }
-        setMissing(false);
-        setTags({
-          title: meta(html, "og:title"),
-          description: meta(html, "og:description"),
-          image: meta(html, "og:image"),
-        });
+    void fetch(`/r/${slug}`).then(async (response) => {
+      const html = await response.text();
+      if (cancelled) return;
+      if (!response.ok) {
+        setMissing(true);
+        setTags(null);
+        return;
+      }
+      setMissing(false);
+      setTags({
+        title: meta(html, "og:title"),
+        description: meta(html, "og:description"),
+        image: meta(html, "og:image"),
       });
+    });
     return () => {
       cancelled = true;
     };
