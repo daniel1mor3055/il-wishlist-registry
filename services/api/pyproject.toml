@@ -19,6 +19,7 @@ dev = [
     "ruff==0.8.6",
     "pytest==8.3.4",
     "httpx==0.28.1",
+    "import-linter==2.13",
 ]
 
 [tool.ruff]
@@ -38,3 +39,34 @@ testpaths = ["tests"]
 # So `pytest` works the same as `python -m pytest`, which would otherwise be the
 # only invocation that puts the service root on sys.path.
 pythonpath = ["."]
+
+[tool.importlinter]
+root_package = "app"
+
+[[tool.importlinter.contracts]]
+name = "Registry, catalog and identity do not import gifting"
+type = "forbidden"
+source_modules = [
+    "app.registry",
+    "app.catalog",
+    "app.identity",
+]
+forbidden_modules = [
+    "app.gifting",
+]
+
+[[tool.importlinter.contracts]]
+name = "Catalog imports nothing internal"
+type = "forbidden"
+source_modules = [
+    "app.catalog",
+]
+forbidden_modules = [
+    "app.registry",
+    "app.gifting",
+    "app.identity",
+]
+# app.deps is shared wiring and imports identity; that hop is not a catalog import.
+ignore_imports = [
+    "app.catalog.** -> app.deps",
+]
