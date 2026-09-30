@@ -28,6 +28,7 @@ class TrackerReservation(BaseModel):
     id: UUID
     item: TrackerItem
     state: Literal["held", "purchased"]
+    resolved_by: Literal["guest", "couple"] | None
     giver_name: str | None
     created_at: datetime
     reported_at: datetime | None

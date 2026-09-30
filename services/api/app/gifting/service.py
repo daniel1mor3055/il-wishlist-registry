@@ -241,47 +241,108 @@ def report_reservation(
     The guest who is still at the shop does not answer this question at all -
     they dismiss it, and their hold stands untouched.
 
-    Idempotent either way, because both branches set a state rather than moving
-    a counter by a delta. That is why this write needs no idempotency key.
+    Idempotent either way: a repeat matches no row, and the counter moves only
+    when that release transition did (D53). That is why this write needs no
+    idempotency key.
     """
     registry = _load_registry(session, slug)
     reservation = _load_reservation(session, registry, reservation_id, guest_id)
+    now = datetime.now(UTC)
+    cleaned = giver_name.strip()[:80] if giver_name and giver_name.strip() else None
 
+    if purchased:
+        values: dict[str, object] = {
+            "state": "purchased",
+            "reported_at": now,
+            "resolved_by": "guest",
+        }
+        from_states = ("held",)
+    else:
+        values = {
+            "state": "released",
+            "reported_at": now,
+            "released_at": now,
+            "resolved_by": "guest",
+        }
+        from_states = ("held", "purchased")
+    if cleaned is not None:
+        values["giver_name"] = cleaned
+
+    changed = _transition_reservation(
+        session, reservation.id, from_states=from_states, values=values
+    )
+    if changed:
+        session.commit()
+        return _view(session, _fresh_reservation(session, reservation.id))
+
+    reservation = _fresh_reservation(session, reservation.id)
     if reservation.state == "released":
-        # Claiming a purchase after giving the unit up is a contradiction. Saying
-        # "no" twice is not, so a retried decline answers rather than errors.
+        # A second decline is a no-op; claiming the purchase after that is a contradiction.
         if purchased:
             raise GiftingError("reservation_released", 409)
         return _view(session, reservation)
 
-    if giver_name and giver_name.strip():
-        reservation.giver_name = giver_name.strip()[:80]
-    reservation.reported_at = datetime.now(UTC)
+    if purchased and reservation.state == "purchased":
+        touch: dict[str, object] = {"reported_at": now}
+        if cleaned is not None:
+            touch["giver_name"] = cleaned
+        updated = session.execute(
+            update(Reservation)
+            .where(Reservation.id == reservation.id, Reservation.state == "purchased")
+            .values(**touch)
+            .returning(Reservation.id)
+            .execution_options(synchronize_session=False)
+        ).scalar_one_or_none()
+        if updated is None:
+            raise GiftingError("reservation_released", 409)
+        session.commit()
+        return _view(session, _fresh_reservation(session, reservation.id))
 
-    if purchased:
-        reservation.state = "purchased"
-        session.flush()
-    else:
-        _hand_back(session, reservation)
-
-    _resettle_claim_state(session, _load_item(session, reservation.item_id))
-    session.commit()
-
-    return _view(session, reservation)
+    raise GiftingError("reservation_released", 409)
 
 
-def _hand_back(session: Session, reservation: Reservation) -> None:
-    """Give the unit up. Conditional on the counter, so it can never go negative."""
-    reservation.state = "released"
-    reservation.released_at = datetime.now(UTC)
+def _fresh_reservation(session: Session, reservation_id: UUID) -> Reservation:
+    reservation = session.get(Reservation, reservation_id, populate_existing=True)
+    if reservation is None:
+        raise GiftingError("reservation_not_found", 404)
+    return reservation
 
-    session.execute(
-        update(RegistryItem)
-        .where(RegistryItem.id == reservation.item_id, RegistryItem.quantity_claimed > 0)
-        .values(quantity_claimed=RegistryItem.quantity_claimed - 1)
+
+def _transition_reservation(
+    session: Session,
+    reservation_id: UUID,
+    *,
+    from_states: tuple[str, ...],
+    values: dict[str, object],
+) -> bool:
+    """A row changes only from `from_states`; only a matched release decrements (D53)."""
+    item_id = session.execute(
+        update(Reservation)
+        .where(Reservation.id == reservation_id, Reservation.state.in_(from_states))
+        .values(**values)
+        .returning(Reservation.item_id)
         .execution_options(synchronize_session=False)
-    )
-    session.flush()
+    ).scalar_one_or_none()
+    if item_id is None:
+        return False
+
+    # Drop the pre-update state so a later flush cannot write it back over this UPDATE.
+    loaded = session.get(Reservation, reservation_id)
+    if loaded is not None:
+        session.expire(loaded)
+
+    if values["state"] == "released":
+        # `> 0` is the second line of defence if a release is matched twice.
+        session.execute(
+            update(RegistryItem)
+            .where(RegistryItem.id == item_id, RegistryItem.quantity_claimed > 0)
+            .values(quantity_claimed=RegistryItem.quantity_claimed - 1)
+            .execution_options(synchronize_session=False)
+        )
+
+    _resettle_claim_state(session, _load_item(session, item_id))
+    session.get(Reservation, reservation_id, populate_existing=True)
+    return True
 
 
 def release_reservation(
@@ -295,13 +356,22 @@ def release_reservation(
     registry = _load_registry(session, slug)
     reservation = _load_reservation(session, registry, reservation_id, guest_id)
 
-    if reservation.state == "released":
-        return
-    if reservation.state == "purchased":
+    changed = _transition_reservation(
+        session,
+        reservation.id,
+        from_states=("held",),
+        values={
+            "state": "released",
+            "released_at": datetime.now(UTC),
+            "resolved_by": "guest",
+        },
+    )
+    if not changed:
+        reservation = _fresh_reservation(session, reservation.id)
+        if reservation.state == "released":
+            return
         raise GiftingError("reservation_already_purchased", 409)
 
-    _hand_back(session, reservation)
-    _resettle_claim_state(session, _load_item(session, reservation.item_id))
     session.commit()
 
 

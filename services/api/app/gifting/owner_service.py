@@ -1,9 +1,9 @@
-"""The couple's gift tracker read (D52)."""
+"""The couple's gift tracker (D52) and their corrections (D16, D53)."""
 
 from __future__ import annotations
 
 from collections import defaultdict
-from datetime import datetime
+from datetime import UTC, datetime
 from uuid import UUID
 
 from sqlalchemy import select
@@ -17,7 +17,7 @@ from app.gifting.owner_schemas import (
     TrackerItem,
     TrackerReservation,
 )
-from app.gifting.service import GiftingError
+from app.gifting.service import GiftingError, _transition_reservation
 from app.identity.models import Couple
 from app.registry.models import Registry, RegistryItem
 
@@ -31,6 +31,64 @@ def gift_tracker(session: Session, *, couple: Couple) -> GiftTracker:
     contributions = _load_contributions(session, registry.id)
     blessings = _load_blessings(session, registry.id)
     return _assemble(items, reservations, contributions, blessings)
+
+
+def release_gift(session: Session, *, couple: Couple, reservation_id: UUID) -> None:
+    """D16 / D53: held or purchased becomes released, and the counter moves once."""
+    reservation = _owned_reservation(session, couple, reservation_id)
+    changed = _transition_reservation(
+        session,
+        reservation.id,
+        from_states=("held", "purchased"),
+        values={
+            "state": "released",
+            "released_at": datetime.now(UTC),
+            "resolved_by": "couple",
+        },
+    )
+    if not changed:
+        fresh = _fresh_owned(session, reservation.id)
+        if fresh.state == "released":
+            return
+        raise GiftingError("gift_state_changed", 409)
+    session.commit()
+
+
+def mark_gift_purchased(session: Session, *, couple: Couple, reservation_id: UUID) -> None:
+    """D16 / D53: held becomes purchased, and reported_at stays null."""
+    reservation = _owned_reservation(session, couple, reservation_id)
+    changed = _transition_reservation(
+        session,
+        reservation.id,
+        from_states=("held",),
+        values={"state": "purchased", "resolved_by": "couple"},
+    )
+    if not changed:
+        fresh = _fresh_owned(session, reservation.id)
+        if fresh.state == "purchased":
+            return
+        raise GiftingError("gift_state_changed", 409)
+    session.commit()
+
+
+def _owned_reservation(session: Session, couple: Couple, reservation_id: UUID) -> Reservation:
+    """Wrong id and someone else's id are the same 404 (D44)."""
+    stmt = (
+        select(Reservation)
+        .join(Registry, Registry.id == Reservation.registry_id)
+        .where(Reservation.id == reservation_id, Registry.couple_id == couple.id)
+    )
+    reservation = session.execute(stmt).scalar_one_or_none()
+    if reservation is None:
+        raise GiftingError("gift_not_found", 404)
+    return reservation
+
+
+def _fresh_owned(session: Session, reservation_id: UUID) -> Reservation:
+    reservation = session.get(Reservation, reservation_id, populate_existing=True)
+    if reservation is None:
+        raise GiftingError("gift_not_found", 404)
+    return reservation
 
 
 def _registry_for(session: Session, couple: Couple) -> Registry:
@@ -137,6 +195,7 @@ def _assemble(
             id=row.id,
             item=_tracker_item(items[row.item_id]),
             state="held",
+            resolved_by=row.resolved_by,
             giver_name=row.giver_name,
             created_at=row.created_at,
             reported_at=row.reported_at,
@@ -149,6 +208,7 @@ def _assemble(
             id=row.id,
             item=_tracker_item(items[row.item_id]),
             state="purchased",
+            resolved_by=row.resolved_by,
             giver_name=row.giver_name,
             created_at=row.created_at,
             reported_at=row.reported_at,

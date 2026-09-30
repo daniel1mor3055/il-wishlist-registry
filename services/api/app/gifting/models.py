@@ -9,10 +9,7 @@ per-registry cookie the web app mints, and that value lands in `guest_id`.
 Holding it is the entire authorisation model for reporting or releasing your own
 hold, which is all the guest side needs and all D23 allows us to build now.
 
-**Idempotency is a unique key, not a store.** The two writes that move a
-counter - taking a unit and adding money - carry a unique `idempotency_key`, so
-a replay returns the row the first attempt created. Reporting and releasing set
-a state instead, so a double tap on either is already harmless.
+Idempotency keys and conditional updates move `quantity_claimed` at most once (D53).
 
 **Money is a record, not a transfer.** A contribution row says "a guest told us
 they sent this much" (D11, D12). Nothing here ever touched the money, and the
@@ -44,9 +41,9 @@ from app.db import Base
 MIN_CONTRIBUTION_AGOROT = 100
 MAX_CONTRIBUTION_AGOROT = 10_000_000
 
-#: held      - the guest has the unit and has not said what happened yet (D16)
-#: purchased - the guest self-reported buying it (D12)
-#: released  - the guest gave the unit back; it no longer counts as claimed
+#: held      - a unit is taken and has not been reported bought (D16)
+#: purchased - the guest reported buying it, or the couple marked it bought (D12, D16)
+#: released  - handed back by the guest or the couple; no longer counts as claimed
 RESERVATION_STATES = ("held", "purchased", "released")
 
 #: The states that occupy a unit of `quantity_claimed`.
@@ -57,6 +54,10 @@ class Reservation(Base):
     __tablename__ = "reservations"
     __table_args__ = (
         CheckConstraint(f"state IN {RESERVATION_STATES}", name="ck_reservation_state"),
+        CheckConstraint(
+            "resolved_by IS NULL OR resolved_by IN ('guest', 'couple')",
+            name="ck_reservation_resolved_by",
+        ),
         Index("ix_reservations_item", "item_id"),
         Index("ix_reservations_registry_guest", "registry_id", "guest_id"),
     )
@@ -73,6 +74,8 @@ class Reservation(Base):
     guest_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True))
 
     state: Mapped[str] = mapped_column(String(12), default="held")
+    #: Who last moved `state` (D53). Null until that first transition.
+    resolved_by: Mapped[str | None] = mapped_column(String(6), default=None)
 
     #: Optional, and asked for as "למי להגיד תודה?" rather than as a login.
     #: Visible to the couple only (D7).

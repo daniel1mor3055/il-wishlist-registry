@@ -24,6 +24,7 @@ RESERVATION_KEYS = {
     "giverName",
     "createdAt",
     "reportedAt",
+    "resolvedBy",
     "blessing",
 }
 CONTRIBUTION_KEYS = {
@@ -226,6 +227,7 @@ def test_sections_put_stuck_holds_first_and_skip_released(
     assert [row["giverName"] for row in body["held"]] == ["Early Hold", "Late Hold"]
     assert [row["state"] for row in body["held"]] == ["held", "held"]
     assert body["held"][0]["reportedAt"] is None
+    assert [row["resolvedBy"] for row in body["held"]] == [None, None]
     assert body["held"][0]["blessing"] is None
     assert set(body["held"][0]) == RESERVATION_KEYS
     held_item = body["held"][0]["item"]
@@ -242,6 +244,7 @@ def test_sections_put_stuck_holds_first_and_skip_released(
     assert body["purchased"][0]["reportedAt"] is not None
     assert body["purchased"][1]["reportedAt"] is None
     assert body["purchased"][0]["state"] == "purchased"
+    assert [row["resolvedBy"] for row in body["purchased"]] == [None, None, None]
     assert [row["giverName"] for row in body["contributions"]] == ["Big Gift", "Small Gift"]
     assert [row["amountAgorot"] for row in body["contributions"]] == [90_000, 1_500]
     assert set(body["contributions"][0]) == CONTRIBUTION_KEYS
