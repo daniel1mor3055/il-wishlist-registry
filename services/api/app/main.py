@@ -23,6 +23,7 @@ from fastapi.responses import JSONResponse
 
 from app.catalog.router import router as catalog_router
 from app.config import get_settings
+from app.gifting.owner_router import router as gifting_owner_router
 from app.gifting.router import router as gifting_router
 from app.gifting.service import GiftingError
 from app.health import router as health_router
@@ -72,6 +73,7 @@ def handle_coded_error(
 app.include_router(health_router)
 app.include_router(registry_router)
 app.include_router(gifting_router)
+app.include_router(gifting_owner_router)
 app.include_router(identity_router)
 app.include_router(owner_router)
 app.include_router(catalog_router)
