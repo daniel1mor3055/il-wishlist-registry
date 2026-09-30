@@ -110,6 +110,47 @@ test.describe("C7 couple ledger", () => {
     await expect(page.locator(heldProduct)).toHaveCount(0);
     await expect(page.locator(availableProduct)).toBeVisible();
   });
+
+  test("a published list can close and reopen (D56)", async ({ page }) => {
+    await signIn(page, `c7-close-${Date.now()}@example.com`);
+    await createDraftList(page, "נועה ומשה");
+    await page.getByRole("link", { name: "להוסיף פריט" }).click();
+    await page.getByRole("button", { name: "משהו אחר" }).click();
+    await page.getByPlaceholder("משאבת חלב ידנית").fill("עגלה לבדיקה");
+    await page.getByRole("button", { name: "להוסיף לרשימה" }).click();
+    await page.waitForURL(/\/editor\/?$/);
+
+    await page.goto("/editor/settings");
+    await expect(page.getByRole("heading", { name: "הגדרות" })).toBeVisible();
+    await expect(page.getByTestId("settings-close")).toHaveCount(0);
+
+    await page.goto("/editor");
+    await page.getByRole("button", { name: "לפרסם את הרשימה" }).click();
+    await expect(page.getByText("הרשימה פורסמה")).toBeVisible();
+    const slug = await ownerSlug(page);
+
+    await page.goto("/editor/settings");
+    await page.getByTestId("settings-close").click();
+    await page.getByTestId("settings-close-confirm").click();
+    await expect(page.getByTestId("settings-close-confirm")).toBeHidden();
+    await expect(page.getByTestId("settings-reopen")).toBeVisible();
+
+    await page.goto("/editor");
+    await expect(page.getByTestId("home-closed")).toBeVisible();
+
+    await page.goto(`/r/${slug}`);
+    await expect(page.getByText("הרשימה נסגרה. תודה לכל מי שהשתתף")).toBeVisible();
+    await expect(page.locator(availableProduct)).toHaveCount(0);
+
+    await page.goto("/editor");
+    await page.getByTestId("home-closed").getByRole("button", { name: "לפתוח מחדש" }).click();
+    await expect(page.getByTestId("home-closed")).toBeHidden();
+    await expect(page.getByText("הרשימה פורסמה")).toBeVisible();
+
+    await page.goto(`/r/${slug}`);
+    await expect(page.getByText("הרשימה נסגרה. תודה לכל מי שהשתתף")).toHaveCount(0);
+    await expect(page.locator(availableProduct)).toBeVisible();
+  });
 });
 
 /** New couple, one manual product, published, guest hold left open on /r/{slug} (D35). */

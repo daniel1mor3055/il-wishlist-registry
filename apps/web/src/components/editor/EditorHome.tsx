@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { addEnvelope, publishRegistry, removeItem } from "@/app/editor/actions";
+import {
+  addEnvelope,
+  publishRegistry,
+  reopenRegistry,
+  removeItem,
+} from "@/app/editor/actions";
 import { FormError } from "@/components/editor/EditorShell";
 import { Toast } from "@/components/feedback/Toast";
 import { Pill } from "@/components/primitives/Badges";
@@ -45,7 +50,7 @@ const EDITOR_HEADER_PX = 61;
  */
 export type EditorHomeView = Pick<
   OwnerRegistry,
-  "slug" | "coupleNames" | "publishedAt" | "itemsTotal" | "itemsClaimed" | "items"
+  "slug" | "coupleNames" | "publishedAt" | "closedAt" | "itemsTotal" | "itemsClaimed" | "items"
 > & {
   /** Presence only. The numbers themselves stay off this screen (D13). */
   hasBit: boolean;
@@ -163,7 +168,11 @@ export function EditorHome({ registry }: { registry: EditorHomeView }) {
 
       {published ? (
         <>
-          <ShareCard slug={registry.slug} />
+          {registry.closedAt !== null ? (
+            <ClosedCard />
+          ) : (
+            <ShareCard slug={registry.slug} />
+          )}
           <TrackerEntry />
         </>
       ) : (
@@ -369,6 +378,37 @@ function ItemRow({
         </button>
       )}
     </li>
+  );
+}
+
+function ClosedCard() {
+  const [error, setError] = useState<string | null>(null);
+  const [pending, startTransition] = useTransition();
+
+  return (
+    <div
+      data-testid="home-closed"
+      className="flex flex-col gap-2.5 rounded-card border border-border bg-surface p-4"
+    >
+      <div className="flex items-center gap-2">
+        <span className="h-2 w-2 rounded-full bg-muted" aria-hidden="true" />
+        <p className="text-body font-bold text-ink">{copy.editor.home.closedTitle}</p>
+      </div>
+      <p className="text-small text-ink-muted">{copy.editor.home.closedBody}</p>
+      <FormError message={error} />
+      <PrimaryButton
+        disabled={pending}
+        onClick={() =>
+          startTransition(async () => {
+            setError(null);
+            const result = await reopenRegistry();
+            if (!result.ok) setError(result.error);
+          })
+        }
+      >
+        {pending ? copy.editor.home.reopening : copy.editor.home.reopen}
+      </PrimaryButton>
+    </div>
   );
 }
 

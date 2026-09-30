@@ -308,6 +308,10 @@ export const copy = {
       publish: "לפרסם את הרשימה",
       publishing: "מפרסמים…",
       publishedTitle: "הרשימה פורסמה",
+      closedTitle: "הרשימה סגורה",
+      closedBody: "מי שפותח את הקישור רואה תודה ולא יכול לתת עוד.",
+      reopen: "לפתוח מחדש",
+      reopening: "פותחים…",
       linkLabel: "הקישור לשליחה",
       copyLink: "העתקה",
       copiedLink: "הקישור הועתק",
@@ -326,6 +330,30 @@ export const copy = {
       title: "הגדרות",
       gearLabel: "הגדרות",
       signOut: "לצאת מהחשבון",
+      groups: {
+        guests: "מה שהאורחים רואים",
+        giving: "כשאורח נותן מתנה",
+        list: "הרשימה",
+      },
+      hints: {
+        story: "תמונה ושתי שורות עליכם",
+        gender: "הצבעים של הרשימה",
+        payment: "המספר שאליו שולחים שי",
+        address: "לאן שולחים מתנות מהחנות",
+      },
+      lifecycle: {
+        closeTitle: "לסגור את הרשימה",
+        closeHint: "אורחים יראו תודה ולא יוכלו לתת עוד",
+        confirmTitle: "לסגור את הרשימה?",
+        confirmBody:
+          "מי שיפתח את הקישור יראה תודה, ולא יוכל לשמור פריט או לשלוח שי. מי שכבר שמר פריט עדיין יוכל לספר אם קנה. אפשר לפתוח מחדש מתי שתרצו.",
+        confirm: "לסגור",
+        closing: "סוגרים…",
+        cancel: "ביטול",
+        reopenTitle: "לפתוח את הרשימה מחדש",
+        reopenHint: "אורחים יוכלו שוב לשמור פריטים ולשלוח שי",
+        notPublished: "אפשר לסגור רק רשימה שפורסמה",
+      },
     },
 
     /* The street guests copy at checkout (D49). Same fields as wizard step 2. */
@@ -514,6 +542,7 @@ export const ERROR_COPY: Record<string, string> = {
   group_gift_needs_price: copy.editor.itemSettings.groupGiftNeedsPrice,
   group_gift_needs_single_unit: copy.editor.itemSettings.groupGiftNeedsSingle,
   registry_empty: copy.editor.home.emptyTitle,
+  registry_not_published: copy.editor.settings.lifecycle.notPublished,
   gift_state_changed: copy.editor.tracker.stateChanged,
   gift_not_found: copy.editor.tracker.notFound,
 };

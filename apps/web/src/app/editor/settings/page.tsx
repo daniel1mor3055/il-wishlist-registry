@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { signOut } from "@/app/editor/actions";
 import { EditorShell } from "@/components/editor/EditorShell";
+import { ListLifecycle } from "@/components/editor/ListLifecycle";
 import { copy } from "@/lib/copy";
 import { getOwnerRegistry } from "@/lib/owner";
 
@@ -18,27 +19,42 @@ export default async function SettingsPage() {
 
   return (
     <EditorShell title={copy.editor.settings.title} back="/editor">
-      <div className="flex flex-1 flex-col gap-2">
-        <SettingsCard
-          href="/editor/story"
-          title={copy.editor.story.title}
-          icon={<StoryIcon />}
-        />
-        <SettingsCard
-          href="/editor/gender"
-          title={copy.editor.gender.label}
-          icon={<GenderIcon />}
-        />
-        <SettingsCard
-          href="/editor/payment?from=settings"
-          title={copy.editor.payment.title}
-          icon={<PaymentIcon />}
-        />
-        <SettingsCard
-          href="/editor/address"
-          title={copy.editor.address.title}
-          icon={<AddressIcon />}
-        />
+      <div className="flex flex-1 flex-col gap-6">
+        <SettingsGroup heading={copy.editor.settings.groups.guests}>
+          <SettingsCard
+            href="/editor/story"
+            title={copy.editor.story.title}
+            hint={copy.editor.settings.hints.story}
+            icon={<StoryIcon />}
+          />
+          <SettingsCard
+            href="/editor/gender"
+            title={copy.editor.gender.label}
+            hint={copy.editor.settings.hints.gender}
+            icon={<GenderIcon />}
+          />
+        </SettingsGroup>
+
+        <SettingsGroup heading={copy.editor.settings.groups.giving}>
+          <SettingsCard
+            href="/editor/payment?from=settings"
+            title={copy.editor.payment.title}
+            hint={copy.editor.settings.hints.payment}
+            icon={<PaymentIcon />}
+          />
+          <SettingsCard
+            href="/editor/address"
+            title={copy.editor.address.title}
+            hint={copy.editor.settings.hints.address}
+            icon={<AddressIcon />}
+          />
+        </SettingsGroup>
+
+        {state.registry.publishedAt !== null && (
+          <SettingsGroup heading={copy.editor.settings.groups.list}>
+            <ListLifecycle closed={state.registry.closedAt !== null} />
+          </SettingsGroup>
+        )}
 
         <div className="mt-auto pt-4">
           <form action={signOut}>
@@ -55,13 +71,24 @@ export default async function SettingsPage() {
   );
 }
 
+function SettingsGroup({ heading, children }: { heading: string; children: ReactNode }) {
+  return (
+    <section className="flex flex-col gap-2">
+      <h2 className="text-small text-ink-muted">{heading}</h2>
+      {children}
+    </section>
+  );
+}
+
 function SettingsCard({
   href,
   title,
+  hint,
   icon,
 }: {
   href: string;
   title: string;
+  hint?: string;
   icon: ReactNode;
 }) {
   return (
@@ -70,7 +97,10 @@ function SettingsCard({
       className="flex items-center gap-3 rounded-card border border-border bg-surface p-4 text-right transition-transform active:scale-[0.99]"
     >
       <span className="shrink-0 text-ink">{icon}</span>
-      <span className="min-w-0 flex-1 text-small font-medium text-ink">{title}</span>
+      <span className="flex min-w-0 flex-1 flex-col gap-1">
+        <span className="text-small font-medium text-ink">{title}</span>
+        {hint && <span className="text-tiny text-ink-muted">{hint}</span>}
+      </span>
     </Link>
   );
 }

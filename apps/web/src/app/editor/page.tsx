@@ -14,8 +14,17 @@ export default async function EditorPage() {
   if (!state.signedIn) redirect("/editor/enter");
   if (!state.registry) redirect("/editor/new");
 
-  const { slug, coupleNames, publishedAt, itemsTotal, itemsClaimed, items, bitHandle, payboxHandle } =
-    state.registry;
+  const {
+    slug,
+    coupleNames,
+    publishedAt,
+    closedAt,
+    itemsTotal,
+    itemsClaimed,
+    items,
+    bitHandle,
+    payboxHandle,
+  } = state.registry;
   const hasBit = Boolean((bitHandle ?? "").trim());
   const hasPaybox = Boolean((payboxHandle ?? "").trim());
 
@@ -29,6 +38,7 @@ export default async function EditorPage() {
           slug,
           coupleNames,
           publishedAt,
+          closedAt,
           itemsTotal,
           itemsClaimed,
           items,

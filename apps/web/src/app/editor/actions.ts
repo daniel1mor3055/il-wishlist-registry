@@ -129,6 +129,31 @@ export async function publishRegistry(): Promise<ActionResult> {
   return { ok: true, data: undefined };
 }
 
+function revalidateOwnerSurfaces() {
+  revalidatePath("/editor");
+  revalidatePath("/editor/settings");
+  revalidatePath("/editor/tracker");
+  revalidatePath("/editor/preview");
+}
+
+export async function closeRegistry(): Promise<ActionResult> {
+  const result = await ownerFetch<OwnerRegistry>("/me/registry/close", {
+    method: "POST",
+  });
+  if (!result.ok) return failed(result.code);
+  revalidateOwnerSurfaces();
+  return { ok: true, data: undefined };
+}
+
+export async function reopenRegistry(): Promise<ActionResult> {
+  const result = await ownerFetch<OwnerRegistry>("/me/registry/reopen", {
+    method: "POST",
+  });
+  if (!result.ok) return failed(result.code);
+  revalidateOwnerSurfaces();
+  return { ok: true, data: undefined };
+}
+
 export async function addEnvelope(): Promise<ActionResult> {
   const result = await ownerFetch<OwnerItem>("/me/registry/envelope", { method: "POST" });
   if (!result.ok) return failed(result.code);
