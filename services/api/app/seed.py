@@ -23,7 +23,8 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import UTC, date, datetime
+import uuid
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +33,7 @@ from sqlalchemy.orm import Session
 
 from app.catalog.models import CatalogItem, Chain
 from app.db import SessionFactory
+from app.gifting.models import Blessing, Contribution, Reservation
 from app.identity.models import Couple
 from app.registry.models import Registry, RegistryItem
 
@@ -133,6 +135,72 @@ def _owner(session: Session, *, email: str, display_name: str) -> Couple:
     return couple
 
 
+def _demo_guest_id(slug: str, guest: str) -> uuid.UUID:
+    # uuid5 so a demo guest key stays the same person on every re-seed.
+    return uuid.uuid5(uuid.NAMESPACE_URL, f"il-registry-demo:{slug}:{guest}")
+
+
+def _ledger_at(now: datetime, row: dict[str, Any]) -> datetime:
+    return now - timedelta(days=row["days_ago"], hours=row.get("hour", 0))
+
+
+def _seed_ledger(
+    session: Session,
+    registry: Registry,
+    items_by_position: dict[int, RegistryItem],
+    row: dict[str, Any],
+    now: datetime,
+) -> None:
+    slug = row["slug"]
+    reservation_index = 0
+    contribution_index = 0
+    for item_row in row["items"]:
+        item = items_by_position[item_row["position"]]
+        for reservation in item_row.get("reservations") or []:
+            created_at = _ledger_at(now, reservation)
+            purchased = reservation["state"] == "purchased"
+            session.add(
+                Reservation(
+                    registry_id=registry.id,
+                    item_id=item.id,
+                    guest_id=_demo_guest_id(slug, reservation["guest"]),
+                    state=reservation["state"],
+                    giver_name=reservation.get("giver_name"),
+                    idempotency_key=f"seed:{slug}:r:{reservation_index}",
+                    created_at=created_at,
+                    reported_at=created_at + timedelta(hours=4) if purchased else None,
+                )
+            )
+            reservation_index += 1
+        for contribution in item_row.get("contributions") or []:
+            session.add(
+                Contribution(
+                    registry_id=registry.id,
+                    item_id=item.id,
+                    guest_id=_demo_guest_id(slug, contribution["guest"]),
+                    amount_agorot=contribution["amount_agorot"],
+                    giver_name=contribution.get("giver_name"),
+                    idempotency_key=f"seed:{slug}:c:{contribution_index}",
+                    created_at=_ledger_at(now, contribution),
+                )
+            )
+            contribution_index += 1
+
+    for index, blessing in enumerate(row.get("blessings") or []):
+        position = blessing.get("item_position")
+        session.add(
+            Blessing(
+                registry_id=registry.id,
+                item_id=None if position is None else items_by_position[position].id,
+                guest_id=_demo_guest_id(slug, blessing["guest"]),
+                giver_name=blessing.get("giver_name"),
+                message=blessing.get("message"),
+                idempotency_key=f"seed:{slug}:b:{index}",
+                created_at=_ledger_at(now, blessing),
+            )
+        )
+
+
 def seed_demo_registries(session: Session) -> int:
     demo = load(DEMO_PATH)
     display_name = demo["couple"]["display_name"]
@@ -174,13 +242,16 @@ def seed_demo_registries(session: Session) -> int:
         session.add(registry)
         session.flush()
 
+        items_by_position: dict[int, RegistryItem] = {}
         for item_row in row["items"]:
-            session.add(
-                RegistryItem(
-                    registry_id=registry.id,
-                    **{field: item_row[field] for field in ITEM_FIELDS},
-                )
+            item = RegistryItem(
+                registry_id=registry.id,
+                **{field: item_row[field] for field in ITEM_FIELDS},
             )
+            session.add(item)
+            items_by_position[item_row["position"]] = item
+        session.flush()
+        _seed_ledger(session, registry, items_by_position, row, now)
 
     return len(demo["registries"])
 

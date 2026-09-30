@@ -47,6 +47,51 @@
           "contributor_count": 6,
           "subtitle": null,
           "caption": "נשלח אחרי הלידה",
+          "reservations": [],
+          "contributions": [
+            {
+              "guest": "s1",
+              "giver_name": "צוות העבודה",
+              "amount_agorot": 73055,
+              "days_ago": 20,
+              "hour": 12
+            },
+            {
+              "guest": "s2",
+              "giver_name": "סבא משה",
+              "amount_agorot": 73055,
+              "days_ago": 16,
+              "hour": 12
+            },
+            {
+              "guest": "s3",
+              "giver_name": "דוד יוסי",
+              "amount_agorot": 73055,
+              "days_ago": 13,
+              "hour": 12
+            },
+            {
+              "guest": "s4",
+              "giver_name": null,
+              "amount_agorot": 73055,
+              "days_ago": 10,
+              "hour": 12
+            },
+            {
+              "guest": "s5",
+              "giver_name": "משפחת לוי",
+              "amount_agorot": 73055,
+              "days_ago": 6,
+              "hour": 12
+            },
+            {
+              "guest": "s6",
+              "giver_name": "נועה מהגן",
+              "amount_agorot": 73055,
+              "days_ago": 3,
+              "hour": 12
+            }
+          ],
           "position": 0
         },
         {
@@ -70,6 +115,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 1
         },
         {
@@ -93,6 +140,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "g1",
+              "state": "purchased",
+              "giver_name": "סבתא רחל",
+              "days_ago": 12,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 2
         },
         {
@@ -116,6 +173,23 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "g2",
+              "state": "purchased",
+              "giver_name": "דנה ועומר",
+              "days_ago": 5,
+              "hour": 12
+            },
+            {
+              "guest": "g3",
+              "state": "held",
+              "giver_name": null,
+              "days_ago": 2,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 3
         },
         {
@@ -139,6 +213,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 4
         },
         {
@@ -162,6 +238,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 5
         },
         {
@@ -185,6 +263,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 6
         },
         {
@@ -208,6 +288,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "g4",
+              "state": "held",
+              "giver_name": null,
+              "days_ago": 9,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 7
         },
         {
@@ -231,6 +321,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 8
         },
         {
@@ -254,6 +346,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 9
         },
         {
@@ -277,7 +371,107 @@
           "contributor_count": 9,
           "subtitle": "כל סכום, ישירות אלינו",
           "caption": null,
+          "reservations": [],
+          "contributions": [
+            {
+              "guest": "f1",
+              "giver_name": "השכנים מלמעלה",
+              "amount_agorot": 36000,
+              "days_ago": 28,
+              "hour": 12
+            },
+            {
+              "guest": "f2",
+              "giver_name": "דודה רונית",
+              "amount_agorot": 18000,
+              "days_ago": 24,
+              "hour": 12
+            },
+            {
+              "guest": "f3",
+              "giver_name": "סבא וסבתא כהן",
+              "amount_agorot": 25000,
+              "days_ago": 21,
+              "hour": 12
+            },
+            {
+              "guest": "f4",
+              "giver_name": null,
+              "amount_agorot": 10000,
+              "days_ago": 17,
+              "hour": 12
+            },
+            {
+              "guest": "f5",
+              "giver_name": "חבר מהצבא",
+              "amount_agorot": 20000,
+              "days_ago": 14,
+              "hour": 12
+            },
+            {
+              "guest": "f6",
+              "giver_name": "משפחת חדד",
+              "amount_agorot": 18000,
+              "days_ago": 11,
+              "hour": 12
+            },
+            {
+              "guest": "f7",
+              "giver_name": "עמית מהלימודים",
+              "amount_agorot": 15000,
+              "days_ago": 8,
+              "hour": 12
+            },
+            {
+              "guest": "f8",
+              "giver_name": "הדודים מצפון",
+              "amount_agorot": 20000,
+              "days_ago": 7,
+              "hour": 12
+            },
+            {
+              "guest": "f9",
+              "giver_name": "חברים מהעבודה",
+              "amount_agorot": 18000,
+              "days_ago": 4,
+              "hour": 12
+            }
+          ],
           "position": 10
+        }
+      ],
+      "blessings": [
+        {
+          "guest": "g1",
+          "item_position": 2,
+          "giver_name": "סבתא רחל",
+          "message": "מחכים כבר לחבק את יעל",
+          "days_ago": 12,
+          "hour": 6
+        },
+        {
+          "guest": "g2",
+          "item_position": 3,
+          "giver_name": "דנה ועומר",
+          "message": "שתהיה בריאה ומאושרת",
+          "days_ago": 5,
+          "hour": 6
+        },
+        {
+          "guest": "s1",
+          "item_position": 0,
+          "giver_name": "צוות העבודה",
+          "message": "באהבה מהצוות",
+          "days_ago": 20,
+          "hour": 6
+        },
+        {
+          "guest": "n1",
+          "item_position": null,
+          "giver_name": "חברים מהשכונה",
+          "message": "מאחלים לכם לידה קלה ושקטה",
+          "days_ago": 3,
+          "hour": 6
         }
       ]
     },
@@ -301,7 +495,8 @@
       "bit_handle": "050-123-4567",
       "paybox_handle": null,
       "payment_display_name": "נועה",
-      "items": []
+      "items": [],
+      "blessings": []
     },
     {
       "slug": "single-item-demo",
@@ -345,9 +540,12 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 0
         }
-      ]
+      ],
+      "blessings": []
     },
     {
       "slug": "fully-claimed-demo",
@@ -391,6 +589,59 @@
           "contributor_count": 6,
           "subtitle": null,
           "caption": "נשלח אחרי הלידה",
+          "reservations": [
+            {
+              "guest": "u0-0",
+              "state": "purchased",
+              "giver_name": "סבתא רחל",
+              "days_ago": 40,
+              "hour": 12
+            }
+          ],
+          "contributions": [
+            {
+              "guest": "s1",
+              "giver_name": "צוות העבודה",
+              "amount_agorot": 73055,
+              "days_ago": 20,
+              "hour": 12
+            },
+            {
+              "guest": "s2",
+              "giver_name": "סבא משה",
+              "amount_agorot": 73055,
+              "days_ago": 16,
+              "hour": 12
+            },
+            {
+              "guest": "s3",
+              "giver_name": "דוד יוסי",
+              "amount_agorot": 73055,
+              "days_ago": 13,
+              "hour": 12
+            },
+            {
+              "guest": "s4",
+              "giver_name": null,
+              "amount_agorot": 73055,
+              "days_ago": 10,
+              "hour": 12
+            },
+            {
+              "guest": "s5",
+              "giver_name": "משפחת לוי",
+              "amount_agorot": 73055,
+              "days_ago": 6,
+              "hour": 12
+            },
+            {
+              "guest": "s6",
+              "giver_name": "נועה מהגן",
+              "amount_agorot": 73055,
+              "days_ago": 3,
+              "hour": 12
+            }
+          ],
           "position": 0
         },
         {
@@ -414,6 +665,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "u1-0",
+              "state": "purchased",
+              "giver_name": "דנה ועומר",
+              "days_ago": 44,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 1
         },
         {
@@ -437,6 +698,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "u2-0",
+              "state": "purchased",
+              "giver_name": "הדודה מיכל",
+              "days_ago": 48,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 2
         },
         {
@@ -460,6 +731,37 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "u3-0",
+              "state": "purchased",
+              "giver_name": "צוות העבודה",
+              "days_ago": 52,
+              "hour": 12
+            },
+            {
+              "guest": "u3-1",
+              "state": "purchased",
+              "giver_name": "סבא משה",
+              "days_ago": 53,
+              "hour": 12
+            },
+            {
+              "guest": "u3-2",
+              "state": "purchased",
+              "giver_name": "דוד יוסי",
+              "days_ago": 54,
+              "hour": 12
+            },
+            {
+              "guest": "u3-3",
+              "state": "purchased",
+              "giver_name": "משפחת לוי",
+              "days_ago": 55,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 3
         },
         {
@@ -483,6 +785,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "u4-0",
+              "state": "purchased",
+              "giver_name": "סבא משה",
+              "days_ago": 56,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 4
         },
         {
@@ -506,6 +818,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "u5-0",
+              "state": "purchased",
+              "giver_name": "דוד יוסי",
+              "days_ago": 60,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 5
         },
         {
@@ -529,6 +851,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "u6-0",
+              "state": "purchased",
+              "giver_name": "משפחת לוי",
+              "days_ago": 64,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 6
         },
         {
@@ -552,6 +884,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "u7-0",
+              "state": "purchased",
+              "giver_name": "נועה מהגן",
+              "days_ago": 68,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 7
         },
         {
@@ -575,6 +917,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "u8-0",
+              "state": "purchased",
+              "giver_name": "השכנים מלמעלה",
+              "days_ago": 72,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 8
         },
         {
@@ -598,6 +950,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "u9-0",
+              "state": "purchased",
+              "giver_name": "דודה רונית",
+              "days_ago": 76,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 9
         },
         {
@@ -621,7 +983,99 @@
           "contributor_count": 9,
           "subtitle": "כל סכום, ישירות אלינו",
           "caption": null,
+          "reservations": [],
+          "contributions": [
+            {
+              "guest": "f1",
+              "giver_name": "השכנים מלמעלה",
+              "amount_agorot": 36000,
+              "days_ago": 28,
+              "hour": 12
+            },
+            {
+              "guest": "f2",
+              "giver_name": "דודה רונית",
+              "amount_agorot": 18000,
+              "days_ago": 24,
+              "hour": 12
+            },
+            {
+              "guest": "f3",
+              "giver_name": "סבא וסבתא כהן",
+              "amount_agorot": 25000,
+              "days_ago": 21,
+              "hour": 12
+            },
+            {
+              "guest": "f4",
+              "giver_name": null,
+              "amount_agorot": 10000,
+              "days_ago": 17,
+              "hour": 12
+            },
+            {
+              "guest": "f5",
+              "giver_name": "חבר מהצבא",
+              "amount_agorot": 20000,
+              "days_ago": 14,
+              "hour": 12
+            },
+            {
+              "guest": "f6",
+              "giver_name": "משפחת חדד",
+              "amount_agorot": 18000,
+              "days_ago": 11,
+              "hour": 12
+            },
+            {
+              "guest": "f7",
+              "giver_name": "עמית מהלימודים",
+              "amount_agorot": 15000,
+              "days_ago": 8,
+              "hour": 12
+            },
+            {
+              "guest": "f8",
+              "giver_name": "הדודים מצפון",
+              "amount_agorot": 20000,
+              "days_ago": 7,
+              "hour": 12
+            },
+            {
+              "guest": "f9",
+              "giver_name": "חברים מהעבודה",
+              "amount_agorot": 18000,
+              "days_ago": 4,
+              "hour": 12
+            }
+          ],
           "position": 10
+        }
+      ],
+      "blessings": [
+        {
+          "guest": "u2-0",
+          "item_position": 2,
+          "giver_name": "הדודה מיכל",
+          "message": "שתגדלו בנחת",
+          "days_ago": 48,
+          "hour": 6
+        },
+        {
+          "guest": "u3-0",
+          "item_position": 3,
+          "giver_name": "צוות העבודה",
+          "message": "בריאות ושמחה לכולכם",
+          "days_ago": 52,
+          "hour": 6
+        },
+        {
+          "guest": "n1",
+          "item_position": null,
+          "giver_name": "משפחת אברהם",
+          "message": "אוהבים אתכם",
+          "days_ago": 2,
+          "hour": 12
         }
       ]
     },
@@ -667,6 +1121,51 @@
           "contributor_count": 6,
           "subtitle": null,
           "caption": "נשלח אחרי הלידה",
+          "reservations": [],
+          "contributions": [
+            {
+              "guest": "s1",
+              "giver_name": "צוות העבודה",
+              "amount_agorot": 73055,
+              "days_ago": 20,
+              "hour": 12
+            },
+            {
+              "guest": "s2",
+              "giver_name": "סבא משה",
+              "amount_agorot": 73055,
+              "days_ago": 16,
+              "hour": 12
+            },
+            {
+              "guest": "s3",
+              "giver_name": "דוד יוסי",
+              "amount_agorot": 73055,
+              "days_ago": 13,
+              "hour": 12
+            },
+            {
+              "guest": "s4",
+              "giver_name": null,
+              "amount_agorot": 73055,
+              "days_ago": 10,
+              "hour": 12
+            },
+            {
+              "guest": "s5",
+              "giver_name": "משפחת לוי",
+              "amount_agorot": 73055,
+              "days_ago": 6,
+              "hour": 12
+            },
+            {
+              "guest": "s6",
+              "giver_name": "נועה מהגן",
+              "amount_agorot": 73055,
+              "days_ago": 3,
+              "hour": 12
+            }
+          ],
           "position": 0
         },
         {
@@ -690,6 +1189,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 1
         },
         {
@@ -713,6 +1214,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "g1",
+              "state": "purchased",
+              "giver_name": "סבתא רחל",
+              "days_ago": 12,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 2
         },
         {
@@ -736,6 +1247,23 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "g2",
+              "state": "purchased",
+              "giver_name": "דנה ועומר",
+              "days_ago": 5,
+              "hour": 12
+            },
+            {
+              "guest": "g3",
+              "state": "held",
+              "giver_name": null,
+              "days_ago": 2,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 3
         },
         {
@@ -759,6 +1287,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 4
         },
         {
@@ -782,6 +1312,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 5
         },
         {
@@ -805,6 +1337,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 6
         },
         {
@@ -828,6 +1362,16 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [
+            {
+              "guest": "g4",
+              "state": "held",
+              "giver_name": null,
+              "days_ago": 9,
+              "hour": 12
+            }
+          ],
+          "contributions": [],
           "position": 7
         },
         {
@@ -851,6 +1395,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 8
         },
         {
@@ -874,6 +1420,8 @@
           "contributor_count": 0,
           "subtitle": null,
           "caption": null,
+          "reservations": [],
+          "contributions": [],
           "position": 9
         },
         {
@@ -897,7 +1445,107 @@
           "contributor_count": 9,
           "subtitle": "כל סכום, ישירות אלינו",
           "caption": null,
+          "reservations": [],
+          "contributions": [
+            {
+              "guest": "f1",
+              "giver_name": "השכנים מלמעלה",
+              "amount_agorot": 36000,
+              "days_ago": 28,
+              "hour": 12
+            },
+            {
+              "guest": "f2",
+              "giver_name": "דודה רונית",
+              "amount_agorot": 18000,
+              "days_ago": 24,
+              "hour": 12
+            },
+            {
+              "guest": "f3",
+              "giver_name": "סבא וסבתא כהן",
+              "amount_agorot": 25000,
+              "days_ago": 21,
+              "hour": 12
+            },
+            {
+              "guest": "f4",
+              "giver_name": null,
+              "amount_agorot": 10000,
+              "days_ago": 17,
+              "hour": 12
+            },
+            {
+              "guest": "f5",
+              "giver_name": "חבר מהצבא",
+              "amount_agorot": 20000,
+              "days_ago": 14,
+              "hour": 12
+            },
+            {
+              "guest": "f6",
+              "giver_name": "משפחת חדד",
+              "amount_agorot": 18000,
+              "days_ago": 11,
+              "hour": 12
+            },
+            {
+              "guest": "f7",
+              "giver_name": "עמית מהלימודים",
+              "amount_agorot": 15000,
+              "days_ago": 8,
+              "hour": 12
+            },
+            {
+              "guest": "f8",
+              "giver_name": "הדודים מצפון",
+              "amount_agorot": 20000,
+              "days_ago": 7,
+              "hour": 12
+            },
+            {
+              "guest": "f9",
+              "giver_name": "חברים מהעבודה",
+              "amount_agorot": 18000,
+              "days_ago": 4,
+              "hour": 12
+            }
+          ],
           "position": 10
+        }
+      ],
+      "blessings": [
+        {
+          "guest": "g1",
+          "item_position": 2,
+          "giver_name": "סבתא רחל",
+          "message": "מחכים כבר לחבק את יעל",
+          "days_ago": 12,
+          "hour": 6
+        },
+        {
+          "guest": "g2",
+          "item_position": 3,
+          "giver_name": "דנה ועומר",
+          "message": "שתהיה בריאה ומאושרת",
+          "days_ago": 5,
+          "hour": 6
+        },
+        {
+          "guest": "s1",
+          "item_position": 0,
+          "giver_name": "צוות העבודה",
+          "message": "באהבה מהצוות",
+          "days_ago": 20,
+          "hour": 6
+        },
+        {
+          "guest": "n1",
+          "item_position": null,
+          "giver_name": "חברים מהשכונה",
+          "message": "מאחלים לכם לידה קלה ושקטה",
+          "days_ago": 3,
+          "hour": 6
         }
       ]
     }
