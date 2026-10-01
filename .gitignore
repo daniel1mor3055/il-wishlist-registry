@@ -25,6 +25,7 @@ build/
 *.tsbuildinfo
 .ruff_cache/
 .pytest_cache/
+.import_linter_cache/
 
 # editor and os
 .DS_Store

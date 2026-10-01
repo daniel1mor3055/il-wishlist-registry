@@ -16,6 +16,8 @@ There are three layers, on purpose. They do not substitute for each other.
 editor or the service. `npm run test:all` is what you run before calling a
 checkpoint done.
 
+CI runs the API suite and the web static checks but not e2e.
+
 Screenshots (`npm run shoot`) are not this suite. They are for looking. A
 screenshot that drifted is a review item; a failing `require` or a failing
 spec is a bug.
@@ -46,6 +48,7 @@ failed before the lock belongs next to the other tests for that surface:
 | Committed races: couple release vs guest release, vs report-yes, vs report-no on a purchased unit; quantity 2 so the `quantity_claimed > 0` guard cannot mask a double decrement (D53) | `test_couple_release_race.py` |
 | Seeded ledgers reconcile with counters (D57) | `test_seed_ledger.py` |
 | Close and reopen: unpublished cannot close, first stamp kept, reopen lets guests hold, unpublished reopen returns, another couple's close leaves this list alone (D56) | `test_owner_registry.py` |
+| Registry, catalog and identity may not import gifting; catalog imports nothing internal except shared app.db/app.deps | `test_module_boundaries.py` |
 
 Do not put Hebrew in the API tests. The API returns codes; the web owns words.
 

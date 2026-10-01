@@ -25,7 +25,7 @@ A B2B2C platform that Israeli retailers can embed or integrate, giving their cus
 
 ## Current phase
 
-Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton and guest registry), C2 (Postgres, seed, API read path), C3 (the double-buy core: reserve, self-report, release), C4 (the money surface: contributions, contact reveal, private blessings), C5 (the couple's editor: magic-link login, create wizard, catalog search, item settings, publish), C6 (payment, story, preview, share) and C7 (gift tracker, release and correct, closing the list) are in.
+Baby registry is the wedge; other occasions are parked. Design discovery is done; the POC is being built in approval-gated checkpoints. C1 (skeleton and guest registry), C2 (Postgres, seed, API read path), C3 (the double-buy core: reserve, self-report, release), C4 (the money surface: contributions, contact reveal, private blessings), C5 (the couple's editor: magic-link login, create wizard, catalog search, item settings, publish), C6 (payment, story, preview, share), C7 (gift tracker, release and correct, closing the list) and C8 (hardening: CI, module boundaries, C5 and accessibility e2e, state gallery audit) are in.
 
 | Document                                                 | What it is                                                           |
 | -------------------------------------------------------- | -------------------------------------------------------------------- |
@@ -114,7 +114,7 @@ To sign in to the seeded demo list, ask for a link as `noa.itai@example.com` and
 | http://localhost:8000/docs                    | API docs, guest and owner endpoints alike          |
 | http://localhost:8025                         | Mailpit — where the magic links arrive             |
 
-Checks: `npm run test` (types + API). Guest screens: `npm run test:e2e` (Playwright, needs the running app). The map of what belongs in which layer, and how to add a spec as a checkpoint lands, is [docs/testing.md](docs/testing.md). `npm run shoot` is still the screenshot driver — looking, not asserting.
+Checks: `npm run test` (types + API). Guest screens: `npm run test:e2e` (Playwright, needs the running app). The map of what belongs in which layer, and how to add a spec as a checkpoint lands, is [docs/testing.md](docs/testing.md). `npm run shoot` is still the screenshot driver — looking, not asserting. CI runs typecheck, lint, format:check, ruff and pytest on every push to main and e2e stays local.
 
 Regenerating seed data (rarely needed — both files are committed):
 
@@ -126,6 +126,8 @@ npm run seed             # load both into Postgres
 
 ## Status
 
+C8 done: CI on every push to main runs the web checks and the API suite. Two import-linter contracts keep registry, catalog and identity from importing gifting, and keep catalog from importing anything internal except shared `app.db` and `app.deps`. The accessibility smoke caught unnamed group-gift meters and low-contrast taken-card pills.
+
 C7 done: the couple can see who held, bought or sent what at `/editor/tracker` (`GET /api/v1/me/registry/gifts`, D52), hand a stuck hold back or mark it bought (`POST /api/v1/me/registry/gifts/reservations/{id}/release`, `POST /api/v1/me/registry/gifts/reservations/{id}/purchased`, D16, D53), and close or reopen the list (`POST /api/v1/me/registry/close`, `POST /api/v1/me/registry/reopen`, D56). Released holds stay off the tracker and the guest id never leaves the API. A closed list still refuses new holds and money, and still accepts reports, blessings and the couple's corrections (D34).
 
 C6 done: the couple can now fill in everything a guest needs after the list exists. Bit or PayBox number at `/editor/payment` (D13, D28, D37), story and cover at `/editor/story`, a session-gated preview at `/editor/preview` that does not make an unpublished `/r/{slug}` work (D30), and the share kit at `/editor/share` — WhatsApp message, a mock preview card, a QR for the ברית. Publish and copy-link were already in C5 (D48). `/dev/og` parses the guest page's real meta tags so the Open Graph gate can be checked on localhost.
@@ -136,7 +138,7 @@ The rule the editor is built around is that the couple may not edit away a guest
 
 Earlier checkpoints stand: the reserve path is one conditional `UPDATE ... WHERE quantity_claimed < quantity_wanted RETURNING`, and both it and the contribution counter are guarded by concurrency tests checked by regression rather than inspection — a read-then-write reserve oversold a two-unit item to five guests, and a read-then-write contribution lost ₪410 of ₪940, while every sequential test still passed.
 
-Next is C8: hardening (CI, import boundaries, C5 e2e, state gallery audit, a11y).
+The checkpoint plan is complete; what comes next is an unranked backlog (tracked outside the repo).
 
 ## License
 
