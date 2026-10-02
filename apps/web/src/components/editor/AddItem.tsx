@@ -1,34 +1,84 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState, useTransition } from "react";
-import { addCatalogItem, addManualItem } from "@/app/editor/actions";
+import { useId, useRef, useState, useTransition } from "react";
+import { addCatalogItem, addLinkItem, addManualItem, resolveCatalogLink } from "@/app/editor/actions";
 import {
   Field,
   FormError,
   inputClass,
   ViewOnSiteLink,
 } from "@/components/editor/EditorShell";
-import { PrimaryButton } from "@/components/primitives/Buttons";
+import { ShopChip } from "@/components/primitives/Badges";
+import { PrimaryButton, SecondaryButton } from "@/components/primitives/Buttons";
 import { ItemImage } from "@/components/primitives/ItemImage";
 import { Price } from "@/components/primitives/Price";
 import { CATEGORY_LABELS, copy } from "@/lib/copy";
-import type { CatalogPage, CatalogResult, Category } from "@/lib/types";
+import type {
+  CatalogPage,
+  CatalogResolveVariant,
+  CatalogResolvedNeedsVariant,
+  CatalogResolvedProduct,
+  CatalogResult,
+  Category,
+} from "@/lib/types";
 
 /**
- * Two ways to add something (PRD ed-C3).
+ * Add screen (PRD ed-C3).
  *
- * Pasting a chain URL and having it resolved is the third, and it needs a
- * resolver that fetches and parses a page; it lands with the checkpoint that
- * owns it. Until then the manual tab takes a link as plain text, which is honest
- * about what we do with it: show it to the guest.
- *
- * Search state lives in the URL, not in this component. That makes the results
- * server-rendered, the back button work, and a search shareable between the two
- * phones a couple is using.
+ * A shop link is the first region, above search and manual. Search stays in
+ * the URL. A read that does not resolve prefills the manual form in state.
  */
 
 const CATEGORIES = Object.keys(CATEGORY_LABELS) as Category[];
+
+type ManualOffer = {
+  link: string;
+  message: string;
+  detail: string | null;
+  retryUrl: string | null;
+};
+
+type PastePhase =
+  | { kind: "idle" }
+  | { kind: "notUrl" }
+  | { kind: "pending" }
+  | { kind: "error"; message: string }
+  | { kind: "added" }
+  | { kind: "product"; url: string; product: CatalogResolvedProduct }
+  | { kind: "needsVariant"; url: string; product: CatalogResolvedNeedsVariant };
+
+function extractUrl(raw: string): string | null {
+  const matches = raw.match(/https?:\/\/[^\s<>"']+/gi);
+  if (!matches || matches.length === 0) return null;
+  const https = matches.find((one) => one.slice(0, 8).toLowerCase() === "https://");
+  return (https ?? matches[0])
+    .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, "")
+    .replace(/[)\].,;:!?]+$/g, "");
+}
+
+function offerFor(reason: string, link: string): ManualOffer {
+  if (reason === "not_product") {
+    return { link, message: copy.editor.add.pasteNotProduct, detail: null, retryUrl: null };
+  }
+  if (reason === "unknown_host" || reason === "not_https") {
+    return { link, message: copy.editor.add.pasteUnknownHost, detail: null, retryUrl: null };
+  }
+  if (reason === "fetch_failed") {
+    return {
+      link,
+      message: copy.editor.add.pasteFetchFailed,
+      detail: copy.editor.add.pasteFetchFailedDetail,
+      retryUrl: link,
+    };
+  }
+  return {
+    link,
+    message: copy.editor.add.pasteBadDocument,
+    detail: null,
+    retryUrl: null,
+  };
+}
 
 export function AddItem({
   page,
@@ -43,6 +93,17 @@ export function AddItem({
 }) {
   const router = useRouter();
   const params = useSearchParams();
+  const generation = useRef(0);
+  const pendingUrl = useRef<string | null>(null);
+  const [text, setText] = useState("");
+  const [phase, setPhase] = useState<PastePhase>({ kind: "idle" });
+  const [selectedVariantId, setSelectedVariantId] = useState<string | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [offer, setOffer] = useState<ManualOffer | null>(null);
+  const [resolving, startResolve] = useTransition();
+  const [saving, startSave] = useTransition();
+
+  const showManual = offer !== null || tab === "manual";
 
   function go(next: Record<string, string | null>) {
     const merged = new URLSearchParams(params.toString());
@@ -53,18 +114,212 @@ export function AddItem({
     router.replace(`/editor/add?${merged.toString()}`);
   }
 
+  function submit(raw: string) {
+    const id = ++generation.current;
+    setSaveError(null);
+    setSelectedVariantId(null);
+
+    const url = extractUrl(raw);
+    if (!url) {
+      pendingUrl.current = null;
+      setText(raw.trim());
+      setOffer(null);
+      setPhase({ kind: "notUrl" });
+      return;
+    }
+
+    pendingUrl.current = url;
+    if (offer?.link !== url) setOffer(null);
+    setText(url);
+    setPhase({ kind: "pending" });
+    startResolve(async () => {
+      const result = await resolveCatalogLink(url);
+      if (generation.current !== id) return;
+      pendingUrl.current = null;
+      if (!result.ok) {
+        setOffer(null);
+        setPhase({ kind: "error", message: result.error });
+        return;
+      }
+      const data = result.data;
+      if (data.outcome === "unresolved") {
+        const echoed = typeof data.url === "string" ? data.url.trim() : "";
+        const link = echoed || url;
+        setText(link);
+        setOffer(offerFor(data.reason, link));
+        setPhase({ kind: "idle" });
+        return;
+      }
+      setOffer(null);
+      if (data.outcome === "needsVariant") {
+        setPhase({ kind: "needsVariant", url, product: data });
+        return;
+      }
+      if (data.outcome === "product") {
+        setPhase({ kind: "product", url, product: data });
+        return;
+      }
+      setPhase({ kind: "error", message: copy.shell.genericError });
+    });
+  }
+
+  function save() {
+    if (phase.kind !== "product" && phase.kind !== "needsVariant") return;
+    const variantId = phase.kind === "product" ? phase.product.variantId : selectedVariantId;
+    if (phase.kind === "needsVariant" && !variantId) return;
+    const id = generation.current;
+    const url = phase.url;
+    setSaveError(null);
+    startSave(async () => {
+      const result = await addLinkItem({ url, variantId });
+      if (generation.current !== id) return;
+      if (!result.ok) {
+        setSaveError(result.error);
+        return;
+      }
+      setText("");
+      setSelectedVariantId(null);
+      setOffer(null);
+      setPhase({ kind: "added" });
+    });
+  }
+
+  const variantList =
+    phase.kind === "needsVariant" ? (phase.product.variants ?? []) : [];
+  const selectedVariant = variantList.find((one) => one.id === selectedVariantId) ?? null;
+  const draftOpen = phase.kind === "product" || phase.kind === "needsVariant";
+
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <Tab active={tab === "search"} onClick={() => go({ tab: null })}>
-          {copy.editor.add.searchTab}
-        </Tab>
-        <Tab active={tab === "manual"} onClick={() => go({ tab: "manual" })}>
-          {copy.editor.add.manualTab}
-        </Tab>
+      <div className="flex flex-col gap-3" aria-busy={phase.kind === "pending" || resolving}>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            submit(text);
+          }}
+        >
+          <Field label={copy.editor.add.pasteLabel} hint={copy.editor.add.pasteHint}>
+            <input
+              value={text}
+              onChange={(event) => {
+                const next = event.target.value;
+                setText(next);
+                const leftResolved =
+                  (phase.kind === "product" || phase.kind === "needsVariant") &&
+                  next.trim() !== phase.url;
+                const leftPending =
+                  phase.kind === "pending" && next.trim() !== pendingUrl.current;
+                if (leftResolved || leftPending) {
+                  generation.current += 1;
+                  pendingUrl.current = null;
+                  setSaveError(null);
+                  setSelectedVariantId(null);
+                  setPhase({ kind: "idle" });
+                  return;
+                }
+                if (phase.kind === "added" || phase.kind === "notUrl" || phase.kind === "error") {
+                  setPhase({ kind: "idle" });
+                }
+              }}
+              onPaste={(event) => {
+                const pasted = event.clipboardData.getData("text");
+                if (!pasted) return;
+                event.preventDefault();
+                submit(pasted);
+              }}
+              placeholder={copy.editor.add.pastePlaceholder}
+              dir={/https?:\/\/\S/i.test(text) ? "ltr" : "rtl"}
+              inputMode="url"
+              enterKeyHint="go"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              className={`${inputClass} text-start`}
+            />
+          </Field>
+        </form>
+
+        {phase.kind === "pending" && (
+          <p role="status" className="text-small text-ink-muted">
+            {copy.editor.add.pastePending}
+          </p>
+        )}
+        {phase.kind === "notUrl" && (
+          <p role="status" className="text-small text-ink-muted">
+            {copy.editor.add.pasteNotUrl}
+          </p>
+        )}
+        {phase.kind === "error" && <FormError message={phase.message} />}
+        {phase.kind === "added" && (
+          <p role="status" className="text-small text-success">
+            {copy.editor.add.added}
+          </p>
+        )}
+        {(phase.kind === "product" || phase.kind === "needsVariant") && (
+          <ResolvedCard
+            product={phase.product}
+            priceAgorot={
+              phase.kind === "product"
+                ? phase.product.priceAgorot
+                : (selectedVariant?.priceAgorot ?? null)
+            }
+            imageUrl={
+              phase.kind === "needsVariant" && selectedVariant
+                ? (selectedVariant.imageUrl ?? phase.product.imageUrl)
+                : phase.product.imageUrl
+            }
+            variants={phase.kind === "needsVariant" ? variantList : null}
+            selectedVariantId={selectedVariantId}
+            onSelect={setSelectedVariantId}
+            error={saveError}
+            pending={saving}
+            canSave={phase.kind === "product" || Boolean(selectedVariantId)}
+            onSave={save}
+          />
+        )}
       </div>
 
-      {tab === "search" ? (
+      {!draftOpen && (
+        <div className="flex gap-2">
+          <Tab
+            active={!showManual}
+            onClick={() => {
+              setOffer(null);
+              if (tab !== "search") go({ tab: null });
+            }}
+          >
+            {copy.editor.add.searchTab}
+          </Tab>
+          <Tab
+            active={showManual}
+            onClick={() => {
+              if (tab !== "manual") go({ tab: "manual" });
+            }}
+          >
+            {copy.editor.add.manualTab}
+          </Tab>
+        </div>
+      )}
+
+      {!draftOpen && (showManual ? (
+        <div className="flex flex-col gap-4">
+          {offer && (
+            <div className="flex flex-col gap-2">
+              <p className="text-small text-ink-muted">{offer.message}</p>
+              {offer.detail && <p className="text-small text-ink-muted">{offer.detail}</p>}
+              {offer.retryUrl && (
+                <SecondaryButton
+                  disabled={resolving || phase.kind === "pending"}
+                  onClick={() => submit(offer.retryUrl!)}
+                >
+                  {copy.editor.add.pasteRetry}
+                </SecondaryButton>
+              )}
+            </div>
+          )}
+          <ManualTab key={offer?.link ?? "manual"} initialLink={offer?.link ?? ""} />
+        </div>
+      ) : (
         <SearchTab
           page={page}
           query={query}
@@ -72,9 +327,110 @@ export function AddItem({
           onSearch={(q) => go({ q, page: null })}
           onCategory={(next) => go({ category: next })}
         />
-      ) : (
-        <ManualTab />
+      ))}
+    </div>
+  );
+}
+
+function ResolvedCard({
+  product,
+  priceAgorot,
+  imageUrl,
+  variants,
+  selectedVariantId,
+  onSelect,
+  error,
+  pending,
+  canSave,
+  onSave,
+}: {
+  product: CatalogResolvedProduct | CatalogResolvedNeedsVariant;
+  priceAgorot: number | null;
+  imageUrl: string | null;
+  variants: CatalogResolveVariant[] | null;
+  selectedVariantId: string | null;
+  onSelect: (id: string) => void;
+  error: string | null;
+  pending: boolean;
+  canSave: boolean;
+  onSave: () => void;
+}) {
+  const headingId = useId();
+  const title = product.title ?? "";
+  const chain = product.chainNameHe?.trim() ? product.chainNameHe : null;
+
+  return (
+    <div className="flex flex-col gap-3 rounded-card border border-border bg-surface p-3">
+      <div className="flex items-start gap-3">
+        <span className="relative h-20 w-20 shrink-0 overflow-hidden rounded-btn bg-image-bg">
+          <ItemImage
+            src={imageUrl}
+            alt={title}
+            category={product.category}
+            title={title}
+            sizes="80px"
+          />
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col gap-1">
+          <span dir="auto" className="line-clamp-2 text-small font-medium text-ink">
+            {title}
+          </span>
+          <span className="flex items-center gap-2">
+            {chain && <ShopChip name={chain} />}
+            {priceAgorot !== null && (
+              <span className="ms-auto">
+                <Price agorot={priceAgorot} />
+              </span>
+            )}
+          </span>
+          <span className="text-tiny text-ink-muted">{copy.item.priceMayDiffer}</span>
+          {product.canonicalUrl && (
+            <ViewOnSiteLink href={product.canonicalUrl} chain={chain} />
+          )}
+        </span>
+      </div>
+
+      {variants && (
+        <div role="group" aria-labelledby={headingId} className="flex flex-col gap-2">
+          <p id={headingId} className="text-small font-medium text-ink">
+            {copy.editor.add.pasteVariantHeading}
+          </p>
+          {variants.map((variant) => {
+            const on = variant.id === selectedVariantId;
+            return (
+              <button
+                key={variant.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => onSelect(variant.id)}
+                className={`flex min-h-11 items-center gap-2 rounded-btn px-2.5 text-start ${
+                  on ? "bg-accent text-on-accent" : "bg-neutral-tint text-ink"
+                }`}
+              >
+                <span className="relative h-10 w-10 shrink-0 overflow-hidden rounded-btn bg-image-bg">
+                  <ItemImage
+                    src={variant.imageUrl}
+                    alt={variant.label}
+                    category={product.category}
+                    title={variant.label}
+                    sizes="40px"
+                  />
+                </span>
+                <span dir="auto" className="min-w-0 flex-1 text-small">
+                  {variant.label}
+                </span>
+                <Price agorot={variant.priceAgorot} />
+              </button>
+            );
+          })}
+        </div>
       )}
+
+      <FormError message={error} />
+
+      <PrimaryButton type="button" disabled={pending || !canSave} onClick={onSave}>
+        {copy.editor.add.manualSubmit}
+      </PrimaryButton>
     </div>
   );
 }
@@ -229,11 +585,11 @@ function ResultRow({ result }: { result: CatalogResult }) {
   );
 }
 
-function ManualTab() {
+function ManualTab({ initialLink = "" }: { initialLink?: string }) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
-  const [link, setLink] = useState("");
+  const [link, setLink] = useState(initialLink);
   const [category, setCategory] = useState<Category | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();

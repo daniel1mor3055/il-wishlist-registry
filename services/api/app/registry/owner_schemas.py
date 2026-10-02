@@ -220,6 +220,34 @@ class AddManualItemRequest(BaseModel):
         return value.strip() if value else value
 
 
+class AddLinkItemRequest(BaseModel):
+    """A shop link. Title, image, and price are read again on save."""
+
+    model_config = ConfigDict(**WireModel, extra="forbid")
+
+    url: str = Field(min_length=1, max_length=4000)
+    variant_id: str | None = None
+
+    @field_validator("variant_id", mode="before")
+    @classmethod
+    def _variant_id(cls, value: object) -> str | None:
+        if value is None:
+            return None
+        if isinstance(value, bool):
+            raise ValueError("variant id must be digits")
+        if isinstance(value, int):
+            text = str(value)
+        elif isinstance(value, str):
+            text = value.strip()
+        else:
+            raise ValueError("variant id must be digits")
+        if not text:
+            return None
+        if not text.isdigit() or len(text) > 64:
+            raise ValueError("variant id must be digits")
+        return text
+
+
 class ItemPatch(BaseModel):
     """Item settings (PRD ed-C4)."""
 

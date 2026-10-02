@@ -485,6 +485,20 @@ export const copy = {
       manualLinkPlaceholder: "אם יש לכם קישור לחנות",
       manualCategoryLabel: "קטגוריה",
       manualSubmit: "להוסיף לרשימה",
+      pasteLabel: "קישור מהחנות",
+      pastePlaceholder: "הדביקו קישור למוצר",
+      pasteHint: "מעתיקים משילב, מוצצים, עגליס או בייבי סטאר ומדביקים כאן",
+      pastePending: "בודקים את הקישור",
+      pasteNotUrl: "זה לא קישור. העתיקו את הכתובת עצמה.",
+      pasteNotProduct: "זה לא עמוד של מוצר. פתחו מוצר אחד והעתיקו שוב.",
+      pasteUnknownHost: "את החנות הזאת לא קראנו. אפשר למלא ידנית — הקישור נשמר.",
+      pasteFetchFailed: "החנות לא ענתה.",
+      pasteFetchFailedDetail:
+        "לא הצלחנו לבדוק. אם תשמרו ידנית, האורחים יפתחו את הקישור כמו שהוא.",
+      pasteRetry: "לנסות שוב",
+      pasteBadDocument: "לא הצלחנו לקרוא את המוצר. אפשר למלא ידנית — הקישור נשמר.",
+      pasteVariantHeading: "בחרו מידה או צבע",
+      pasteAlreadyOnList: "הפריט כבר ברשימה",
       quantityLabel: "כמה מהם?",
       noteLabel: "הערה לאורחים",
       notePlaceholder: "למשל: בצבע אפור, או ׳יש לנו כבר אחד׳",
@@ -551,6 +565,8 @@ export const ERROR_COPY: Record<string, string> = {
   registry_not_published: copy.editor.settings.lifecycle.notPublished,
   gift_state_changed: copy.editor.tracker.stateChanged,
   gift_not_found: copy.editor.tracker.notFound,
+  already_on_list: copy.editor.add.pasteAlreadyOnList,
+  variant_required: copy.editor.add.pasteVariantHeading,
 };
 
 export function errorCopy(code: string | undefined): string {

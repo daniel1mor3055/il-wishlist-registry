@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { apiFetch } from "@/lib/bff";
 import { errorCopy } from "@/lib/copy";
 import { clearSessionToken, ownerFetch } from "@/lib/owner";
-import type { OwnerItem, OwnerRegistry } from "@/lib/types";
+import type { CatalogResolve, OwnerItem, OwnerRegistry } from "@/lib/types";
 
 /**
  * Every write the editor makes.
@@ -185,6 +185,33 @@ export async function addManualItem(input: ManualItemInput): Promise<ActionResul
   const result = await ownerFetch<OwnerItem>("/me/registry/items/manual", {
     method: "POST",
     body: JSON.stringify(input),
+  });
+  if (!result.ok) return failed(result.code);
+  revalidatePath("/editor");
+  return { ok: true, data: undefined };
+}
+
+export async function resolveCatalogLink(url: string): Promise<ActionResult<CatalogResolve>> {
+  const result = await ownerFetch<CatalogResolve>("/catalog/resolve", {
+    method: "POST",
+    body: JSON.stringify({ url }),
+  });
+  if (!result.ok) return failed(result.code);
+  return { ok: true, data: result.data };
+}
+
+// Omit variantId when the product has one shared price (D60). Server re-reads title, price, and image.
+export async function addLinkItem(input: {
+  url: string;
+  variantId: string | null;
+}): Promise<ActionResult> {
+  const body =
+    input.variantId === null
+      ? { url: input.url }
+      : { url: input.url, variantId: input.variantId };
+  const result = await ownerFetch<OwnerItem>("/me/registry/items/link", {
+    method: "POST",
+    body: JSON.stringify(body),
   });
   if (!result.ok) return failed(result.code);
   revalidatePath("/editor");

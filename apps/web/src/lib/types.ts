@@ -294,3 +294,54 @@ export interface CatalogPage {
   /** All matches, not just this page, so the screen can say there are more. */
   total: number;
 }
+
+/** POST /catalog/resolve. needsVariant has no single price; the couple picks one (D60). */
+export type CatalogResolveReason =
+  | "unknown_host"
+  | "not_product"
+  | "not_https"
+  | "fetch_failed"
+  | "bad_document"
+  | "missing_price";
+
+export interface CatalogResolveVariant {
+  id: string;
+  label: string;
+  priceAgorot: number;
+  imageUrl: string | null;
+}
+
+export interface CatalogResolvedProduct {
+  outcome: "product";
+  chainSlug: string;
+  chainNameHe: string;
+  title: string;
+  imageUrl: string | null;
+  priceAgorot: number;
+  canonicalUrl: string;
+  /** Null when every variant shares one price and no pick is required (D60). */
+  variantId: string | null;
+  category: Category | null;
+}
+
+export interface CatalogResolvedNeedsVariant {
+  outcome: "needsVariant";
+  chainSlug: string;
+  chainNameHe: string;
+  title: string;
+  imageUrl: string | null;
+  canonicalUrl: string;
+  category: Category | null;
+  variants: CatalogResolveVariant[];
+}
+
+export interface CatalogResolvedUnresolved {
+  outcome: "unresolved";
+  reason: CatalogResolveReason;
+  url: string;
+}
+
+export type CatalogResolve =
+  | CatalogResolvedProduct
+  | CatalogResolvedNeedsVariant
+  | CatalogResolvedUnresolved;

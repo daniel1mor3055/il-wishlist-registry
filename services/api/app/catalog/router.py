@@ -12,7 +12,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from app.catalog.schemas import CatalogPage
+from app.catalog.resolve import ProductFetcherDep, resolve_paste
+from app.catalog.schemas import CatalogPage, ResolveRequest, ResolveResult
 from app.catalog.service import search_catalog
 from app.deps import CurrentCouple, DbSessionDep
 
@@ -29,3 +30,12 @@ def search(
     limit: Annotated[int, Query(ge=1, le=48)] = 24,
 ) -> CatalogPage:
     return search_catalog(session, query=q, category=category, chain=chain, limit=limit)
+
+
+@router.post("/resolve", response_model=ResolveResult)
+def resolve_product_url(
+    body: ResolveRequest,
+    couple: CurrentCouple,
+    fetch: ProductFetcherDep,
+) -> ResolveResult:
+    return resolve_paste(body.url, fetch=fetch)

@@ -8,6 +8,7 @@
     POST   /me/registry/reopen          clear the close stamp
     POST   /me/registry/items/catalog   add from the seeded catalog
     POST   /me/registry/items/manual    add something the catalog lacks
+    POST   /me/registry/items/link      add a pasted shop product
     POST   /me/registry/envelope        add the envelope, if the wizard skipped it
     PATCH  /me/registry/items/{id}      item settings
     DELETE /me/registry/items/{id}      remove, or hide if a guest has acted
@@ -21,9 +22,11 @@ from uuid import UUID
 
 from fastapi import APIRouter, status
 
+from app.catalog.resolve import ProductFetcherDep
 from app.deps import CurrentCouple, DbSessionDep
 from app.registry.owner_schemas import (
     AddCatalogItemRequest,
+    AddLinkItemRequest,
     AddManualItemRequest,
     CreateRegistryRequest,
     ItemPatch,
@@ -34,6 +37,7 @@ from app.registry.owner_schemas import (
 from app.registry.owner_service import (
     add_catalog_item,
     add_envelope,
+    add_link_item,
     add_manual_item,
     close_registry,
     create_registry,
@@ -119,6 +123,24 @@ def add_by_hand(
     body: AddManualItemRequest, couple: CurrentCouple, session: DbSessionDep
 ) -> OwnerItem:
     return add_manual_item(session, couple=couple, body=body)
+
+
+@router.post(
+    "/registry/items/link",
+    response_model=OwnerItem,
+    status_code=status.HTTP_201_CREATED,
+    responses={
+        409: {"description": "Already on the list, or the list is full"},
+        422: {"description": "The link did not resolve to one product"},
+    },
+)
+def add_by_link(
+    body: AddLinkItemRequest,
+    couple: CurrentCouple,
+    session: DbSessionDep,
+    fetch: ProductFetcherDep,
+) -> OwnerItem:
+    return add_link_item(session, couple=couple, body=body, fetch=fetch)
 
 
 @router.post(

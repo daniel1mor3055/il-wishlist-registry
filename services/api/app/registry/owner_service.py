@@ -28,11 +28,14 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session, selectinload
 
 from app.catalog.models import CatalogItem, Chain
+from app.catalog.resolve import Fetcher, resolve_paste
+from app.catalog.schemas import ResolveNeedsVariant, ResolveUnresolved
 from app.identity.models import Couple
 from app.registry.models import Registry, RegistryItem
 from app.registry.owner_schemas import (
     MAX_ITEMS,
     AddCatalogItemRequest,
+    AddLinkItemRequest,
     AddManualItemRequest,
     CreateRegistryRequest,
     ItemPatch,
@@ -315,6 +318,50 @@ def add_manual_item(session: Session, *, couple: Couple, body: AddManualItemRequ
         price_agorot=body.price_agorot,
         canonical_url=body.canonical_url,
         quantity_wanted=body.quantity_wanted,
+    )
+    session.add(item)
+    session.commit()
+    return to_owner_item(item)
+
+
+def add_link_item(
+    session: Session,
+    *,
+    couple: Couple,
+    body: AddLinkItemRequest,
+    fetch: Fetcher,
+) -> OwnerItem:
+    registry = _load(session, couple)
+    _guard_capacity(registry)
+    result = resolve_paste(body.url, fetch=fetch, variant_id=body.variant_id)
+    if isinstance(result, ResolveUnresolved):
+        raise OwnerError(result.reason, 422)
+    if isinstance(result, ResolveNeedsVariant):
+        code = "variant_unknown" if body.variant_id is not None else "variant_required"
+        raise OwnerError(code, 422)
+    duplicate = any(
+        item.is_active and item.canonical_url == result.canonical_url
+        for item in registry.items
+    )
+    if duplicate:
+        raise OwnerError("already_on_list", 409)
+
+    item = RegistryItem(
+        registry_id=registry.id,
+        position=_next_position(session, registry.id),
+        kind="product",
+        title=result.title,
+        source_title=result.source_title,
+        note=None,
+        category=result.category,
+        image_url=result.image_url,
+        chain_slug=result.chain_slug,
+        chain_name_he=result.chain_name_he,
+        external_id=result.external_id,
+        canonical_url=result.canonical_url,
+        price_agorot=result.price_agorot,
+        quantity_wanted=1,
+        group_gift_enabled=False,
     )
     session.add(item)
     session.commit()

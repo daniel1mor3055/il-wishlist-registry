@@ -171,6 +171,16 @@ Taken after C8. `/` was a dev index. The human uses the app as a couple and as a
 
 Resolved open questions: **O2** is closed by D55.
 
+## Locked, round thirteen (paste a product link)
+
+Taken with the human after the add-by-link council. Briefs and the consolidation are in `docs/council/add-by-link/`. The couple copies a product URL from a shop and pastes it. Installing an extension is out.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D59 | Paste reads one Shopify product on the four chains | A paste field on the add screen, above the existing search and manual tabs. The server accepts a direct `https` product URL on שילב, מוצצים, עגליס, or בייבי סטאר only (`/products/{handle}`, collection prefix allowed), builds `https://{harvest host}/products/{handle}.js` itself, and copies chain, title, image, price in agorot, and the buy URL onto the registry item. No catalog row and no foreign key. Numeric `variant` is kept; tracking parameters are dropped. `.js` prices are already agorot; the harvest's decimal `products.json` converter is not reused. Unknown host, non-product path, timeout, or a non-200 opens the existing manual form with the URL kept and nothing fetched. No extension, bookmarklet, share target, HTML scrape, Open Graph, JSON-LD, or model. Shortened and wrapped links are not followed. | LOCKED |
+| D60 | A missing variant is a pick, not a guess | One variant, or a price that does not vary, is taken. Several variants and no `variant` in the URL: the couple picks from that payload before save, and the chosen variant's price and buy link are what the guest gets. The first variant is never used silently. | LOCKED |
+| D61 | A resolved card is not a form | The couple does not edit the shop's price, title, or category. Those come from the product read, with the harvest's existing title shortening and keyword category. Save stores a second server read, so the browser cannot supply the price. The only actions on a successful read are the variant pick when D60 requires it, then `להוסיף לרשימה`. | LOCKED |
+
 ## Target retailers
 
 Design content should look like these chains. None of them is integrated in this phase; all catalog data is mock.
@@ -201,7 +211,7 @@ Carried forward from the council, not blocking the Figma Make prompt pack.
 
 | # | Question | Council positions |
 |---|---|---|
-| O1 | Paste-a-URL fidelity in the POC | All four chains run Shopify and currently expose public product JSON, so live cards are cheap. That stretches D4's "mocked catalogs". Decide when the POC plan is written, not now. |
+| O1 | Paste-a-URL fidelity in the POC | Closed. D22 kept a live Shopify read for the paste resolver. D59–D61 specify it: four chains, `.js`, variant pick, no couple edits on a resolved card. |
 | O2 | Thank-you channel | Product wants an optional guest phone with an explicit reason. Adversary wants no phone ever, only copy-ready text the couple pastes. D13 partially resolves this in the opposite direction: the couple's details are revealed to the guest, not the reverse. |
 | O3 | Brand posture on the guest page | Neutral cross-chain with per-item chain marks is assumed. Alternatives are white-label per retailer, or our brand with chains in fine print. |
 | O4 | Phase success criterion | Adversary's proposal: five of eight real Israeli parents say they would share the link in their birth-announcement group. The alternative, internal aesthetic sign-off, produces a different design. |
