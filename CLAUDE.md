@@ -52,7 +52,7 @@ npm run demo-data           # recompose the 5 demo registries from the snapshot
 npm run migrate             # alembic upgrade head inside the api container
 ```
 
-Sign-in for the seeded demo: request a magic link as `noa.itai@example.com`, open it from Mailpit (http://localhost:8025). Any other address creates a new couple.
+Opening http://localhost:3000 redirects to the editor; ask for a magic link with your own email and open it from Mailpit (http://localhost:8025). Any address creates a new couple, and `noa.itai@example.com` still opens the seeded fixture list, which exists for the test suite (D57), not as a product entry.
 
 ## Architecture
 

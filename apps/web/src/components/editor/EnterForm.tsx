@@ -48,6 +48,7 @@ export function EnterForm({ deadLink = false }: { deadLink?: boolean }) {
       }}
     >
       <p className="text-small text-ink-muted">{copy.editor.enter.body}</p>
+      <p className="text-small text-ink-muted">{copy.editor.enter.guestHint}</p>
 
       <Field label={copy.editor.enter.emailLabel}>
         <input

@@ -21,7 +21,7 @@ Status values: `LOCKED` (design and POC assume it), `PARKED` (deliberately defer
 
 ## Locked, round two (post-council)
 
-Resolved from [council/consolidation.md](council/consolidation.md). These supersede any council brief that contradicts them.
+Resolved after the first council. These supersede any council brief that contradicts them.
 
 | # | Decision | Detail | Status |
 |---|---|---|---|
@@ -38,7 +38,7 @@ Consequence worth stating plainly: because of D11 and D12, the product is a **co
 
 ## Locked, round three (implementation)
 
-Resolved from [council/impl-consolidation.md](council/impl-consolidation.md) and the decisions taken with the human before writing code. These are implementation decisions; the product decisions above are unchanged.
+Resolved with the human before writing code. These are implementation decisions; the product decisions above are unchanged.
 
 | # | Decision | Detail | Status |
 |---|---|---|---|
@@ -64,7 +64,7 @@ Taken with the human after C1, before the C2 schema was written. Every one of th
 | D29 | No post-birth state | The lifecycle is `published -> closed`. The pre-birth framing `נשלח אחרי הלידה` already carries D14's shipping promise, and per D14 publishing *is* the birth announcement, so a second hero and a re-sorted list were a second design of the same page with no new gifting capability behind it. `born_on` and the announcement hero are gone. | LOCKED |
 | D30 | Not-yet-published is not a guest-facing state | An unpublished registry answers exactly like a wrong slug: not found. Publishing survives as the couple's action (D14) and as a nullable `published_at` on the row, but `הרשימה עדיין לא פורסמה` is deleted. A guest only holds the link because the couple sent it, which happens at the announcement; and a leaked pre-birth link that confirms "נועה ואיתי have a registry" leaks more than a 404 does. This also removes the lifecycle enum and its transition validation: two timestamps, `published_at` and `closed_at`, say everything the four-state machine said. | LOCKED |
 
-Consequence for the C2 schema: `registry_items` has no `priority`, no `out_of_stock`; `catalog_items` has no `in_stock`; `registries` has no `lifecycle` enum and no `born_on`. The council's [domain brief](council/impl-domain.md) still lists all of those, and is superseded here.
+Consequence for the C2 schema: `registry_items` has no `priority`, no `out_of_stock`; `catalog_items` has no `in_stock`; `registries` has no `lifecycle` enum and no `born_on`.
 
 ## Locked, round five (the guest write loop)
 
@@ -160,6 +160,14 @@ Taken with the human while planning C7: the tracker, D16's corrections, and clos
 | D55 | No thank-you feature | The G9 confirmation already thanks the guest, and the couple thanks people themselves. No `thanked_at`, no composer, no `תודה` column and no `ממתין לתודה` filter. Supersedes PRD ed-C9's thank-you column and CTA, the UX brief's C10 composer and the council's `thanked_at`. | LOCKED |
 | D56 | Closing is reversible | `POST /me/registry/close` stamps `closed_at` on a published list and keeps the first stamp; `POST /me/registry/reopen` clears it. D34 is unchanged: a closed list refuses new holds and money and still accepts reports, blessings and the couple's corrections. Supersedes the one-way Closed state in PRD section 5. | LOCKED |
 | D57 | Demo registries carry a ledger that reconciles | Every claimed unit in the seed has a reservation row and every contributed agora a contribution row. The demo composer derives the counters from the ledger, and a test runs the seed and reconciles them. | LOCKED |
+
+## Locked, round twelve (the front door)
+
+Taken after C8. `/` was a dev index. The human uses the app as a couple and as a guest.
+
+| # | Decision | Detail | Status |
+|---|---|---|---|
+| D58 | The bare domain is the couple door | `GET /` redirects to `/editor`, which already sends a signed-out visitor to `/editor/enter` and a couple with no list to `/editor/new`. There is no dev index, no state gallery, and no directory of registries. `/dev/states` is removed. `/dev/og` stays a non-production checker and is not linked from a product page. The email screen says, from `copy.ts`, that a list someone received opens only from the WhatsApp link. Demo registries remain seed for tests (D57) and are not an entry point. | LOCKED |
 
 Resolved open questions: **O2** is closed by D55.
 

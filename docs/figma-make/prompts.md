@@ -8,7 +8,7 @@ Source of truth is [../prd.md](../prd.md). If Make produces something that contr
 
 | Step | Prompts | Stop and check |
 |---|---|---|
-| 1 | Enriched P1 in [p1-enriched.md](p1-enriched.md) | RTL is genuinely right-to-left, not a mirrored English layout |
+| 1 | P1, the fenced block below | RTL is genuinely right-to-left, not a mirrored English layout |
 | 2 | P2 to P8 | Each state exists as its own view |
 | 3 | P9, then P10 to P13 | Couple editor |
 | 4 | P14, P15 | Widget prototype |
@@ -20,7 +20,7 @@ Rules while iterating: one change per prompt, 5 to 25 words. If Make starts inve
 
 ## P1. Master prompt (public guest registry)
 
-Do not use the short block below. Paste the fenced prompt in [p1-enriched.md](p1-enriched.md) instead. That version adds the sample catalog, exact Hebrew copy, mixed card states, the cash envelope sheet, and harder "no checkout" / RTL constraints. The short block is kept only as a map of the original eight screens.
+Paste the fenced block below.
 
 ```
 Build a mobile-first Hebrew web app: a baby gift registry ("רשימת לידה") that works across multiple Israeli baby shops. This first screen set is the PUBLIC GUEST VIEW of one couple's registry. The guest arrives from a WhatsApp link on a phone, has no account, never logs in, and never enters payment details anywhere in this product.

@@ -238,6 +238,7 @@ export const copy = {
     enter: {
       title: "לערוך את הרשימה שלכם",
       body: "נשלח קישור למייל. אין סיסמה ואין הרשמה.",
+      guestHint: "רשימה שקיבלתם נפתחת מהקישור בוואטסאפ, לא מכאן.",
       emailLabel: "מייל",
       emailPlaceholder: "you@example.com",
       submit: "לשלוח לי קישור",

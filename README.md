@@ -98,21 +98,19 @@ The couple's side works the other way round: `/editor` pages read the API from t
 /editor/tracker    gift tracker
 ```
 
-To sign in to the seeded demo list, ask for a link as `noa.itai@example.com` and open it from [Mailpit](http://localhost:8025). Any other address creates a new couple and lands in the wizard.
+Opening `http://localhost:3000` redirects to the editor. Ask for a magic link with your own email and open it from [Mailpit](http://localhost:8025). Any address creates a new couple. `noa.itai@example.com` still opens the seeded fixture list, which exists for the test suite (D57), not as a product entry.
 
 `npm run seed` is also the reset: demo registries are dropped and rebuilt, which drops every hold and contribution placed against them, and it clears the registries left behind by screenshot runs.
 
 `npm run dev:bg` starts the same dev server detached, logging to `.logs/web-dev.log`, and `npm run dev:stop` stops it. It exists for scripted screenshot runs, which cannot block on a process that never exits.
 
-| URL                                           | What                                               |
-| --------------------------------------------- | -------------------------------------------------- |
-| http://localhost:3000                         | Dev index — links to every demo registry           |
-| http://localhost:3000/r/noa-itai-k4m2xq8vp3wt | The main demo registry (נועה ואיתי)                |
-| http://localhost:3000/editor                  | The couple's editor (magic link, no password)      |
-| http://localhost:3000/dev/states              | State gallery — every PRD state on one page        |
-| http://localhost:3000/dev/og                  | WhatsApp-shaped card from the guest page's OG tags |
-| http://localhost:8000/docs                    | API docs, guest and owner endpoints alike          |
-| http://localhost:8025                         | Mailpit — where the magic links arrive             |
+| URL                          | What                                               |
+| ---------------------------- | -------------------------------------------------- |
+| http://localhost:3000        | Redirects to the couple editor                     |
+| http://localhost:3000/editor | The couple's editor (magic link, no password)      |
+| http://localhost:3000/dev/og | WhatsApp-shaped card from the guest page's OG tags |
+| http://localhost:8000/docs   | API docs, guest and owner endpoints alike          |
+| http://localhost:8025        | Mailpit — where the magic links arrive             |
 
 Checks: `npm run test` (types + API). Guest screens: `npm run test:e2e` (Playwright, needs the running app). The map of what belongs in which layer, and how to add a spec as a checkpoint lands, is [docs/testing.md](docs/testing.md). `npm run shoot` is still the screenshot driver — looking, not asserting. CI runs typecheck, lint, format:check, ruff and pytest on every push to main and e2e stays local.
 
