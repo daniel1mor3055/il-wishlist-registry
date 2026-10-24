@@ -1,9 +1,6 @@
 @import "tailwindcss";
 
-/* Design tokens: PRD section 9. This block is the only place a colour, radius
-   or type size is defined. A hex literal anywhere under src/components is a bug.
-   Default palette is unset mint (gender not chosen); girl/boy override via
-   [data-theme]. */
+/* Design A tokens coexist with the old ones during the screen-by-screen port. */
 @theme {
   --color-bg: #fbf6f4;
   --color-surface: #fffcfb;
@@ -57,6 +54,77 @@
   --text-micro--line-height: 1.4;
 
   --font-sans: var(--font-heebo), system-ui, sans-serif;
+
+  --font-rubik: var(--font-rubik-face), "Arial Hebrew", system-ui, sans-serif;
+
+  --color-graphite: #252324;
+  --color-charcoal: #494647;
+  --color-slate: #6b6669;
+  --color-pebble: #8f8a8c;
+  --color-hairline: #e9e8e8;
+  --color-hairline-strong: #dfddde;
+  --color-cloud: #f5f5f5;
+  --color-snow: #fafafa;
+  --color-paper: #ffffff;
+  --color-mint-ink: #2f743e;
+  --color-mint-wash: #edf8ef;
+  --color-heart-a: #ff3b3f;
+  --color-heart-b: #ff79aa;
+
+  --color-brand-deep: #6e3264;
+  --color-brand-hover: #904183;
+  --color-brand-press: #4a2143;
+  --color-brand-soft: #efdcec;
+  --color-brand-softer: #f7edf5;
+  --color-brand-link: #904183;
+  --color-page-sand: #f9f6f3;
+  --color-sticker: #ff4287;
+  --color-ring-from: #ff7aab;
+  --color-ring-to: #6e3264;
+  --color-hero-1: #f59bc0;
+  --color-hero-2: #e07bb0;
+  --color-hero-3: #a866a6;
+  --color-hero-4: #7a6bb0;
+  --color-hero-5: #3f86be;
+  --color-pastel-1: #b7f1ff;
+  --color-pastel-2: #d8d6fb;
+  --color-pastel-3: #f2b3e8;
+  --color-shape-ink: #743363;
+
+  --color-alert: #d6004f;
+  --color-alert-hover: #b00042;
+  --color-alert-press: #8a0032;
+  --color-alert-wash: #ffebf2;
+  --color-alert-ink: #9e0e3a;
+
+  --radius-tile: 8px;
+  --radius-thumb: 12px;
+  --radius-sheet: 16px;
+  --radius-pill: 999px;
+
+  --shadow-lift-xs: 0 1px 4px #49464714;
+  --shadow-lift-sm: 0 14px 32px #49464714, 0 2px 4px #4946470a;
+  --shadow-lift-md: 0 24px 48px #4946471f;
+  --shadow-lift-lg: 0 40px 80px #49464729;
+
+  --text-hero: 2.125rem;
+  --text-hero--line-height: 1.15;
+  --text-hero-wide: 3.5rem;
+  --text-hero-wide--line-height: 1.1;
+  --text-headline: 1.625rem;
+  --text-headline--line-height: 1.2;
+  --text-title: 1.375rem;
+  --text-title--line-height: 1.25;
+  --text-lead: 1.0625rem;
+  --text-lead--line-height: 1.6;
+  --text-copy: 1rem;
+  --text-copy--line-height: 1.45;
+  --text-fine: 0.875rem;
+  --text-fine--line-height: 1.4;
+  --text-badge: 0.8125rem;
+  --text-badge--line-height: 1.25;
+
+  --ease-squish: cubic-bezier(0.17, 0.88, 0.32, 1.25);
 }
 
 /* Nested wizard/gender can return to mint while a parent is girl/boy. */
@@ -78,6 +146,25 @@
   --color-panel: #f1f7f3;
   --color-image-bg: #e8f2ed;
   --color-neutral-tint: #ebf3ef;
+  --color-brand-deep: #6e3264;
+  --color-brand-hover: #904183;
+  --color-brand-press: #4a2143;
+  --color-brand-soft: #efdcec;
+  --color-brand-softer: #f7edf5;
+  --color-brand-link: #904183;
+  --color-page-sand: #f9f6f3;
+  --color-sticker: #ff4287;
+  --color-ring-from: #ff7aab;
+  --color-ring-to: #6e3264;
+  --color-hero-1: #f59bc0;
+  --color-hero-2: #e07bb0;
+  --color-hero-3: #a866a6;
+  --color-hero-4: #7a6bb0;
+  --color-hero-5: #3f86be;
+  --color-pastel-1: #b7f1ff;
+  --color-pastel-2: #d8d6fb;
+  --color-pastel-3: #f2b3e8;
+  --color-shape-ink: #743363;
 }
 
 [data-theme="girl"] {
@@ -98,6 +185,25 @@
   --color-panel: #f7f1f2;
   --color-image-bg: #f3eaec;
   --color-neutral-tint: #f4eef0;
+  --color-brand-deep: #9a2457;
+  --color-brand-hover: #b23a6e;
+  --color-brand-press: #6b1239;
+  --color-brand-soft: #ffe0ec;
+  --color-brand-softer: #fff0f5;
+  --color-brand-link: #b23a6e;
+  --color-page-sand: #fff6f4;
+  --color-sticker: #ff6d4e;
+  --color-ring-from: #ff9c8a;
+  --color-ring-to: #9a2457;
+  --color-hero-1: #ffc2a8;
+  --color-hero-2: #ff95a6;
+  --color-hero-3: #e8608f;
+  --color-hero-4: #c8407a;
+  --color-hero-5: #a02a66;
+  --color-pastel-1: #ffd9cc;
+  --color-pastel-2: #ffc6da;
+  --color-pastel-3: #f3c9f8;
+  --color-shape-ink: #9a2457;
 }
 
 [data-theme="boy"] {
@@ -118,6 +224,25 @@
   --color-panel: #f0f5f9;
   --color-image-bg: #e8f0f6;
   --color-neutral-tint: #eaf1f6;
+  --color-brand-deep: #00649e;
+  --color-brand-hover: #0a6faa;
+  --color-brand-press: #004166;
+  --color-brand-soft: #d9f1ff;
+  --color-brand-softer: #eef8ff;
+  --color-brand-link: #0a6faa;
+  --color-page-sand: #f3f9fc;
+  --color-sticker: #ffd43e;
+  --color-ring-from: #6bc9ff;
+  --color-ring-to: #00649e;
+  --color-hero-1: #a6ebd9;
+  --color-hero-2: #74d3ec;
+  --color-hero-3: #3fa9de;
+  --color-hero-4: #2d7fc4;
+  --color-hero-5: #3a5daa;
+  --color-pastel-1: #bdefe3;
+  --color-pastel-2: #bfe4ff;
+  --color-pastel-3: #dcddfc;
+  --color-shape-ink: #00649e;
 }
 
 html,
@@ -211,5 +336,81 @@ html {
   .animate-fade,
   .animate-toast {
     animation: none;
+  }
+}
+
+/* 0% of band-field is the inline-start, so the title sits on the deep stop. */
+.band-field {
+  background: linear-gradient(
+    260deg,
+    var(--color-brand-deep) 0%,
+    var(--color-brand-deep) 72%,
+    var(--color-hero-4) 86%,
+    var(--color-hero-2) 95%,
+    var(--color-hero-1) 100%
+  );
+}
+
+@media (min-width: 64rem) {
+  .band-field {
+    background: linear-gradient(
+      260deg,
+      var(--color-brand-deep) 0%,
+      var(--color-brand-deep) 18%,
+      var(--color-hero-4) 56%,
+      var(--color-hero-2) 84%,
+      var(--color-hero-1) 100%
+    );
+  }
+}
+
+.pastel-field {
+  background: linear-gradient(
+    100deg,
+    var(--color-pastel-1) 0%,
+    var(--color-pastel-2) 50%,
+    var(--color-pastel-3) 100%
+  );
+}
+
+.wave-flip {
+  transform: scaleX(-1);
+}
+
+.focus-ring:focus-visible {
+  outline: 3px solid var(--color-brand-deep);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .arrive {
+    animation: arrive-rise 0.5s cubic-bezier(0.17, 0.88, 0.32, 1.25) 0.12s both;
+  }
+
+  @keyframes arrive-rise {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+  }
+
+  .press {
+    transition:
+      transform 80ms ease-in-out,
+      background-color 0.15s ease-out;
+  }
+
+  .press:active {
+    transform: scale(0.95);
+  }
+
+  .spin {
+    animation: kit-spin 0.8s linear infinite;
+  }
+
+  @keyframes kit-spin {
+    to {
+      transform: rotate(360deg);
+    }
   }
 }

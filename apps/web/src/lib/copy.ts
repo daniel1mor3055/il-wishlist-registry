@@ -238,14 +238,15 @@ export const copy = {
     enter: {
       title: "לערוך את הרשימה שלכם",
       body: "נשלח קישור למייל. אין סיסמה ואין הרשמה.",
-      guestHint: "רשימה שקיבלתם נפתחת מהקישור בוואטסאפ, לא מכאן.",
       emailLabel: "מייל",
       emailPlaceholder: "you@example.com",
       submit: "לשלוח לי קישור",
       sending: "שולחים…",
       /* Says nothing about whether the address is known. */
       sent: (email: string) => `שלחנו קישור ל${email}. הוא תקף ל-20 דקות.`,
-      sentHint: "לא הגיע? אפשר לבקש עוד אחד בעוד רגע.",
+      sentHint: "לא הגיע?",
+      resend: "לשלוח שוב",
+      resent: "שלחנו עוד קישור.",
       invalidEmail: "כתובת המייל לא נראית תקינה",
       linkDead: "הקישור לא תקף יותר. אפשר לבקש חדש.",
       signOut: "יציאה",

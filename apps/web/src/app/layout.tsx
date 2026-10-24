@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Heebo } from "next/font/google";
+import { Heebo, Rubik } from "next/font/google";
 import "./globals.css";
 
 // Self-hosted at build time. A Hebrew-first product cannot afford a
@@ -10,6 +10,13 @@ const heebo = Heebo({
   weight: ["400", "500", "700"],
   display: "swap",
   variable: "--font-heebo",
+});
+
+const rubik = Rubik({
+  subsets: ["hebrew", "latin"],
+  weight: "variable",
+  display: "swap",
+  variable: "--font-rubik-face",
 });
 
 export const metadata: Metadata = {
@@ -29,7 +36,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="he" dir="rtl" className={heebo.variable}>
+    <html lang="he" dir="rtl" className={`${heebo.variable} ${rubik.variable}`}>
       <body>{children}</body>
     </html>
   );

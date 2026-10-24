@@ -1,5 +1,6 @@
-import { EditorShell } from "@/components/editor/EditorShell";
+import { EditorFrame } from "@/components/editor/EditorFrame";
 import { EnterForm } from "@/components/editor/EnterForm";
+import { EnterArch } from "@/components/illustrations/EnterArch";
 import { copy } from "@/lib/copy";
 
 type Props = { searchParams: Promise<{ dead?: string }> };
@@ -9,19 +10,19 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-/**
- * The door: one field, one button, no password (D23).
- *
- * The link itself lands on `/editor/session`, which is a route handler because
- * it sets a cookie. A spent or expired link redirects back here with `dead=1`,
- * so the message about it appears next to the form that fixes it.
- */
+/** A spent or expired link returns here with `dead=1` (the session route sets the cookie). */
 export default async function EnterPage({ searchParams }: Props) {
   const { dead } = await searchParams;
 
   return (
-    <EditorShell title={copy.editor.enter.title}>
-      <EnterForm deadLink={dead === "1"} />
-    </EditorShell>
+    <div data-theme="unset">
+      <EditorFrame
+        title={copy.editor.enter.title}
+        lead={copy.editor.enter.body}
+        illustration={<EnterArch />}
+      >
+        <EnterForm deadLink={dead === "1"} />
+      </EditorFrame>
+    </div>
   );
 }
