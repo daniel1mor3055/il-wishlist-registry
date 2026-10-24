@@ -1,4 +1,13 @@
-/** A neutral pill. Used for the chain mark and quantity counters. */
+import { Icon } from "@/components/ui/Sprite";
+
+const tones = {
+  neutral: "bg-paper font-semibold text-graphite shadow-lift-xs ring-1 ring-hairline",
+  bordered: "bg-paper font-medium text-slate ring-1 ring-hairline",
+  muted: "bg-charcoal font-medium text-snow",
+  primary: "bg-brand-soft font-medium text-brand-deep",
+} as const;
+
+/** Count or status chip. */
 export function Pill({
   children,
   tone = "neutral",
@@ -6,22 +15,21 @@ export function Pill({
   children: React.ReactNode;
   tone?: "neutral" | "bordered" | "muted" | "primary";
 }) {
-  const tones = {
-    neutral: "bg-neutral-tint text-ink-muted",
-    bordered: "bg-neutral-tint text-ink-muted border border-border",
-    muted: "bg-neutral-tint text-ink-muted",
-    primary: "bg-primary text-on-primary",
-  } as const;
   return (
     <span
-      className={`w-fit rounded-full px-2.5 py-0.5 text-micro font-medium ${tones[tone]}`}
+      className={`inline-flex h-6 w-fit items-center rounded-[6px] px-2 text-badge ${tones[tone]}`}
     >
       {children}
     </span>
   );
 }
 
-/** The chain the item comes from. Neutral by design: we are cross-chain (O3). */
+/** Chain mark stays slate: the list is cross-chain. */
 export function ShopChip({ name }: { name: string }) {
-  return <Pill tone="bordered">{name}</Pill>;
+  return (
+    <span className="inline-flex w-fit items-center gap-1 text-badge text-slate">
+      <Icon name="ic-store" className="size-3.5" />
+      {name}
+    </span>
+  );
 }

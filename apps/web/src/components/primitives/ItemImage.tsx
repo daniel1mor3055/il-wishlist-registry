@@ -4,13 +4,7 @@ import Image from "next/image";
 import { useState } from "react";
 import type { Category } from "@/lib/types";
 
-/**
- * Category glyphs for the broken-image placeholder.
- *
- * PRD section 7 is explicit: a broken image gets a branded 1:1 placeholder with
- * a category glyph and the product name. Never a grey box with alt text, and
- * never a layout shift.
- */
+/** Broken image: category glyph and the name, in a fixed box. */
 const GLYPHS: Record<Category, React.ReactNode> = {
   linens: (
     <>
@@ -58,11 +52,10 @@ const GLYPHS: Record<Category, React.ReactNode> = {
   ),
 };
 
-/** An item with no category still gets the branded placeholder, just no glyph:
-    a manually added item may have nothing to classify it by. */
+/** No category: the same well, without a glyph. */
 function Placeholder({ category, title }: { category: Category | null; title: string }) {
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-image-bg p-4">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-2 bg-cloud p-4">
       {category && (
         <svg
           width="52"
@@ -73,15 +66,13 @@ function Placeholder({ category, title }: { category: Category | null; title: st
           strokeWidth="2.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="text-muted"
+          className="text-pebble"
           aria-hidden="true"
         >
           {GLYPHS[category]}
         </svg>
       )}
-      <p className="line-clamp-2 text-center text-micro font-medium text-ink-muted">
-        {title}
-      </p>
+      <p className="clamp-2 text-center text-badge font-medium text-slate">{title}</p>
     </div>
   );
 }
@@ -117,7 +108,7 @@ export function ItemImage({
       sizes={sizes}
       priority={priority}
       onError={() => setFailed(true)}
-      className={`object-cover ${grayscale ? "grayscale" : ""}`}
+      className={`object-contain ${grayscale ? "grayscale" : ""}`}
     />
   );
 }

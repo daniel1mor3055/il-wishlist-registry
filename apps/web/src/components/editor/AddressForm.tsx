@@ -3,14 +3,13 @@
 import { useState, useTransition } from "react";
 import { patchRegistry } from "@/app/editor/actions";
 import { AddressFields, type AddressValue } from "@/components/editor/AddressFields";
-import { FormError } from "@/components/editor/EditorShell";
-import { PrimaryButton } from "@/components/primitives/Buttons";
+import { C5aAddressHouse } from "@/components/illustrations/C5aAddressHouse";
+import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
+import { SavedStatus } from "@/components/ui/SavedStatus";
 import { copy } from "@/lib/copy";
 
-/**
- * Later edit of the D49 address. Same fields as wizard step 2, so skipping
- * onboarding is not a trap: they can fill it the moment a guest asks.
- */
+/** Later edit of the D49 address. Same fields as wizard step 2. */
 export function AddressForm({
   street,
   entrance,
@@ -60,19 +59,22 @@ export function AddressForm({
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-5">
-      <p className="text-small text-ink-muted">{copy.editor.address.body}</p>
-      <AddressFields value={value} onChange={setValue} showIntro={false} />
-      <div className="mt-auto flex flex-col gap-2 pt-4">
-        <FormError message={error} />
-        {saved && (
-          <p role="status" className="text-small text-success">
-            {copy.editor.address.saved}
-          </p>
-        )}
-        <PrimaryButton onClick={save} disabled={pending}>
-          {pending ? copy.editor.address.saving : copy.editor.address.save}
-        </PrimaryButton>
+    <div className="overflow-hidden rounded-sheet bg-paper shadow-lift-md lg:grid lg:grid-cols-[300px_minmax(0,1fr)]">
+      <C5aAddressHouse />
+      <div className="flex min-w-0 flex-col">
+        <div className="px-5 pb-6 pt-5 lg:px-8 lg:pt-8">
+          <p className="text-copy text-charcoal lg:text-lead">{copy.editor.address.body}</p>
+          <AddressFields value={value} onChange={setValue} showIntro={false} />
+        </div>
+        <div className="mt-auto border-t border-hairline px-5 pb-5 pt-4 lg:px-8 lg:pb-6">
+          {error ? <Alert>{error}</Alert> : null}
+          <div className="flex flex-col items-center gap-3 lg:flex-row">
+            <Button type="button" onClick={save} pending={pending} fit>
+              {pending ? copy.editor.address.saving : copy.editor.address.save}
+            </Button>
+            {saved ? <SavedStatus>{copy.editor.address.saved}</SavedStatus> : null}
+          </div>
+        </div>
       </div>
     </div>
   );

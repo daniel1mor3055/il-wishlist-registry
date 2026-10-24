@@ -1,19 +1,18 @@
 "use client";
 
+import { useId, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
 import { addEnvelope, patchRegistry } from "@/app/editor/actions";
-import { Field, FormError, inputClass } from "@/components/editor/EditorShell";
-import { PrimaryButton } from "@/components/primitives/Buttons";
+import { C5PaymentPhone } from "@/components/illustrations/C5PaymentPhone";
+import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
+import { SavedStatus } from "@/components/ui/SavedStatus";
 import { copy } from "@/lib/copy";
 
-/**
- * The number D13 reveals. One Israeli mobile fills both Bit and PayBox (D50).
- *
- * Add-without-a-number requires a phone, then creates the חיבוק tile.
- * Settings can still save an empty field; that is not an off switch for the
- * tile, which lives on editor home.
- */
+const cloudField =
+  "focus-ring mt-1.5 h-14 w-full rounded-tile bg-cloud px-4 text-copy text-graphite outline-none placeholder:text-slate focus:bg-paper";
+
+/** One Israeli mobile fills both Bit and PayBox (D50); an empty settings save does not remove the tile. */
 export function PaymentForm({
   bitHandle,
   payboxHandle,
@@ -32,11 +31,14 @@ export function PaymentForm({
   returnTo?: string | null;
 }) {
   const router = useRouter();
+  const hintId = useId();
+  const phoneErrorId = useId();
   const [phone, setPhone] = useState(bitHandle || payboxHandle || "");
   const [displayName, setDisplayName] = useState(paymentDisplayName || coupleNames);
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
+  const numberMissing = error === copy.editor.payment.numberRequired;
 
   function save() {
     setError(null);
@@ -72,46 +74,78 @@ export function PaymentForm({
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-5">
-      <p className="text-tiny text-ink-muted">{copy.editor.payment.explainer}</p>
+    <div className="overflow-hidden rounded-sheet bg-paper shadow-lift-md lg:grid lg:grid-cols-[300px_minmax(0,1fr)]">
+      <C5PaymentPhone />
+      <div className="flex min-w-0 flex-col">
+        <div className="px-5 pb-6 pt-5 lg:px-8 lg:pt-8">
+          <p className="text-copy text-charcoal lg:text-lead">{copy.editor.payment.explainer}</p>
 
-      <Field label={copy.editor.payment.handleLabel}>
-        <input
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          dir="ltr"
-          maxLength={40}
-          value={phone}
-          onChange={(event) => setPhone(event.target.value)}
-          placeholder={copy.editor.payment.handlePlaceholder}
-          className={`${inputClass} text-start`}
-        />
-      </Field>
+          <label className="mt-6 block text-start">
+            <span className="block text-fine font-medium text-slate">
+              {copy.editor.payment.handleLabel}
+            </span>
+            <input
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel"
+              dir="ltr"
+              maxLength={40}
+              value={phone}
+              onChange={(event) => setPhone(event.target.value)}
+              placeholder={copy.editor.payment.handlePlaceholder}
+              aria-invalid={numberMissing ? true : undefined}
+              aria-describedby={numberMissing ? phoneErrorId : undefined}
+              className={
+                numberMissing
+                  ? "ltr-token focus-ring mt-1.5 h-14 w-full rounded-tile border-2 border-alert bg-alert-wash px-4 text-copy text-graphite outline-none placeholder:text-slate focus:bg-paper"
+                  : `ltr-token ${cloudField}`
+              }
+            />
+          </label>
+          {numberMissing ? (
+            <p
+              id={phoneErrorId}
+              role="alert"
+              className="mt-2 flex items-center gap-2 text-fine font-medium text-alert-ink"
+            >
+              <span
+                aria-hidden="true"
+                className="grid size-5 shrink-0 place-items-center rounded-full bg-alert text-badge text-paper"
+              >
+                !
+              </span>
+              {error}
+            </p>
+          ) : null}
 
-      <Field
-        label={copy.editor.payment.displayNameLabel}
-        hint={copy.editor.payment.displayNameHint}
-      >
-        <input
-          value={displayName}
-          onChange={(event) => setDisplayName(event.target.value)}
-          placeholder={copy.editor.payment.displayNamePlaceholder}
-          maxLength={80}
-          className={inputClass}
-        />
-      </Field>
-
-      <div className="mt-auto flex flex-col gap-2 pt-4">
-        <FormError message={error} />
-        {saved && (
-          <p role="status" className="text-small text-success">
-            {copy.editor.payment.saved}
+          <label className="mt-5 block text-start">
+            <span className="block text-fine font-medium text-slate">
+              {copy.editor.payment.displayNameLabel}
+            </span>
+            <input
+              value={displayName}
+              autoComplete="name"
+              maxLength={80}
+              onChange={(event) => setDisplayName(event.target.value)}
+              placeholder={copy.editor.payment.displayNamePlaceholder}
+              aria-describedby={hintId}
+              className={cloudField}
+            />
+          </label>
+          <p id={hintId} className="mt-2 text-fine text-slate">
+            {copy.editor.payment.displayNameHint}
           </p>
-        )}
-        <PrimaryButton onClick={save} disabled={pending}>
-          {pending ? copy.editor.payment.saving : copy.editor.payment.save}
-        </PrimaryButton>
+        </div>
+
+        <div className="mt-auto border-t border-hairline px-5 pb-5 pt-4 lg:px-8 lg:pb-6">
+          {error && !numberMissing ? <Alert>{error}</Alert> : null}
+          <div className="flex flex-col items-center gap-3 lg:flex-row">
+            <Button type="button" onClick={save} pending={pending} fit>
+              {pending ? copy.editor.payment.saving : copy.editor.payment.save}
+            </Button>
+            {saved ? <SavedStatus>{copy.editor.payment.saved}</SavedStatus> : null}
+          </div>
+        </div>
       </div>
     </div>
   );

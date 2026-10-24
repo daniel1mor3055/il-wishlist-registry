@@ -1,5 +1,5 @@
 import { notFound, redirect } from "next/navigation";
-import { EditorShell } from "@/components/editor/EditorShell";
+import { EditorFrame } from "@/components/editor/EditorFrame";
 import { ItemSettings } from "@/components/editor/ItemSettings";
 import { copy } from "@/lib/copy";
 import { getOwnerRegistry } from "@/lib/owner";
@@ -17,15 +17,14 @@ export default async function ItemSettingsPage({ params }: Props) {
   if (!state.signedIn) redirect("/editor/enter");
   if (!state.registry) redirect("/editor/new");
 
-  // Found in the registry the session owns, so someone else's item id is a 404
-  // here for the same reason it is one at the API.
+  // Owned-registry lookup: someone else's id 404s here the same way the API does.
   const item = state.registry.items.find((one) => one.id === id);
   if (!item) notFound();
   if (item.kind === "fund") redirect("/editor/payment");
 
   return (
-    <EditorShell title={item.title} back="/editor">
+    <EditorFrame title={item.title} lead={state.registry.coupleNames} back="/editor" nav="home">
       <ItemSettings item={item} />
-    </EditorShell>
+    </EditorFrame>
   );
 }

@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { EditorShell } from "@/components/editor/EditorShell";
+import { EditorFrame } from "@/components/editor/EditorFrame";
 import { ShareForm } from "@/components/editor/ShareForm";
 import { copy } from "@/lib/copy";
 import { getOwnerRegistry } from "@/lib/owner";
@@ -18,13 +18,13 @@ export default async function SharePage() {
   const { slug, coupleNames, story, coverImageUrl } = state.registry;
 
   return (
-    <EditorShell title={copy.editor.share.title} back="/editor">
+    <EditorFrame title={copy.editor.share.title} back="/editor" lead={coupleNames} nav="share">
       <ShareForm
         slug={slug}
         coupleNames={coupleNames}
         story={story}
         coverImageUrl={coverImageUrl}
       />
-    </EditorShell>
+    </EditorFrame>
   );
 }

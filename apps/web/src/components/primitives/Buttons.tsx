@@ -1,8 +1,10 @@
 "use client";
 
-/** Filled primary control. Charcoal on the pink fill — white on it fails WCAG. */
+import { Icon } from "@/components/ui/Sprite";
+
+/** Color classes for a primary pill. Callers still supply their own width and radius. */
 export const fillPrimary =
-  "bg-primary text-on-primary transition-colors hover:bg-primary-hover active:bg-primary-active disabled:opacity-45";
+  "bg-brand-deep text-paper shadow-lift-sm hover:bg-brand-hover active:bg-brand-press motion-safe:transition-colors disabled:opacity-30";
 
 export function PrimaryButton({
   children,
@@ -22,9 +24,9 @@ export function PrimaryButton({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`w-full rounded-btn py-3.5 text-body font-medium ${
+      className={`press focus-ring flex h-14 w-full items-center justify-center rounded-pill text-copy font-medium motion-safe:transition-colors disabled:opacity-30 ${
         tone === "success"
-          ? "bg-success text-on-success transition-opacity active:opacity-80 disabled:opacity-45"
+          ? "bg-mint-ink text-paper hover:opacity-90 active:opacity-80"
           : fillPrimary
       }`}
     >
@@ -47,7 +49,7 @@ export function SecondaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="w-full rounded-btn bg-neutral-tint py-3.5 text-body font-medium text-ink transition-opacity active:opacity-80 disabled:opacity-50"
+      className="press focus-ring flex h-14 w-full items-center justify-center rounded-pill bg-cloud text-copy font-medium text-charcoal hover:bg-snow active:bg-hairline motion-safe:transition-colors disabled:opacity-30"
     >
       {children}
     </button>
@@ -66,34 +68,22 @@ export function TextButton({
     <button
       type="button"
       onClick={onClick}
-      className="py-1 text-small font-medium text-ink-muted transition-opacity active:opacity-70"
+      className="focus-ring inline-flex h-11 items-center justify-center text-copy font-medium text-brand-link"
     >
       {children}
     </button>
   );
 }
 
-/**
- * Back, not close. PRD section 8: back chevrons point right in RTL.
- * The reference conflated the two, giving a back chevron a "close" label.
- */
 export function BackButton({ onClick }: { onClick: () => void }) {
   return (
     <button
       type="button"
       onClick={onClick}
       aria-label="חזרה"
-      className="grid h-9 w-9 place-items-center rounded-full text-ink-muted transition-colors hover:bg-neutral-tint"
+      className="press focus-ring grid size-11 place-items-center rounded-full text-brand-deep hover:bg-brand-softer"
     >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="M9 6l6 6-6 6"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </svg>
+      <Icon name="ic-chev-start" className="size-6" />
     </button>
   );
 }
@@ -111,16 +101,9 @@ export function CloseButton({
       type="button"
       onClick={onClick}
       aria-label={label}
-      className="grid h-9 w-9 place-items-center rounded-full text-ink-muted transition-colors hover:bg-neutral-tint"
+      className="press focus-ring grid size-11 place-items-center rounded-full bg-paper text-brand-deep shadow-lift-sm hover:bg-brand-softer"
     >
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path
-          d="M6 6l12 12M18 6L6 18"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
+      <Icon name="ic-close" className="size-5" />
     </button>
   );
 }

@@ -1,70 +1,25 @@
 "use client";
 
 import { InlineAmount } from "@/components/primitives/Price";
+import { Icon } from "@/components/ui/Sprite";
 import { copy } from "@/lib/copy";
 import type { PublicItem } from "@/lib/types";
 
-/**
- * The envelope illustration for cash funds. A gift or envelope glyph is not
- * mirrored in RTL (PRD section 8).
- */
-export function EnvelopeArt() {
-  return (
-    <div className="grid aspect-square w-full place-items-center rounded-btn bg-accent-tint">
-      <svg width="72" height="72" viewBox="0 0 64 64" fill="none" aria-hidden="true">
-        <rect
-          x="8"
-          y="16"
-          width="48"
-          height="34"
-          rx="5"
-          className="fill-surface stroke-accent"
-          strokeWidth="2.5"
-        />
-        <path
-          d="M10 20l22 16 22-16"
-          className="stroke-accent"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        <path
-          d="M32 30v10M27 35h10"
-          className="stroke-primary"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-      </svg>
-    </div>
-  );
-}
-
-/**
- * The cash envelope tile.
- *
- * Dashed border so the money tile reads as a different kind of object from a
- * product, and deliberately quieter: PRD risk 3 is that cash cannibalises
- * products, so the product tile has to be the more attractive object.
- *
- * It shows what has been given so far and by how many guests, but no meter and
- * no remaining amount: an envelope is not a fund with a target (D28), so there
- * is no "מתוך" to show. Collecting toward a specific thing is what group
- * gifting on a real product is for, and that lives on `ProductCard`.
- *
- * Nothing is shown until the first guest gives. An envelope announcing ₪0 asks
- * the first person to go first, which is the opposite of what the line is for.
- */
+/** Cash strip. No meter and no target: an envelope is not a fund (D28). */
 export function MoneyCard({
   item,
   hasBit = false,
   hasPaybox = false,
   onClick,
+  prominent = false,
 }: {
   item: PublicItem;
   hasBit?: boolean;
   hasPaybox?: boolean;
   /** Optional so the card can be rendered statically from a server component. */
   onClick?: () => void;
+  /** Every product is taken, so the envelope is the way left to give. */
+  prominent?: boolean;
 }) {
   const collected = item.contributorCount > 0;
   const title = copy.fund.tile(hasBit, hasPaybox);
@@ -75,23 +30,59 @@ export function MoneyCard({
       onClick={onClick}
       data-testid="item-card"
       data-kind={item.kind}
-      className="flex flex-col gap-2.5 rounded-card border border-dashed border-border bg-surface p-3 text-right transition-transform active:scale-[0.98]"
+      className={
+        prominent
+          ? "focus-ring group relative grid min-h-[112px] w-full grid-cols-[64px_1fr_20px] items-center gap-x-4 overflow-hidden rounded-sheet border-2 border-brand-soft bg-page-sand px-4 py-4 text-start shadow-lift-sm lg:min-h-[128px] lg:grid-cols-[72px_1fr_auto_20px] lg:gap-6 lg:px-6"
+          : "focus-ring group relative grid min-h-[88px] w-full grid-cols-[56px_1fr_20px] items-center gap-x-4 overflow-hidden rounded-tile border border-hairline bg-page-sand px-4 py-3.5 text-start hover:border-hairline-strong motion-safe:transition motion-safe:active:scale-[.99] lg:flex lg:min-h-[104px] lg:gap-6 lg:px-6"
+      }
     >
-      <EnvelopeArt />
-      <p className="text-body font-bold text-ink">{title}</p>
-      {item.subtitle && <p className="text-tiny text-ink-muted">{item.subtitle}</p>}
-      {item.caption && <p className="text-tiny text-ink-muted">{item.caption}</p>}
-
-      {collected && (
-        <div className="flex flex-col gap-1">
-          <p className="text-tiny font-medium text-ink">
-            {copy.fund.collected} <InlineAmount agorot={item.contributedAgorot} />
-          </p>
-          <p className="text-micro text-ink-muted">
-            {copy.group.contributors(item.contributorCount)}
-          </p>
-        </div>
+      {prominent ? null : (
+        <span aria-hidden="true" className="pointer-events-none absolute inset-0 hidden fill-shape-ink lg:block">
+          <Icon name="sh-arch" className="absolute -top-10 start-[40%] aspect-[2/1] w-40 fill-shape-ink opacity-[.06]" />
+          <Icon name="sh-flower" className="absolute -bottom-16 start-[56%] aspect-square w-28 fill-shape-ink opacity-[.05]" />
+          <Icon name="sh-triangle" className="absolute top-4 start-[70%] aspect-[210/176] w-8 fill-shape-ink opacity-[.07]" />
+        </span>
       )}
+      <span
+        aria-hidden="true"
+        className={`pastel-field relative row-span-2 grid shrink-0 place-items-center rounded-full ${
+          prominent ? "size-16 lg:size-[72px]" : "size-14 lg:size-16"
+        }`}
+      >
+        <Icon
+          name="ic-heart"
+          className={`fill-current text-brand-deep ${prominent ? "size-8" : "size-7"}`}
+        />
+      </span>
+      <span className="relative min-w-0 lg:flex-1">
+        <span className={`block font-medium text-charcoal ${prominent ? "text-lead" : "text-copy lg:text-lead"}`}>
+          {title}
+        </span>
+        {item.subtitle ? <span className="block text-fine text-slate">{item.subtitle}</span> : null}
+        {item.caption ? <span className="block text-fine text-slate">{item.caption}</span> : null}
+      </span>
+      {collected ? (
+        <span
+          className={
+            prominent
+              ? "relative col-start-2 mt-1 flex flex-wrap items-baseline gap-x-3 text-fine lg:col-start-3 lg:mt-0 lg:flex-col lg:items-end"
+              : "relative col-start-2 mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-badge lg:mt-0 lg:flex-col lg:items-end lg:gap-0.5 lg:text-end"
+          }
+        >
+          <span className={`font-medium text-charcoal ${prominent ? "" : "lg:text-copy"}`}>
+            {copy.fund.collected} <InlineAmount agorot={item.contributedAgorot} />
+          </span>
+          <span className={`text-slate ${prominent ? "" : "lg:text-fine"}`}>
+            {copy.group.contributors(item.contributorCount)}
+          </span>
+        </span>
+      ) : null}
+      <Icon
+        name="ic-chev-end"
+        className={`relative col-start-3 row-span-2 row-start-1 size-5 shrink-0 text-slate ${
+          prominent ? "lg:col-start-4" : ""
+        }`}
+      />
     </button>
   );
 }

@@ -1,8 +1,32 @@
 import Link from "next/link";
+import { Icon, type IconName } from "@/components/ui/Sprite";
 import { copy } from "@/lib/copy";
 
 const backClassName =
   "press -ms-1.5 grid size-11 shrink-0 place-items-center rounded-full bg-paper/15 text-paper outline-none hover:bg-paper/25 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-paper motion-safe:transition-colors lg:mt-1.5 lg:size-12";
+
+export type EditorNavKey = "home" | "add" | "tracker" | "share" | "preview" | "settings";
+
+const NAV: {
+  key: EditorNavKey;
+  href: string;
+  label: string;
+  icon: IconName;
+  sticker?: boolean;
+}[] = [
+  { key: "home", href: "/editor", label: copy.editor.home.title, icon: "ic-list" },
+  { key: "add", href: "/editor/add", label: copy.editor.home.addItem, icon: "ic-plus" },
+  {
+    key: "tracker",
+    href: "/editor/tracker",
+    label: copy.editor.tracker.title,
+    icon: "ic-gift",
+    sticker: true,
+  },
+  { key: "share", href: "/editor/share", label: copy.editor.share.title, icon: "ic-share" },
+  { key: "preview", href: "/editor/preview", label: copy.editor.home.preview, icon: "ic-eye" },
+  { key: "settings", href: "/editor/settings", label: copy.editor.settings.title, icon: "ic-gear" },
+];
 
 function BackChevron() {
   return (
@@ -21,6 +45,46 @@ function BackChevron() {
   );
 }
 
+function EditorSideNav({ current }: { current: EditorNavKey }) {
+  // display:none below lg so these names are not in the mobile accessibility tree.
+  return (
+    <nav className="hidden lg:sticky lg:top-24 lg:order-2 lg:-mt-28 lg:block">
+      <ul className="flex flex-col gap-0.5 rounded-sheet border border-hairline bg-paper p-2 shadow-lift-sm">
+        {NAV.map((item) => {
+          const active = item.key === current;
+          return (
+            <li key={item.key}>
+              <Link
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                className={
+                  active
+                    ? "press focus-ring flex h-12 items-center gap-3 rounded-tile bg-brand-soft px-2.5 text-copy font-medium text-brand-deep"
+                    : "press focus-ring flex h-12 items-center gap-3 rounded-tile px-2.5 text-copy text-charcoal hover:bg-cloud motion-safe:transition-colors"
+                }
+              >
+                <span
+                  aria-hidden="true"
+                  className={`grid size-9 shrink-0 place-items-center rounded-full ${
+                    item.sticker
+                      ? "bg-sticker text-graphite"
+                      : active
+                        ? "bg-paper text-brand-deep"
+                        : "bg-brand-softer text-brand-deep"
+                  }`}
+                >
+                  <Icon name={item.icon} className="size-5" />
+                </span>
+                {item.label}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
 export function EditorFrame({
   title,
   back,
@@ -30,6 +94,7 @@ export function EditorFrame({
   illustration,
   eyebrow,
   wide = false,
+  nav,
   children,
 }: {
   title: string;
@@ -41,6 +106,7 @@ export function EditorFrame({
   illustration?: React.ReactNode;
   eyebrow?: React.ReactNode;
   wide?: boolean;
+  nav?: EditorNavKey;
   children: React.ReactNode;
 }) {
   const compact = illustration != null;
@@ -94,45 +160,6 @@ export function EditorFrame({
 
   return (
     <div className="min-h-dvh bg-page-sand font-rubik text-charcoal antialiased">
-      {/* Shape ids are referenced by the sent card. */}
-      <svg width="0" height="0" className="absolute" aria-hidden="true" focusable="false">
-        <defs>
-          <symbol id="sh-arch" viewBox="0 0 280 140">
-            <path
-              transform="translate(-178 -429)"
-              d="M317.199 429C243.84 429 183.598 485.759 178.031 557.506C177.574 563.288 182.225 568.234 188.097 568.234H247.577C251.847 568.234 255.431 565.114 255.965 560.93C259.625 530.42 285.705 506.682 317.199 506.682C346.939 506.682 371.875 527.833 377.67 555.832C379.119 562.984 385.372 568.234 392.693 568.234H447.673C452.783 568.234 456.824 563.897 456.443 558.799C451.562 486.443 390.939 429 317.199 429Z"
-            />
-          </symbol>
-          <symbol id="sh-flower" viewBox="0 0 205 205">
-            <path
-              transform="translate(-75.4 -1057.4)"
-              d="M98.0664 1159.72C97.9545 1159.61 97.843 1159.5 97.7318 1159.38C75.553 1137.21 75.4044 1101.4 97.3998 1079.4C119.395 1057.4 155.206 1057.55 177.384 1079.73C177.495 1079.84 177.606 1079.95 177.716 1080.07C177.826 1079.95 177.937 1079.84 178.048 1079.73C200.227 1057.55 236.037 1057.4 258.032 1079.4C280.028 1101.4 279.879 1137.21 257.701 1159.38C257.623 1159.46 257.546 1159.54 257.468 1159.62C257.434 1159.65 257.4 1159.68 257.366 1159.72C257.478 1159.83 257.589 1159.94 257.701 1160.05C279.879 1182.23 280.028 1218.04 258.032 1240.03C236.037 1262.03 200.227 1261.88 178.048 1239.7C177.937 1239.59 177.826 1239.48 177.716 1239.37C177.606 1239.48 177.495 1239.59 177.384 1239.7C155.206 1261.88 119.395 1262.03 97.3999 1240.03C75.4045 1218.04 75.5531 1182.23 97.7318 1160.05C97.843 1159.94 97.9545 1159.83 98.0664 1159.72Z"
-            />
-          </symbol>
-          <symbol id="sh-triangle" viewBox="0 0 210 176">
-            <path
-              transform="translate(-566 -532)"
-              d="M654.569 542.825L572.196 683.117C566.016 693.666 573.609 706.851 585.881 706.851H755.129C767.577 706.851 775.17 693.314 768.637 682.766L681.673 542.473C675.405 532.364 660.572 532.54 654.569 542.825Z"
-            />
-          </symbol>
-          <symbol id="sh-door" viewBox="0 0 160 193">
-            <path
-              transform="translate(-518 -951)"
-              d="M597.429 951C553.582 951 518 988.915 518 1035.65L518 1126.72C518 1136.03 525.583 1143.5 534.819 1143.5H658.58C668.691 1143.5 676.857 1135.35 676.857 1125.27L676.857 1035.65C676.954 988.915 641.372 951 597.429 951Z"
-            />
-          </symbol>
-          <symbol id="sh-circle" viewBox="0 0 178 178">
-            <circle cx="89" cy="89" r="89" />
-          </symbol>
-          <symbol id="wave" viewBox="0 0 1632 160" preserveAspectRatio="none">
-            <path
-              transform="translate(0 -4423)"
-              d="m0 4423.20703c226.015625 115.91406 542.398437 167.99479 949.148437 156.24219 315.351563-12.4349 542.968753-38.20478 682.851563-77.30966v80.86044h-1632z"
-            />
-          </symbol>
-        </defs>
-      </svg>
-
       <header className="sticky top-0 z-40 bg-paper shadow-lift-xs">
         <div className="mx-auto flex h-14 max-w-[1240px] items-center px-3 lg:h-16 lg:px-8">
           <span aria-hidden="true" className="flex items-center gap-2 ps-1 text-brand-deep">
@@ -153,7 +180,7 @@ export function EditorFrame({
         </div>
       </header>
 
-      <main className={wide ? "pb-16" : "relative overflow-hidden pb-24"}>
+      <main className={nav ? undefined : wide ? "pb-16" : "relative overflow-hidden pb-24"}>
         <section className="band-field relative overflow-hidden text-paper">
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 fill-paper">
             <svg className="absolute -top-8 -end-8 w-36 opacity-20 lg:-top-14 lg:end-[30%] lg:w-72">
@@ -205,11 +232,18 @@ export function EditorFrame({
           </svg>
         </section>
 
-        <div className="relative z-10 mx-auto -mt-16 max-w-[1240px] px-4 lg:-mt-28 lg:px-8">
-          <div className={wide ? "arrive w-full" : "arrive w-full lg:max-w-[560px]"}>{children}</div>
-        </div>
+        {nav ? (
+          <div className="relative mx-auto max-w-[1240px] px-4 pb-16 lg:grid lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start lg:gap-8 lg:px-8">
+            <EditorSideNav current={nav} />
+            <div className="arrive relative z-10 -mt-16 min-w-0 lg:order-1 lg:-mt-28">{children}</div>
+          </div>
+        ) : (
+          <div className="relative z-10 mx-auto -mt-16 max-w-[1240px] px-4 lg:-mt-28 lg:px-8">
+            <div className={wide ? "arrive w-full" : "arrive w-full lg:max-w-[560px]"}>{children}</div>
+          </div>
+        )}
 
-        {wide ? null : (
+        {nav || wide ? null : (
           <div
             aria-hidden="true"
             className="pointer-events-none absolute start-0 end-0 bottom-0 mx-auto h-40 max-w-[1240px] fill-paper opacity-70 lg:h-56"

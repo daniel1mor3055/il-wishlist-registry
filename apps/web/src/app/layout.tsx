@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Heebo, Rubik } from "next/font/google";
+import { Sprite } from "@/components/ui/Sprite";
 import "./globals.css";
 
 // Self-hosted at build time. A Hebrew-first product cannot afford a
@@ -42,7 +43,10 @@ export default function RootLayout({
       className={`${heebo.variable} ${rubik.variable}`}
       suppressHydrationWarning
     >
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <Sprite />
+        {children}
+      </body>
     </html>
   );
 }

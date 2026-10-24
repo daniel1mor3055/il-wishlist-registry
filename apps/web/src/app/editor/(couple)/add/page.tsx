@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { AddItem } from "@/components/editor/AddItem";
-import { EditorShell } from "@/components/editor/EditorShell";
+import { EditorFrame } from "@/components/editor/EditorFrame";
 import { copy } from "@/lib/copy";
 import { getOwnerRegistry, ownerFetch } from "@/lib/owner";
 import type { CatalogPage } from "@/lib/types";
@@ -14,10 +14,10 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-const EMPTY: CatalogPage = { results: [], total: 0 };
-
 /** Enough to fill a phone screen twice over without paging. */
 const LIMIT = 24;
+
+const EMPTY: CatalogPage = { results: [], total: 0 };
 
 export default async function AddItemPage({ searchParams }: Props) {
   const state = await getOwnerRegistry();
@@ -29,21 +29,25 @@ export default async function AddItemPage({ searchParams }: Props) {
   if (q) search.set("q", q);
   if (category) search.set("category", category);
 
-  // Rendered server-side, so the results are in the HTML and the search survives
-  // a reload. Only the catalog tab needs them.
+  // Server HTML so a reload keeps the search. The manual tab does not need it.
   const result =
     tab === "manual"
       ? { ok: true as const, data: EMPTY }
       : await ownerFetch<CatalogPage>(`/catalog/search?${search}`);
 
   return (
-    <EditorShell title={copy.editor.add.title} back="/editor">
+    <EditorFrame
+      title={copy.editor.add.title}
+      lead={state.registry.coupleNames}
+      back="/editor"
+      nav="add"
+    >
       <AddItem
         page={result.ok ? result.data : EMPTY}
         query={q ?? ""}
         category={category ?? null}
         tab={tab === "manual" ? "manual" : "search"}
       />
-    </EditorShell>
+    </EditorFrame>
   );
 }

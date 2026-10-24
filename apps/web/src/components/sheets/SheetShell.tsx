@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 import { CloseButton } from "@/components/primitives/Buttons";
+import { Icon } from "@/components/ui/Sprite";
+import { copy } from "@/lib/copy";
 
 function useDismissOnEscape(onClose: () => void) {
   useEffect(() => {
@@ -13,39 +15,36 @@ function useDismissOnEscape(onClose: () => void) {
   }, [onClose]);
 }
 
-/**
- * A bottom sheet.
- *
- * Deviation from PRD section 8, recorded deliberately: the PRD says drawers
- * enter from the right, but a mobile bottom sheet entering from the bottom is
- * the correct platform pattern and is what the reference render does. The
- * right-entry rule applies to side drawers, of which we have none.
- *
- * The header is a three-column grid so the grabber is genuinely centred. The
- * reference used `mx-auto -translate-x-4`, a magic offset compensating for the
- * close button's width, which drifts the moment that button changes size.
- */
+/** Bottom sheet below `lg`, centred dialog from `lg`. Fixed so it covers the viewport. */
 export function Sheet({
   children,
   onClose,
   cta,
   labelledBy,
+  wide = false,
+  tall = false,
 }: {
   children: React.ReactNode;
   onClose: () => void;
   cta?: React.ReactNode;
   labelledBy?: string;
+  /** 920px desktop dialog. Item detail, handoff, and group gift. */
+  wide?: boolean;
+  /** Group gift is taller than the other wide sheets. */
+  tall?: boolean;
 }) {
   useDismissOnEscape(onClose);
 
-  // Fixed, not absolute. The reference could use absolute because it lived
-  // inside a fake 390x844 phone frame; on a real page the overlay has to cover
-  // the viewport regardless of scroll position. The panel stays constrained to
-  // the mobile column so the sheet does not stretch across a desktop window.
+  const width = wide
+    ? tall
+      ? "lg:max-h-[720px] lg:max-w-[920px]"
+      : "lg:max-h-[680px] lg:max-w-[920px]"
+    : "lg:max-w-[640px]";
+
   return (
-    <div className="fixed inset-0 z-40 flex flex-col justify-end">
+    <div className="fixed inset-0 z-50 flex items-end justify-center lg:items-center lg:p-10">
       <div
-        className="animate-fade absolute inset-0 bg-black/35"
+        className="sheet-scrim absolute inset-0 bg-graphite/55"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -53,29 +52,20 @@ export function Sheet({
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
-        className="animate-sheet relative mx-auto flex max-h-[85%] w-full max-w-[430px] flex-col rounded-t-[24px] bg-surface"
+        className={`sheet-panel relative flex max-h-[92dvh] min-h-0 w-full flex-col overflow-hidden rounded-t-sheet bg-paper shadow-lift-lg lg:rounded-sheet ${width}`}
       >
-        <div className="grid grid-cols-[auto_1fr_auto] items-center px-4 pt-3">
+        <span aria-hidden="true" className="band-field absolute inset-x-0 top-0 z-20 h-1.5" />
+        <div className="absolute top-4 end-3 z-20 lg:top-5 lg:end-5">
           <CloseButton onClick={onClose} />
-          <div className="h-1 w-10 justify-self-center rounded-full bg-border" />
-          <div className="h-9 w-9" aria-hidden="true" />
         </div>
-        <div className="hide-scroll flex-1 overflow-y-auto px-5 pb-4">{children}</div>
-        {cta && (
-          <div className="border-t border-border bg-surface px-5 pb-8 pt-3">{cta}</div>
-        )}
+        <div className="min-h-0 flex-auto overflow-y-auto">{children}</div>
+        {cta ? <div className="shrink-0">{cta}</div> : null}
       </div>
     </div>
   );
 }
 
-/**
- * A centred modal, used for the D12 self-report moment.
- *
- * Dismissable by tap, not only by Escape. On the report modal, dismissal is a
- * real answer - "still at the shop, keep my hold" (D35) - and a keyboard key is
- * not an answer a phone can give.
- */
+/** Centred on every width. Scrim and Escape both dismiss; on the report that keeps the hold (D35). */
 export function Modal({
   children,
   onClose,
@@ -88,9 +78,9 @@ export function Modal({
   useDismissOnEscape(onClose);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-10">
       <div
-        className="animate-fade absolute inset-0 bg-black/45"
+        className="sheet-scrim absolute inset-0 bg-graphite/55"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -98,18 +88,27 @@ export function Modal({
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
-        className="animate-fade relative w-full max-w-[382px] rounded-card bg-surface px-6 pb-6 pt-3"
+        className="sheet-panel relative w-full max-w-[440px] rounded-sheet bg-paper p-5 shadow-lift-lg"
       >
-        <div className="mb-1 flex">
-          <CloseButton onClick={onClose} />
-        </div>
+        <span
+          aria-hidden="true"
+          className="band-field absolute inset-x-0 top-0 h-1.5 rounded-t-sheet"
+        />
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={copy.common.close}
+          className="press focus-ring absolute top-4 end-3 grid size-11 place-items-center rounded-full text-brand-deep hover:bg-brand-softer motion-safe:transition-colors"
+        >
+          <Icon name="ic-close" className="size-5" />
+        </button>
         {children}
       </div>
     </div>
   );
 }
 
-/** The green check used on confirmation surfaces. A checkmark is not mirrored. */
+/** Not mirrored in RTL. */
 export function CheckMark({
   size = 24,
   tone = "success",
@@ -123,7 +122,7 @@ export function CheckMark({
       height={size}
       viewBox="0 0 24 24"
       fill="none"
-      className={tone === "muted" ? "text-muted" : "text-success"}
+      className={tone === "muted" ? "text-slate" : "text-mint-ink"}
       aria-hidden="true"
     >
       <path

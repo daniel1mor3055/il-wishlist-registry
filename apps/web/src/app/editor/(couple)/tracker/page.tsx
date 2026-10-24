@@ -1,7 +1,11 @@
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { EditorShell, FormError } from "@/components/editor/EditorShell";
+import { EditorFrame } from "@/components/editor/EditorFrame";
 import { GiftTracker } from "@/components/editor/GiftTracker";
+import { C9TrackerBanner } from "@/components/illustrations/C9TrackerBanner";
+import { C9TrackerEmpty } from "@/components/illustrations/C9TrackerEmpty";
+import { Alert } from "@/components/ui/Alert";
+import { Icon } from "@/components/ui/Sprite";
 import { copy, errorCopy } from "@/lib/copy";
 import { getOwnerRegistry, ownerFetch } from "@/lib/owner";
 import type { GiftTracker as GiftTrackerPayload } from "@/lib/types";
@@ -16,10 +20,25 @@ export default async function TrackerPage() {
   if (!state.signedIn) redirect("/editor/enter");
   if (!state.registry) redirect("/editor/new");
 
+  const lead = state.registry.coupleNames;
+
   if (state.registry.publishedAt === null) {
     return (
-      <Frame>
-        <p className="text-small text-ink-muted">{copy.editor.tracker.unpublished}</p>
+      <Frame lead={lead}>
+        <div className="relative overflow-hidden rounded-sheet bg-brand-soft p-6 shadow-lift-md lg:p-8">
+          <svg aria-hidden="true" className="absolute -bottom-10 -end-8 w-36 fill-paper opacity-60">
+            <use href="#sh-flower" />
+          </svg>
+          <span
+            aria-hidden="true"
+            className="relative grid size-12 place-items-center rounded-full bg-paper text-brand-deep"
+          >
+            <Icon name="ic-gift" className="size-6" />
+          </span>
+          <p className="relative mt-4 max-w-[28rem] text-lead text-charcoal">
+            {copy.editor.tracker.unpublished}
+          </p>
+        </div>
       </Frame>
     );
   }
@@ -27,8 +46,8 @@ export default async function TrackerPage() {
   const result = await ownerFetch<GiftTrackerPayload>("/me/registry/gifts");
   if (!result.ok) {
     return (
-      <Frame>
-        <FormError message={errorCopy(result.code)} />
+      <Frame lead={lead}>
+        <Alert>{errorCopy(result.code)}</Alert>
       </Frame>
     );
   }
@@ -41,16 +60,19 @@ export default async function TrackerPage() {
     gifts.blessings.length === 0;
   if (empty) {
     return (
-      <Frame>
-        <div className="flex flex-col gap-1 rounded-card border border-dashed border-border bg-surface p-4 text-center">
-          <p className="text-body font-medium text-ink">{copy.editor.tracker.empty}</p>
+      <Frame lead={lead}>
+        <div className="overflow-hidden rounded-sheet bg-paper shadow-lift-md">
+          <C9TrackerEmpty />
+          <p className="px-5 py-6 text-center text-lead text-charcoal lg:px-10">
+            {copy.editor.tracker.empty}
+          </p>
         </div>
       </Frame>
     );
   }
 
   return (
-    <Frame>
+    <Frame lead={lead}>
       {/* Only these rows cross into the client, so the payment handle and street stay on the server. */}
       <GiftTracker
         held={withAge(gifts.held, (row) => row.createdAt)}
@@ -62,11 +84,17 @@ export default async function TrackerPage() {
   );
 }
 
-function Frame({ children }: { children: ReactNode }) {
+function Frame({ lead, children }: { lead: string; children: ReactNode }) {
   return (
-    <EditorShell title={copy.editor.tracker.title} back="/editor">
+    <EditorFrame
+      title={copy.editor.tracker.title}
+      lead={lead}
+      back="/editor"
+      nav="tracker"
+      illustration={<C9TrackerBanner />}
+    >
       {children}
-    </EditorShell>
+    </EditorFrame>
   );
 }
 

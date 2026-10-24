@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { EditorShell } from "@/components/editor/EditorShell";
+import { EditorFrame } from "@/components/editor/EditorFrame";
 import { StoryForm } from "@/components/editor/StoryForm";
 import { copy } from "@/lib/copy";
 import { getOwnerRegistry } from "@/lib/owner";
@@ -14,11 +14,16 @@ export default async function StoryPage() {
   if (!state.signedIn) redirect("/editor/enter");
   if (!state.registry) redirect("/editor/new");
 
-  const { story, coverImageUrl } = state.registry;
+  const { story, coverImageUrl, coupleNames } = state.registry;
 
   return (
-    <EditorShell title={copy.editor.story.title} back="/editor/settings">
+    <EditorFrame
+      title={copy.editor.story.title}
+      lead={coupleNames}
+      back="/editor/settings"
+      nav="settings"
+    >
       <StoryForm story={story} coverImageUrl={coverImageUrl} />
-    </EditorShell>
+    </EditorFrame>
   );
 }

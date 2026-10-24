@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { AddressForm } from "@/components/editor/AddressForm";
-import { EditorShell } from "@/components/editor/EditorShell";
+import { EditorFrame } from "@/components/editor/EditorFrame";
 import { copy } from "@/lib/copy";
 import { getOwnerRegistry } from "@/lib/owner";
 
@@ -22,10 +22,16 @@ export default async function AddressPage() {
     shippingApartment,
     shippingNotes,
     shippingPostalCode,
+    coupleNames,
   } = state.registry;
 
   return (
-    <EditorShell title={copy.editor.address.title} back="/editor/settings">
+    <EditorFrame
+      title={copy.editor.address.title}
+      lead={coupleNames}
+      back="/editor/settings"
+      nav="settings"
+    >
       <AddressForm
         city={city}
         street={shippingStreet}
@@ -35,6 +41,6 @@ export default async function AddressPage() {
         notes={shippingNotes}
         postalCode={shippingPostalCode}
       />
-    </EditorShell>
+    </EditorFrame>
   );
 }

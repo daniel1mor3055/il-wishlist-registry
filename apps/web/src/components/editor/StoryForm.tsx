@@ -2,15 +2,18 @@
 
 import { useState, useTransition } from "react";
 import { patchRegistry } from "@/app/editor/actions";
-import { Field, FormError, inputClass } from "@/components/editor/EditorShell";
-import { PrimaryButton } from "@/components/primitives/Buttons";
+import { C6StoryPortrait } from "@/components/illustrations/C6StoryPortrait";
+import { Alert } from "@/components/ui/Alert";
+import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Sprite";
+import { SavedStatus } from "@/components/ui/SavedStatus";
 import { copy } from "@/lib/copy";
-import { coverSrc } from "@/lib/cover";
+import { coverIsCustom, coverSrc } from "@/lib/cover";
 
-/**
- * Cover is a URL paste for the POC. Empty string keeps the default teddy.
- * List colour lives on /editor/gender, not here.
- */
+const cloudField =
+  "focus-ring mt-1.5 w-full resize-none rounded-tile bg-cloud px-4 py-3 text-copy text-graphite outline-none placeholder:text-slate focus:bg-paper";
+
+/** Empty cover stays null; guests still get the default teddy. */
 export function StoryForm({
   story,
   coverImageUrl,
@@ -23,7 +26,7 @@ export function StoryForm({
   const [error, setError] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
   const [pending, startTransition] = useTransition();
-  const preview = coverSrc(cover);
+  const customCover = coverIsCustom(cover);
 
   function save() {
     setError(null);
@@ -39,49 +42,55 @@ export function StoryForm({
   }
 
   return (
-    <div className="flex flex-1 flex-col gap-5">
-      <p className="text-small text-ink-muted">{copy.editor.story.body}</p>
-      <Field label={copy.editor.story.storyLabel}>
-        <textarea
-          value={storyText}
-          onChange={(event) => setStory(event.target.value)}
-          placeholder={copy.editor.story.storyPlaceholder}
-          maxLength={2000}
-          rows={3}
-          className={`${inputClass} resize-none`}
-        />
-      </Field>
-      <Field label={copy.editor.story.coverLabel}>
-        <input
-          value={cover}
-          onChange={(event) => setCover(event.target.value)}
-          placeholder={copy.editor.story.coverPlaceholder}
-          maxLength={500}
-          dir="ltr"
-          className={`${inputClass} text-start`}
-        />
-      </Field>
-      {preview && (
-        <div className="relative aspect-[16/10] w-full overflow-hidden rounded-card border border-border bg-image-bg">
-          {/* Arbitrary pasted URLs are not on the Next image allowlist. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={preview}
-            alt={copy.hero.defaultCoverAlt}
-            className="h-full w-full object-cover object-center"
-          />
+    <div className="overflow-hidden rounded-sheet bg-paper shadow-lift-md lg:grid lg:grid-cols-[320px_minmax(0,1fr)]">
+      <C6StoryPortrait
+        src={customCover ? coverSrc(cover) : null}
+        alt={copy.hero.defaultCoverAlt}
+      />
+      <div className="flex min-w-0 flex-col">
+        <div className="px-5 pb-6 pt-5 lg:px-8 lg:pt-8">
+          <p className="text-copy text-charcoal lg:text-lead">{copy.editor.story.body}</p>
+          <label className="mt-6 block text-start">
+            <span className="block text-fine font-medium text-slate">
+              {copy.editor.story.storyLabel}
+            </span>
+            <textarea
+              value={storyText}
+              onChange={(event) => setStory(event.target.value)}
+              placeholder={copy.editor.story.storyPlaceholder}
+              maxLength={2000}
+              rows={4}
+              className={cloudField}
+            />
+          </label>
+          <label className="mt-5 block text-start">
+            <span className="flex items-center gap-1.5 text-fine font-medium text-slate">
+              <Icon name="ic-photo" className="size-4 text-brand-deep" />
+              {copy.editor.story.coverLabel}
+            </span>
+            <input
+              value={cover}
+              onChange={(event) => setCover(event.target.value)}
+              placeholder={copy.editor.story.coverPlaceholder}
+              maxLength={500}
+              dir="ltr"
+              className={
+                customCover
+                  ? "ltr-token focus-ring mt-1.5 h-14 w-full truncate rounded-tile bg-cloud px-4 text-fine text-graphite outline-none placeholder:text-slate focus:bg-paper"
+                  : "ltr-token focus-ring mt-1.5 h-14 w-full rounded-tile bg-cloud px-4 text-copy text-graphite outline-none placeholder:text-slate focus:bg-paper"
+              }
+            />
+          </label>
         </div>
-      )}
-      <div className="mt-auto flex flex-col gap-2 pt-4">
-        <FormError message={error} />
-        {saved && (
-          <p role="status" className="text-small text-success">
-            {copy.editor.story.saved}
-          </p>
-        )}
-        <PrimaryButton onClick={save} disabled={pending}>
-          {pending ? copy.editor.story.saving : copy.editor.story.save}
-        </PrimaryButton>
+        <div className="mt-auto border-t border-hairline px-5 pb-5 pt-4 lg:px-8 lg:pb-6">
+          {error ? <Alert>{error}</Alert> : null}
+          <div className="flex flex-col items-center gap-3 lg:flex-row">
+            <Button type="button" onClick={save} pending={pending} fit>
+              {pending ? copy.editor.story.saving : copy.editor.story.save}
+            </Button>
+            {saved ? <SavedStatus>{copy.editor.story.saved}</SavedStatus> : null}
+          </div>
+        </div>
       </div>
     </div>
   );

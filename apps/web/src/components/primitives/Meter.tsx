@@ -1,13 +1,6 @@
 import { copy } from "@/lib/copy";
 
-/**
- * A funding or progress meter.
- *
- * PRD section 8: meters fill right to left, flush to the right edge. The
- * reference render achieved this with `right-0`, which is right by accident -
- * correct only because RTL happens to make right the inline start. This uses
- * the logical property, so it expresses the intent rather than the coincidence.
- */
+/** 12px track. The fill starts at the inline-start, the right edge in RTL. */
 export function Meter({
   percent,
   tone = "accent",
@@ -20,7 +13,7 @@ export function Meter({
   const clamped = Math.max(0, Math.min(100, percent));
   return (
     <div
-      className="relative h-2 w-full overflow-hidden rounded-full bg-meter-track"
+      className="h-3 w-full overflow-hidden rounded-pill bg-hairline"
       role="progressbar"
       aria-valuenow={Math.round(clamped)}
       aria-valuemin={0}
@@ -29,9 +22,7 @@ export function Meter({
       aria-labelledby={labelledBy}
     >
       <div
-        className={`absolute inset-y-0 start-0 rounded-full ${
-          tone === "success" ? "bg-success" : "bg-accent"
-        }`}
+        className={`h-full rounded-pill ${tone === "success" ? "bg-mint-ink" : "meter-fill"}`}
         style={{ width: `${clamped}%` }}
       />
     </div>

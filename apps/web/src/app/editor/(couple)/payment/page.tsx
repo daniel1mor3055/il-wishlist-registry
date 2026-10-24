@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
+import { EditorFrame } from "@/components/editor/EditorFrame";
 import { PaymentForm } from "@/components/editor/PaymentForm";
-import { EditorShell } from "@/components/editor/EditorShell";
 import { copy } from "@/lib/copy";
 import { getOwnerRegistry } from "@/lib/owner";
 
@@ -13,11 +13,7 @@ type Props = {
   searchParams: Promise<{ setup?: string; from?: string }>;
 };
 
-/**
- * One GET for the number (D13, D41). Two doors: the list (add or tap חיבוק)
- * and settings (change the number later). Settings does not re-add a removed
- * tile.
- */
+/** List door can require a number and add the envelope; settings only edits the handle (D13, D41). */
 export default async function PaymentPage({ searchParams }: Props) {
   const state = await getOwnerRegistry();
   if (!state.signedIn) redirect("/editor/enter");
@@ -30,9 +26,11 @@ export default async function PaymentPage({ searchParams }: Props) {
   const { bitHandle, payboxHandle, paymentDisplayName, coupleNames } = state.registry;
 
   return (
-    <EditorShell
+    <EditorFrame
       title={copy.editor.payment.title}
+      lead={coupleNames}
       back={fromSettings ? "/editor/settings" : "/editor"}
+      nav="settings"
     >
       <PaymentForm
         bitHandle={bitHandle}
@@ -43,6 +41,6 @@ export default async function PaymentPage({ searchParams }: Props) {
         needsEnvelope={isSetup && !hasFund}
         returnTo={fromSettings ? null : "/editor"}
       />
-    </EditorShell>
+    </EditorFrame>
   );
 }

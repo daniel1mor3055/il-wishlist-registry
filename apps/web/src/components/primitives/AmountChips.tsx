@@ -4,18 +4,7 @@ import { useState } from "react";
 import { formatAgorot } from "@/lib/money";
 import { copy } from "@/lib/copy";
 
-/**
- * Contribution amount chips, plus the free-amount field behind "סכום אחר".
- *
- * The selected value is always agorot or nothing, so a caller never has to
- * know whether the guest picked a chip or typed a number. Picking "סכום אחר"
- * opens the field and clears the selection, because an "other amount" with no
- * amount in it is not a choice yet - the CTA above stays disabled until the
- * guest types something.
- *
- * The field is a digit-only shekel input: agorot exist in prices we read from
- * chains, never in a sum a person chooses to give.
- */
+/** Selected value is agorot or null. The custom field is whole shekels only. */
 
 const MAX_SHEKELS = 100_000;
 
@@ -73,22 +62,20 @@ export function AmountChips({
       </div>
 
       {custom && (
-        // LTR, so the sign and the digits read as one "₪360" the way every
-        // other amount on the page does, instead of sitting at opposite edges.
+        // LTR so the shekel and the digits stay one amount.
         <div
           dir="ltr"
-          className="flex items-center gap-1 rounded-btn border border-border bg-panel px-4 py-3 focus-within:border-primary"
+          className="flex h-14 items-center gap-2 rounded-tile border-2 border-brand-deep bg-paper px-4"
         >
-          <span className="text-body font-medium text-ink-muted">₪</span>
+          <span className="text-copy text-slate">₪</span>
           <input
-            // Numeric keypad on a phone, and no spinner arrows to mis-tap.
             inputMode="numeric"
             autoFocus
             value={typed}
             onChange={(event) => changeTyped(event.target.value)}
             placeholder={copy.group.customAmountPlaceholder}
             aria-label={copy.group.otherAmount}
-            className="w-full bg-transparent text-body text-ink outline-none"
+            className="min-w-0 flex-1 bg-transparent text-copy text-graphite outline-none placeholder:text-slate"
           />
         </div>
       )}
@@ -112,10 +99,10 @@ function Chip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`rounded-full px-4 py-2 text-small font-medium transition-colors ${
+      className={`press focus-ring flex h-11 items-center rounded-pill px-4 text-fine font-medium ${
         active
-          ? "border border-accent bg-accent text-on-accent"
-          : "border border-border bg-surface text-ink"
+          ? "bg-brand-deep text-paper"
+          : "border border-hairline-strong bg-paper text-charcoal"
       }`}
     >
       <span className={ltr ? "ltr-token" : undefined}>{children}</span>

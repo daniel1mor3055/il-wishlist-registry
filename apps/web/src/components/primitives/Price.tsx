@@ -1,10 +1,6 @@
 import { formatAgorot } from "@/lib/money";
 
-/**
- * A price is an LTR run inside RTL text and an unbreakable token: the shekel
- * sign precedes the digits and the value never splits across a line, never
- * truncates (PRD section 8).
- */
+/** Shekel amount as one unbreakable LTR token. */
 export function Price({
   agorot,
   size = "body",
@@ -12,9 +8,10 @@ export function Price({
   agorot: number;
   size?: "body" | "h3" | "h2";
 }) {
-  const sizeClass = size === "h2" ? "text-h2" : size === "h3" ? "text-h3" : "text-body";
+  const sizeClass =
+    size === "h2" ? "text-title" : size === "h3" ? "text-lg" : "text-copy";
   return (
-    <span className={`ltr-token shrink-0 font-bold text-ink ${sizeClass}`}>
+    <span className={`ltr-token shrink-0 font-medium text-graphite ${sizeClass}`}>
       {formatAgorot(agorot)}
     </span>
   );

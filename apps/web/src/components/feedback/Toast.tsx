@@ -1,14 +1,8 @@
 "use client";
 
-/**
- * A toast.
- *
- * PRD section 8: text right-aligned, close affordance on the left. The
- * reference render put the button first in the DOM with `order-first`, which in
- * an RTL flex row places it on the *right* - the opposite of the spec, and a
- * defect still live in the pinned reference at 6967bdb. Here the text comes
- * first in the DOM, so the button lands at the inline end, which is the left.
- */
+import { Icon } from "@/components/ui/Sprite";
+
+/** Text comes first so the close control lands at the inline end. */
 export function Toast({
   message,
   onDismiss,
@@ -19,18 +13,18 @@ export function Toast({
   action?: { label: string; onClick: () => void };
 }) {
   return (
-    <div className="fixed inset-x-0 bottom-24 z-[60] flex justify-center px-6">
+    <div className="fixed start-0 end-0 bottom-24 z-[60] flex justify-center px-6">
       <div
         role="status"
         aria-live="polite"
-        className="animate-toast flex items-center gap-3 rounded-btn bg-ink px-4 py-3 text-small font-medium text-white shadow-lg"
+        className="toast-face animate-toast flex w-full max-w-md items-center gap-2 rounded-tile py-2 pe-2 ps-4 text-snow"
       >
-        <span>{message}</span>
+        <p className="min-w-0 flex-1 text-copy">{message}</p>
         {action && (
           <button
             type="button"
             onClick={action.onClick}
-            className="shrink-0 transition-opacity active:opacity-70"
+            className="focus-ring flex h-11 shrink-0 items-center text-fine font-medium text-paper"
           >
             {action.label}
           </button>
@@ -39,16 +33,9 @@ export function Toast({
           type="button"
           onClick={onDismiss}
           aria-label="סגירה"
-          className="shrink-0 transition-opacity active:opacity-70"
+          className="focus-ring grid size-11 shrink-0 place-items-center rounded-full text-snow"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path
-              d="M6 6l12 12M18 6L6 18"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
+          <Icon name="ic-close" className="size-5" />
         </button>
       </div>
     </div>

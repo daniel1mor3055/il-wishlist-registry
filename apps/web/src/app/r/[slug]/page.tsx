@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Hero, HowItWorks } from "@/components/registry/Hero";
 import { RegistryClient } from "@/components/registry/RegistryClient";
-import { ClosedRegistrySummary } from "@/components/registry/RegistryShell";
+import {
+  ClosedRegistrySummary,
+  GuestBrandBar,
+  GuestFooter,
+} from "@/components/registry/RegistryShell";
 import { getPublicRegistry } from "@/lib/api";
 import { copy } from "@/lib/copy";
 import { DEFAULT_COVER_PATH, coverIsCustom, coverSrc } from "@/lib/cover";
@@ -72,7 +76,7 @@ export default async function RegistryPage({ params }: Props) {
   if (registry.lifecycle === "closed") {
     return (
       <div data-theme={theme}>
-        <ClosedRegistrySummary registry={registry} />
+        <ClosedRegistrySummary registry={registry} heading />
       </div>
     );
   }
@@ -80,26 +84,13 @@ export default async function RegistryPage({ params }: Props) {
   return (
     <main
       data-theme={theme}
-      className="paper-wash mx-auto flex min-h-dvh w-full max-w-[430px] flex-col"
+      className="flex min-h-dvh flex-col bg-paper font-rubik text-charcoal antialiased"
     >
+      <GuestBrandBar />
       <Hero registry={registry} />
-      <HowItWorks />
-
-      {registry.items.length > 0 && (
-        <div className="px-5 pt-4">
-          {/* An anchor, not a scroll handler: it works before hydration and
-              costs no client JavaScript. */}
-          <a
-            href="#list"
-            className="block w-full rounded-btn bg-primary py-3.5 text-center text-body font-medium text-on-primary hover:bg-primary-hover active:bg-primary-active"
-          >
-            {copy.hero.cta}
-          </a>
-        </div>
-      )}
-
-      <div id="list" className="scroll-mt-0" />
+      <HowItWorks intoFilter={registry.items.length > 0} />
       <RegistryClient registry={registry} />
+      <GuestFooter />
     </main>
   );
 }

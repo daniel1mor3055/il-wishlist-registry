@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ProductCard } from "./ProductCard";
 import { MoneyCard } from "./MoneyCard";
 import { Toast } from "@/components/feedback/Toast";
+import { Icon } from "@/components/ui/Sprite";
 import {
   BlessingSheet,
   CashSheet,
@@ -153,6 +154,66 @@ function writeCachedHolds(slug: string, holds: Holds) {
   } catch {
     // Private mode or quota. The cookie-backed GET is the real source.
   }
+}
+
+function shekelRuns(label: string) {
+  return label.split(/(₪[\d,]+(?:[\u2013-]₪[\d,]+)?)/).map((part, index) =>
+    part.startsWith("₪") ? (
+      <span key={index} className="ltr-token">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  );
+}
+
+function FilterChip({
+  label,
+  pressed,
+  onClick,
+}: {
+  label: string;
+  pressed: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={pressed}
+      className="press group flex h-11 shrink-0 items-center rounded-tile outline-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-paper"
+    >
+      <span
+        className={`flex h-9 items-center gap-1 rounded-tile border px-3.5 text-fine font-medium motion-safe:transition-colors ${
+          pressed
+            ? "border-paper bg-paper text-brand-deep"
+            : "border-paper/45 bg-paper/10 text-paper group-hover:border-paper"
+        }`}
+      >
+        {shekelRuns(label)}
+      </span>
+    </button>
+  );
+}
+
+function tileSpan(item: PublicItem) {
+  if (item.kind === "fund") return "col-span-2 lg:col-span-5";
+  if (item.groupGiftEnabled && item.targetAgorot !== null) return "col-span-2 lg:col-span-1";
+  return "";
+}
+
+function FullyClaimedBanner() {
+  return (
+    <div className="mx-auto max-w-[1392px] px-4 pt-5 lg:px-12 lg:pt-8">
+      <div className="flex items-center gap-4 rounded-sheet bg-brand-soft px-5 py-5">
+        <span aria-hidden="true" className="pastel-field grid size-12 shrink-0 place-items-center rounded-full">
+          <Icon name="ic-heart" className="size-6 fill-current text-brand-deep" />
+        </span>
+        <p className="text-title font-medium text-graphite">{copy.grid.fullyClaimed}</p>
+      </div>
+    </div>
+  );
 }
 
 export function RegistryClient({
@@ -492,11 +553,11 @@ export function RegistryClient({
 
   if (items.length === 0) {
     return (
-      <div className="px-5 py-10">
-        <div className="rounded-card border border-border bg-surface p-6 text-center">
-          <p className="text-body text-ink">{copy.grid.empty(registry.coupleNames)}</p>
+      <section id="list" className="mx-auto max-w-[720px] px-4 pb-6 pt-8 lg:pt-10">
+        <div className="rounded-sheet bg-brand-soft p-5">
+          <p className="text-lead text-charcoal">{copy.grid.empty(registry.coupleNames)}</p>
         </div>
-      </div>
+      </section>
     );
   }
 
@@ -618,97 +679,95 @@ export function RegistryClient({
 
   return (
     <>
-      <div className="mt-6">
+      <section
+        id="list"
+        className={`pb-6 ${preview ? "scroll-mt-14 lg:scroll-mt-16" : ""}`}
+      >
         <div
-          className={`sticky z-20 flex flex-col gap-2 border-b border-border bg-bg/80 px-5 pb-3 pt-3 backdrop-blur-sm ${
-            preview ? "top-12" : "top-0"
+          className={`sticky z-30 bg-brand-deep text-paper ${
+            preview ? "top-14 lg:top-16" : "top-0"
           }`}
         >
-          <p className="text-small font-medium text-ink-muted">{registry.coupleNames}</p>
-          {/* Carousels and chip rows start at the rightmost item (PRD section 8),
-              which is what the inline start gives us in RTL. */}
-          <div className="hide-scroll -mx-5 flex gap-2 overflow-x-auto px-5">
-            {FILTERS.map((option) => {
-              const active = filter === option.id;
-              return (
-                <button
+          <div className="mx-auto flex max-w-[1392px] items-center gap-3 px-4 py-2.5 lg:px-12 lg:py-3">
+            <span className="shrink-0 text-fine font-semibold lg:text-copy">{registry.coupleNames}</span>
+            <span aria-hidden="true" className="h-6 w-px shrink-0 bg-paper/35" />
+            <div className="no-scrollbar -me-4 flex min-w-0 flex-1 gap-2 overflow-x-auto pe-4 lg:me-0 lg:pe-0">
+              {FILTERS.map((option) => (
+                <FilterChip
                   key={option.id}
-                  type="button"
+                  label={option.label}
+                  pressed={filter === option.id}
                   onClick={() => setFilter(option.id)}
-                  aria-pressed={active}
-                  className={`shrink-0 whitespace-nowrap rounded-full px-3.5 py-1.5 text-small font-medium transition-colors ${
-                    active
-                      ? "border border-accent bg-accent text-on-accent"
-                      : "border border-border bg-surface text-ink"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              );
-            })}
+                />
+              ))}
+            </div>
           </div>
         </div>
 
-        {allProductsClaimed && (
-          <div className="mx-4 mt-4 rounded-card bg-accent-tint p-4 text-center">
-            <p className="text-small font-medium text-accent-ink">
-              {copy.grid.fullyClaimed}
-            </p>
-          </div>
-        )}
+        {allProductsClaimed ? <FullyClaimedBanner /> : null}
 
         {singleItem ? (
-          <div className="p-4">
-            <p className="pb-3 text-small text-ink-muted">{copy.grid.singleItem}</p>
-            <div className="grid grid-cols-2 gap-3">
-              {singleItem.kind === "product" ? (
-                <ProductCard
-                  item={singleItem}
-                  heldByYou={Boolean(holds[singleItem.id])}
-                  onClick={() => openItem(singleItem)}
-                  featured
-                />
-              ) : (
-                <MoneyCard
-                  item={singleItem}
-                  hasBit={registry.hasBit}
-                  hasPaybox={registry.hasPaybox}
-                  onClick={() => openItem(singleItem)}
-                />
-              )}
-            </div>
+          <div
+            className={`mx-auto max-w-[880px] px-4 lg:px-12 ${
+              allProductsClaimed ? "pt-4 lg:pt-6" : "pt-5 lg:pt-8"
+            }`}
+          >
+            <p className="rounded-sheet bg-brand-soft px-5 py-4 text-lead text-charcoal">
+              {copy.grid.singleItem}
+            </p>
+            <ul role="list" className="mt-4">
+              <li>
+                {singleItem.kind === "product" ? (
+                  <ProductCard
+                    item={singleItem}
+                    heldByYou={Boolean(holds[singleItem.id])}
+                    onClick={() => openItem(singleItem)}
+                    featured
+                  />
+                ) : (
+                  <MoneyCard
+                    item={singleItem}
+                    hasBit={registry.hasBit}
+                    hasPaybox={registry.hasPaybox}
+                    onClick={() => openItem(singleItem)}
+                  />
+                )}
+              </li>
+            </ul>
           </div>
         ) : shown.length === 0 ? (
-          <div className="px-5 py-10 text-center">
-            <p className="text-small text-ink-muted">{copy.grid.noneInFilter}</p>
+          <div className="mx-auto max-w-[720px] px-4 py-10 text-center">
+            <p className="text-lead text-charcoal">{copy.grid.noneInFilter}</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-3 p-4">
-            {shown.map((item) =>
-              item.kind === "product" ? (
-                <ProductCard
-                  key={item.id}
-                  item={item}
-                  heldByYou={Boolean(holds[item.id])}
-                  onClick={() => openItem(item)}
-                />
-              ) : (
-                <MoneyCard
-                  key={item.id}
-                  item={item}
-                  hasBit={registry.hasBit}
-                  hasPaybox={registry.hasPaybox}
-                  onClick={() => openItem(item)}
-                />
-              ),
-            )}
-          </div>
+          <ul
+            role="list"
+            className={`mx-auto grid max-w-[1392px] grid-cols-2 gap-3 lg:grid-cols-5 lg:gap-5 ${
+              allProductsClaimed ? "px-4 pt-4 lg:px-12 lg:pt-6" : "px-4 pt-5 lg:px-12 lg:pt-8"
+            }`}
+          >
+            {shown.map((item) => (
+              <li key={item.id} className={tileSpan(item)}>
+                {item.kind === "product" ? (
+                  <ProductCard
+                    item={item}
+                    heldByYou={Boolean(holds[item.id])}
+                    onClick={() => openItem(item)}
+                  />
+                ) : (
+                  <MoneyCard
+                    item={item}
+                    hasBit={registry.hasBit}
+                    hasPaybox={registry.hasPaybox}
+                    onClick={() => openItem(item)}
+                    prominent={allProductsClaimed}
+                  />
+                )}
+              </li>
+            ))}
+          </ul>
         )}
-      </div>
-
-      <footer className="pb-10 pt-2 text-center">
-        <span className="text-tiny text-muted">{copy.common.footer}</span>
-      </footer>
+      </section>
 
       {toast && <Toast message={toast} onDismiss={() => setToast(null)} />}
 
