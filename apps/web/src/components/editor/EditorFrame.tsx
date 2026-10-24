@@ -1,29 +1,63 @@
 import Link from "next/link";
 import { copy } from "@/lib/copy";
 
+const backClassName =
+  "press -ms-1.5 grid size-11 shrink-0 place-items-center rounded-full bg-paper/15 text-paper outline-none hover:bg-paper/25 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-paper motion-safe:transition-colors lg:mt-1.5 lg:size-12";
+
+function BackChevron() {
+  return (
+    <svg
+      className="size-6"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2.2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9.5 6l6 6-6 6" />
+    </svg>
+  );
+}
+
 export function EditorFrame({
   title,
   back,
+  onBack,
+  backDisabled = false,
   lead,
   illustration,
+  eyebrow,
+  wide = false,
   children,
 }: {
   title: string;
   /** A route, not a history pop: these screens are linkable. */
   back?: string;
+  onBack?: () => void;
+  backDisabled?: boolean;
   lead?: React.ReactNode;
   illustration?: React.ReactNode;
+  eyebrow?: React.ReactNode;
+  wide?: boolean;
   children: React.ReactNode;
 }) {
   const compact = illustration != null;
+  const openBanner = !compact && eyebrow != null;
 
   const titleBlock = (
     <>
+      {eyebrow}
       <h1
         className={
           compact
-            ? "max-w-[13rem] text-[28px] font-medium leading-tight lg:max-w-[34rem] lg:text-hero-wide lg:font-normal"
-            : "text-[30px] font-medium leading-tight lg:text-[46px] lg:font-normal"
+            ? eyebrow
+              ? "mt-1 text-[30px] font-medium leading-tight lg:text-hero-wide lg:font-normal"
+              : "max-w-[13rem] text-[28px] font-medium leading-tight lg:max-w-[34rem] lg:text-hero-wide lg:font-normal"
+            : eyebrow
+              ? "mt-1 text-[30px] font-medium leading-tight lg:text-[46px] lg:font-normal"
+              : "text-[30px] font-medium leading-tight lg:text-[46px] lg:font-normal"
         }
       >
         {title}
@@ -41,6 +75,22 @@ export function EditorFrame({
       ) : null}
     </>
   );
+
+  const backControl = onBack ? (
+    <button
+      type="button"
+      onClick={onBack}
+      disabled={backDisabled}
+      aria-label={copy.common.back}
+      className={`${backClassName} disabled:opacity-60`}
+    >
+      <BackChevron />
+    </button>
+  ) : back ? (
+    <Link href={back} aria-label={copy.common.back} className={backClassName}>
+      <BackChevron />
+    </Link>
+  ) : null;
 
   return (
     <div className="min-h-dvh bg-page-sand font-rubik text-charcoal antialiased">
@@ -103,7 +153,7 @@ export function EditorFrame({
         </div>
       </header>
 
-      <main className="relative overflow-hidden pb-24">
+      <main className={wide ? "pb-16" : "relative overflow-hidden pb-24"}>
         <section className="band-field relative overflow-hidden text-paper">
           <div aria-hidden="true" className="pointer-events-none absolute inset-0 fill-paper">
             <svg className="absolute -top-8 -end-8 w-36 opacity-20 lg:-top-14 lg:end-[30%] lg:w-72">
@@ -119,36 +169,34 @@ export function EditorFrame({
               <use href="#sh-circle" />
             </svg>
           </div>
-          <div className="relative mx-auto flex max-w-[1240px] items-end gap-4 px-5 pb-24 pt-7 lg:gap-10 lg:px-8 lg:pb-32 lg:pt-12">
-            <div className="min-w-0 flex-1 pb-2">
-              {back ? (
-                <div className="flex items-start gap-3 lg:gap-4">
-                  <Link
-                    href={back}
-                    aria-label={copy.common.back}
-                    className="press -ms-1.5 grid size-11 shrink-0 place-items-center rounded-full bg-paper/15 text-paper outline-none hover:bg-paper/25 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-paper motion-safe:transition-colors lg:mt-1.5 lg:size-12"
-                  >
-                    <svg
-                      className="size-6"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      aria-hidden="true"
-                    >
-                      <path d="M9.5 6l6 6-6 6" />
-                    </svg>
-                  </Link>
-                  <div className="min-w-0 pt-0.5">{titleBlock}</div>
-                </div>
-              ) : (
-                titleBlock
-              )}
+          {openBanner ? (
+            <div className="relative mx-auto max-w-[1240px] px-5 pb-24 pt-5 lg:px-8 lg:pb-32 lg:pt-9">
+              <div className="flex items-start gap-3 lg:gap-4">
+                {backControl}
+                <div className="min-w-0 max-w-[15rem] pt-0.5 lg:max-w-[40rem]">{titleBlock}</div>
+              </div>
             </div>
-            {illustration}
-          </div>
+          ) : (
+            <div
+              className={
+                compact && eyebrow
+                  ? "relative mx-auto flex max-w-[1240px] items-end gap-4 px-5 pb-24 pt-6 lg:gap-10 lg:px-8 lg:pb-32 lg:pt-12"
+                  : "relative mx-auto flex max-w-[1240px] items-end gap-4 px-5 pb-24 pt-7 lg:gap-10 lg:px-8 lg:pb-32 lg:pt-12"
+              }
+            >
+              <div className="min-w-0 flex-1 pb-2">
+                {backControl ? (
+                  <div className="flex items-start gap-3 lg:gap-4">
+                    {backControl}
+                    <div className="min-w-0 pt-0.5">{titleBlock}</div>
+                  </div>
+                ) : (
+                  titleBlock
+                )}
+              </div>
+              {illustration}
+            </div>
+          )}
           <svg
             aria-hidden="true"
             className="wave-flip absolute start-0 end-0 bottom-0 h-[30px] w-full fill-page-sand lg:h-[72px]"
@@ -158,23 +206,25 @@ export function EditorFrame({
         </section>
 
         <div className="relative z-10 mx-auto -mt-16 max-w-[1240px] px-4 lg:-mt-28 lg:px-8">
-          <div className="arrive w-full lg:max-w-[560px]">{children}</div>
+          <div className={wide ? "arrive w-full" : "arrive w-full lg:max-w-[560px]"}>{children}</div>
         </div>
 
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute start-0 end-0 bottom-0 mx-auto h-40 max-w-[1240px] fill-paper opacity-70 lg:h-56"
-        >
-          <svg className="absolute -bottom-10 start-[4%] w-40 lg:w-64">
-            <use href="#sh-door" />
-          </svg>
-          <svg className="absolute -bottom-6 end-[8%] w-48 lg:w-80">
-            <use href="#sh-arch" />
-          </svg>
-          <svg className="absolute bottom-8 start-[46%] w-10 lg:w-16">
-            <use href="#sh-triangle" />
-          </svg>
-        </div>
+        {wide ? null : (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute start-0 end-0 bottom-0 mx-auto h-40 max-w-[1240px] fill-paper opacity-70 lg:h-56"
+          >
+            <svg className="absolute -bottom-10 start-[4%] w-40 lg:w-64">
+              <use href="#sh-door" />
+            </svg>
+            <svg className="absolute -bottom-6 end-[8%] w-48 lg:w-80">
+              <use href="#sh-arch" />
+            </svg>
+            <svg className="absolute bottom-8 start-[46%] w-10 lg:w-16">
+              <use href="#sh-triangle" />
+            </svg>
+          </div>
+        )}
       </main>
     </div>
   );

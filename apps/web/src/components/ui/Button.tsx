@@ -3,23 +3,31 @@ export function Button({
   type = "submit",
   disabled = false,
   pending = false,
+  onClick,
+  fit = false,
 }: {
   children: React.ReactNode;
   type?: "button" | "submit";
   disabled?: boolean;
   pending?: boolean;
+  onClick?: () => void;
+  fit?: boolean;
 }) {
+  const fitClass = fit ? " lg:w-auto lg:min-w-[260px] lg:px-10" : "";
+
   return (
     <button
       type={type}
+      onClick={onClick}
       disabled={disabled || pending}
       aria-busy={pending ? true : undefined}
       className={
-        pending
+        (pending
           ? "flex h-14 w-full items-center justify-center gap-2 rounded-pill bg-brand-deep text-copy font-medium text-paper shadow-lift-sm"
           : disabled
             ? "flex h-14 w-full items-center justify-center rounded-pill bg-brand-deep text-copy font-medium text-paper opacity-30"
-            : "press focus-ring flex h-14 w-full items-center justify-center rounded-pill bg-brand-deep text-copy font-medium text-paper shadow-lift-sm hover:bg-brand-hover active:bg-brand-press motion-safe:transition-colors"
+            : "press focus-ring flex h-14 w-full items-center justify-center rounded-pill bg-brand-deep text-copy font-medium text-paper shadow-lift-sm hover:bg-brand-hover active:bg-brand-press motion-safe:transition-colors") +
+        fitClass
       }
     >
       {pending && (

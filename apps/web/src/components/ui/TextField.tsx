@@ -9,20 +9,29 @@ export function TextField({
   autoComplete,
   dir,
   error,
+  hint,
+  autoFocus,
+  inputMode,
   onChange,
 }: {
   label: string;
-  type?: "text" | "email" | "tel";
+  type?: "text" | "email" | "tel" | "date";
   name?: string;
   value: string;
   placeholder?: string;
   autoComplete?: string;
   dir?: "ltr" | "rtl";
   error?: string | null;
+  hint?: React.ReactNode;
+  autoFocus?: boolean;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
   onChange: (value: string) => void;
 }) {
   const errorId = useId();
+  const hintId = useId();
   const ltr = dir === "ltr";
+  const describedBy =
+    [hint ? hintId : null, error ? errorId : null].filter(Boolean).join(" ") || undefined;
 
   return (
     <>
@@ -33,10 +42,12 @@ export function TextField({
           name={name}
           dir={dir}
           autoComplete={autoComplete}
+          autoFocus={autoFocus}
+          inputMode={inputMode}
           placeholder={placeholder}
           value={value}
           aria-invalid={error ? true : undefined}
-          aria-describedby={error ? errorId : undefined}
+          aria-describedby={describedBy}
           onChange={(event) => onChange(event.target.value)}
           className={
             error
@@ -45,6 +56,11 @@ export function TextField({
           }
         />
       </label>
+      {hint ? (
+        <p id={hintId} className="mt-2 flex items-center gap-2 text-fine text-slate">
+          {hint}
+        </p>
+      ) : null}
       {error ? (
         <p
           id={errorId}
