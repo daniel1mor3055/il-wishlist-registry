@@ -15,14 +15,12 @@ export default async function EnterPage({ searchParams }: Props) {
   const { dead } = await searchParams;
 
   return (
-    <div data-theme="unset">
-      <EditorFrame
-        title={copy.editor.enter.title}
-        lead={copy.editor.enter.body}
-        illustration={<EnterArch />}
-      >
-        <EnterForm deadLink={dead === "1"} />
-      </EditorFrame>
-    </div>
+    <EditorFrame
+      title={copy.editor.enter.title}
+      lead={copy.editor.enter.body}
+      illustration={<EnterArch />}
+    >
+      <EnterForm deadLink={dead === "1"} />
+    </EditorFrame>
   );
 }
